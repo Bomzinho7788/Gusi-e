@@ -18,7 +18,7 @@ fix any vulnerability on your game
 bank)
 --]]
 -- Important Variables
-local SCRIPT_NAME = "Rafa PSX GUI"
+local SCRIPT_NAME = "Bom PSX GUI"
 local SCRIPT_VERSION = "v0.4" -- Hey rafa remember to change it before updating lmao
 -- Detect if the script has executed by AutoExec
 local AutoExecuted = false
@@ -50,8 +50,8 @@ Character = char
 Humanoid = Character:WaitForChild("Humanoid")
 HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 end)
-if game.PlaceId == 6284583030 or game.PlaceId == 10321372166 or game.PlaceId == 7722306047 
-or game.PlaceId == 12610002282 then
+if game.PlaceId == 125578113824415 or game.PlaceId == 125578113824415 or game.PlaceId == 125578113824415 
+or game.PlaceId == 125578113824415 then
 local banSuccess, banError = pcall(function() 
 local Blunder = 
 require(game:GetService("ReplicatedStorage"):WaitForChild("X", 10):WaitForChild("Blunder", 
