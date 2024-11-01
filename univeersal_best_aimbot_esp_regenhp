@@ -1,0 +1,398 @@
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim", HidePremium = false, SaveConfig = true, IntroText = "Bom_Hub_Aim"})
+
+local tab1 = window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998"})
+local tab2 = window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998"})
+local tab3 = window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998"})
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+local aimPart = "Head"
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = 1
+fovCircle.Filled = false
+fovCircle.Color = Color3.new(1, 0, 0)
+fovCircle.Transparency = 0.5
+fovCircle.Visible = false
+local fovRadius = 50
+local fovEnabled = false
+local aimbotEnabled = false
+local wallcheckEnabled = false
+local espEnabled = false 
+
+local function updateFovCircle()
+    if fovEnabled then
+        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        fovCircle.Position = mousePos
+        fovCircle.Radius = fovRadius
+        fovCircle.Visible = true
+    else
+        fovCircle.Visible = false
+    end
+end
+
+RunService.RenderStepped:Connect(updateFovCircle)
+
+local function getClosestPlayerInFOV()
+    local closestPlayer = nil
+    local shortestDistance = fovRadius
+
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
+            local head = targetPlayer.Character[aimPart]
+            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
+
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = head
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function silentAimAtClosestPlayer()
+    if aimbotEnabled then
+        local targetHead = getClosestPlayerInFOV()
+
+        if targetHead then
+            if not wallcheckEnabled or isPlayerVisible(targetHead) then
+                local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
+                camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+            end
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
+
+local function regenerateHP()
+    while wait(0) do
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.Health = LocalPlayer.Character.Humanoid.MaxHealth
+        end
+    end
+end
+
+local function drawESP(targetPlayer)
+    local espBox = Drawing.new("Square")
+    espBox.Thickness = 2
+    espBox.Color = Color3.fromRGB(255, 0, 0)
+    espBox.Filled = false
+    espBox.Transparency = 1
+    espBox.Visible = false
+
+    
+RunService.RenderStepped:Connect(function()
+        if espEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = targetPlayer.Character.HumanoidRootPart
+            local head = targetPlayer.Character:FindFirstChild("Head")
+
+            if humanoidRootPart and head then
+                local rootPos, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
+                local headPos, _ = camera:WorldToViewportPoint(head.Position)
+                local distance = (headPos - rootPos).magnitude
+
+                if onScreen then
+                    espBox.Size = Vector2.new(distance * 2, distance * 3)
+                    espBox.Position = Vector2.new(rootPos.X - espBox.Size.X / 2, rootPos.Y - espBox.Size.Y / 2)
+                    espBox.Visible = true
+                else
+                    espBox.Visible = false
+                end
+            else
+                espBox.Visible = false
+            end
+        else
+            espBox.Visible = false
+        end
+    end)
+end
+
+local function addESPToPlayer(player)
+    if player.Character then
+        drawESP(player)
+    end
+    player.CharacterAdded:Connect(function()
+        drawESP(player)
+    end)
+end
+
+for _, targetPlayer in pairs(Players:GetPlayers()) do
+    if targetPlayer ~= LocalPlayer then
+        addESPToPlayer(targetPlayer)
+    end
+end
+
+Players.PlayerAdded:Connect(addESPToPlayer)
+
+tab1:AddToggle({
+    Name = "Ativar FOV",
+    Default = fovEnabled,
+    Callback = function(state)
+        fovEnabled = state
+    end
+})
+
+tab1:AddToggle({
+    Name = "Ativar Aimbot",
+    Default = aimbotEnabled,
+    Callback = function(state)
+        aimbotEnabled = state
+    end
+})
+
+tab1:AddTextbox({
+    Name = "Tamanho do FOV (0-100)",
+    Default = tostring(fovRadius),
+    TextDisappear = false,
+    Callback = function(input)
+        local value = tonumber(input)
+        if value and value >= 0 and value <= 100 then
+            fovRadius = value
+        else
+            print("Por favor, insira um valor entre 0 e 100.")
+        end
+    end
+})
+
+tab3:AddToggle({
+    Name = "Regenerar HP",
+    Default = false,
+    Callback = function(state)
+        if state then
+            spawn(regenerateHP)
+        end
+    end
+})
+
+tab2:AddToggle({
+    Name = "Ativar ESP Box",
+    Default = espEnabled,
+    Callback = function(state)
+        espEnabled = state
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                addESPToPlayer(player)
+            end
+        end
+    end
+})
+
+tab3:AddButton({
+    Name = "Fechar Hub",
+    Callback = function()
+        OrionLib:Destroy()
+    end
+})
+
+tab3:AddButton({
+    Name = "Salvar Configurações",
+    Callback = function()
+        OrionLib:Save()
+        print("Configurações salvas!")
+    end
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local espLineEnabled = false
+local lines = {}
+
+local function createESPLine(player)
+    local Line = Drawing.new("Line")
+    Line.Color = Color3.new(1, 0, 0)
+    Line.Thickness = 1
+    Line.Transparency = 1
+    Line.Visible = false
+
+    lines[player] = Line
+
+    RunService.RenderStepped:Connect(function()
+        if espLineEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = player.Character.HumanoidRootPart
+            local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
+            if onScreen then
+                Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)
+                Line.To = Vector2.new(screenPos.X, screenPos.Y)
+                Line.Visible = true
+            else
+                Line.Visible = false
+            end
+        else
+            Line.Visible = false
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            wait(0.5)
+            createESPLine(player)
+        end)
+    end
+end)
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer and player.Character then
+        createESPLine(player)
+        player.CharacterAdded:Connect(function()
+            wait(0.5)
+            createESPLine(player)
+        end)
+    end
+end
+
+tab2:AddToggle({
+    Name = "Esp Line",
+    Default = espLineEnabled,
+    Callback = function(state)
+        espLineEnabled = state
+        for _, line in pairs(lines) do
+            line.Visible = state
+        end
+    end,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local chamsEnabled = false
+local chamsLoop
+
+local function applyChams(player)
+    if player ~= LocalPlayer and player.Character and not player.Character:FindFirstChild("Chams") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "Chams"
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineTransparency = 1
+        highlight.Parent = player.Character
+    end
+end
+
+local function toggleChams(state)
+    if state then
+                chamsLoop = coroutine.wrap(function()
+            while chamsEnabled do
+                for _, player in pairs(Players:GetPlayers()) do
+                    applyChams(player)
+                end
+                wait(0.25)
+            end
+        end)
+        chamsLoop()
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("Chams") then
+                player.Character.Chams:Destroy()
+            end
+        end
+    end
+end
+
+tab2:AddToggle({
+    Name = "Chams",
+    Default = chamsEnabled,
+    Callback = function(state)
+        chamsEnabled = state
+        toggleChams(state)
+    end
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local skeletonEnabled = false
+
+local function createSkeleton(character)
+    local parts = {
+        Head = character:FindFirstChild("Head"),
+        Torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso"),
+        LeftArm = character:FindFirstChild("Left Arm") or character:FindFirstChild("LeftUpperArm"),
+        RightArm = character:FindFirstChild("Right Arm") or character:FindFirstChild("RightUpperArm"),
+        LeftLeg = character:FindFirstChild("Left Leg") or character:FindFirstChild("LeftUpperLeg"),
+        RightLeg = character:FindFirstChild("Right Leg") or character:FindFirstChild("RightUpperLeg")
+    }
+
+    local lines = {}
+    for i = 1, 7 do
+        local line = Drawing.new("Line")
+        line.Color = Color3.new(1, 0, 0)
+        line.Thickness = 1
+        line.Transparency = 1
+        lines[i] = line
+    end
+
+    local function updateSkeleton()
+        if skeletonEnabled and character.Parent and parts.Head and parts.Torso and parts.LeftArm and parts.RightArm and parts.LeftLeg and parts.RightLeg then
+            local headPos, headVis = Camera:WorldToViewportPoint(parts.Head.Position)
+            local torsoPos, torsoVis = Camera:WorldToViewportPoint(parts.Torso.Position)
+            local leftArmPos, leftArmVis = Camera:WorldToViewportPoint(parts.LeftArm.Position)
+            local rightArmPos, rightArmVis = Camera:WorldToViewportPoint(parts.RightArm.Position)
+            local leftLegPos, leftLegVis = Camera:WorldToViewportPoint(parts.LeftLeg.Position)
+            local rightLegPos, rightLegVis = Camera:WorldToViewportPoint(parts.RightLeg.Position)
+
+            if headVis and torsoVis and leftArmVis and rightArmVis and leftLegVis and rightLegVis then
+                lines[1].From, lines[1].To = Vector2.new(headPos.X, headPos.Y), Vector2.new(torsoPos.X, torsoPos.Y)
+                lines[2].From, lines[2].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(leftArmPos.X, leftArmPos.Y)
+                lines[3].From, lines[3].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(rightArmPos.X, rightArmPos.Y)
+                lines[4].From, lines[4].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(leftLegPos.X, leftLegPos.Y)
+                lines[5].From, lines[5].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(rightLegPos.X, rightLegPos.Y)
+                lines[6].From, lines[6].To = Vector2.new(leftArmPos.X, leftArmPos.Y), Vector2.new(leftLegPos.X, leftLegPos.Y)
+                lines[7].From, lines[7].To = Vector2.new(rightArmPos.X, rightArmPos.Y), Vector2.new(rightLegPos.X, rightLegPos.Y)
+                for _, line in pairs(lines) do line.Visible = true end
+            else
+                for _, line in pairs(lines) do line.Visible = false end
+            end
+        else
+            for _, line in pairs(lines) do line.Visible = false end
+        end
+    end
+
+    RunService.RenderStepped:Connect(updateSkeleton)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function(character)
+            wait(0.5)
+            createSkeleton(character)
+        end)
+    end
+end)
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer and player.Character then
+        createSkeleton(player.Character)
+        player.CharacterAdded:Connect(function(character)
+            wait(0.5)
+            createSkeleton(character)
+        end)
+    end
+end
+
+tab2:AddToggle({
+    Name = "Ativar Skeleton ESP",
+    Default = false,
+    Callback = function(value)
+        skeletonEnabled = value
+    end,
+})
+
+Tab3:AddLabel("Por Bomzinho")
+
+OrionLib:Init()
