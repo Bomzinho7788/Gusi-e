@@ -38,18 +38,6 @@ end
 
 RunService.RenderStepped:Connect(updateFovCircle)
 
--- Função para verificar visibilidade do alvo
-local function isPlayerVisible(targetHead)
-    local rayOrigin = camera.CFrame.Position
-    local rayDirection = (targetHead.Position - rayOrigin).unit * (targetHead.Position - rayOrigin).magnitude
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
-
-    local hit = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
-    return hit == nil
-end
-
 -- Função para encontrar o jogador mais próximo no FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
@@ -167,14 +155,6 @@ tab1:AddToggle({
     Default = aimbotEnabled,
     Callback = function(state)
         aimbotEnabled = state
-    end
-})
-
-tab1:AddToggle({
-    Name = "Ativar Wallcheck",
-    Default = wallcheckEnabled,
-    Callback = function(state)
-        wallcheckEnabled = state
     end
 })
 
