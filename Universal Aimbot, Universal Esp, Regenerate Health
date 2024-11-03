@@ -407,60 +407,15 @@ end
 
 -- Adicionando o Toggle na aba 2 existente
 tab2:AddToggle({
-    Name = "Ativar Skeleton ESP",
+    Name = "Skeleton ESP",
     Default = false,
     Callback = function(value)
         skeletonEnabled = value -- Atualiza a variável quando o toggle é ativado/desativado
     end,
 })
 
-tab3:AddLabel("Por Bomzinho")
+tab3:AddLabel("BybBomzinho")
 
-
--- Função para abrir o color picker
-local function openColorPicker()
-    local colorPicker = Instance.new("Frame")
-    colorPicker.Size = UDim2.new(0, 300, 0, 300)
-    colorPicker.Position = UDim2.new(0.5, -150, 0.5, -150)
-    colorPicker.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    colorPicker.Parent = game.Players.LocalPlayer.PlayerGui
-
-    -- Adiciona a grade de cores
-    local colors = {
-        Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255),
-        Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 0, 255), Color3.fromRGB(0, 255, 255),
-        Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 0, 0)
-    }
-
-    local gridSize = 4
-    local buttonSize = 75
-
-    for i, color in ipairs(colors) do
-        local colorButton = Instance.new("TextButton")
-        colorButton.Size = UDim2.new(0, buttonSize, 0, buttonSize)
-        colorButton.Position = UDim2.new((i - 1) % gridSize / gridSize, 0, math.floor((i - 1) / gridSize) / (math.ceil(#colors / gridSize)))
-        colorButton.BackgroundColor3 = color
-        colorButton.Text = ""
-        colorButton.Parent = colorPicker
-
-        colorButton.MouseButton1Click:Connect(function()
-            espColor = color -- Atualiza a cor do ESP
-            colorPicker:Destroy() -- Fecha o color picker
-        end)
-    end
-
-    -- Botão para fechar o color picker
-    local closeButton = Instance.new("TextButton")
-    closeButton.Size = UDim2.new(0, 100, 0, 50)
-    closeButton.Position = UDim2.new(0.5, -50, 0.95, -25)
-    closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-    closeButton.Text = "Fechar"
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.Parent = colorPicker
-
-    closeButton.MouseButton1Click:Connect(function()
-        colorPicker:Destroy() -- Fecha o color picker
-    end)
 end
 
 -- Toggle para ativar/desativar o color picker
