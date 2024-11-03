@@ -414,7 +414,7 @@ tab2:AddToggle({
     end,
 })
 
-Tab3:AddLabel("Por Bomzinho")
+tab3:AddLabel("Por Bomzinho")
 
 -- Inicializa o hub
 OrionLib:Init()
