@@ -416,5 +416,9 @@ tab2:AddToggle({
 
 tab3:AddLabel("Por Bomzinho")
 
+local espColor = tab2:AddColorPicker("Esp Box Color", Color3.fromRGB(255, 0, 0), function(value)
+    espBox.Color = value -- Atualiza a cor do espBox com a cor escolhida
+end)
+
 -- Inicializa o hub
 OrionLib:Init()
