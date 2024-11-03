@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+.local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 local window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim", HidePremium = false, SaveConfig = true, IntroText = "Bom_Hub_Aim"})
 
 -- Tabelas do hub
@@ -416,21 +416,6 @@ tab2:AddToggle({
 
 tab3:AddLabel("BybBomzinho")
 
-end
-
--- Toggle para ativar/desativar o color picker
-tab2:AddToggle({
-    Name = "Ativar Color Picker",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            openColorPicker() -- Abre o color picker se ativado
-        else
-            -- Aqui você pode adicionar lógica para desativar ou fechar o color picker se necessário
-            -- Você pode precisar de uma referência ao color picker para fechá-lo
-        end
-    end
-})
 
 -- Inicializa o hub
 OrionLib:Init()
