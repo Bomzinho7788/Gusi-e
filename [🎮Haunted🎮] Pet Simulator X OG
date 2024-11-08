@@ -1,0 +1,447 @@
+-- Verifica se o jogo atual é o correto
+local allowedPlaceId = 88888090882427
+
+if game.PlaceId ~= allowedPlaceId then
+    warn("Este script só pode ser executado no jogo correto!")
+    return -- Encerra o script se não estiver no jogo especificado
+end
+
+
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Window = OrionLib:MakeWindow({Name = "[🎮Haunted🎮] Pet Simulator X OG", HidePremium = false, SaveConfig = true, ConfigFolder = "EggConfig"})
+
+local EggName = "Cracked Egg"
+local OpeningEggs = false
+local eggLoop
+
+--funções
+
+local function BuyTripleCoins()
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = "Triple Coins",
+                [2] = "10000"
+            },
+            [2] = {
+                [1] = false,
+                [2] = false
+            }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("boost working in the working twiks"):InvokeServer(unpack(args))
+end
+
+
+
+local function BuyTripleDamage()
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = "Triple Damage",
+                [2] = "15000"
+            },
+            [2] = {
+                [1] = false,
+                [2] = false
+            }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("boost working in the working twiks"):InvokeServer(unpack(args))
+end
+
+
+
+local function BuySuperLucky()
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = "Super Lucky",
+                [2] = "20000"
+            },
+            [2] = {
+                [1] = false,
+                [2] = false
+            }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("boost working in the working twiks"):InvokeServer(unpack(args))
+end
+
+
+
+
+local function BuyUltraLucky()
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = "Ultra Lucky",
+                [2] = "25000"
+            },
+            [2] = {
+                [1] = false,
+                [2] = false
+            }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("boost working in the working twiks"):InvokeServer(unpack(args))
+end
+
+
+-- Variáveis para controle dos loops
+local TripleCoinsLoop = false
+local TripleDamageLoop = false
+local SuperLuckyLoop = false
+local UltraLuckyLoop = false
+
+
+
+
+
+
+-- Tabela com todos os nomes dos ovos
+local eggList = {
+    "Cracked Egg", "Spotted Egg", "Golden Cracked Egg", "Golden Spotted Egg",
+    "Wood Egg", "Grass Egg", "Golden Wood Egg", "Golden Grass Egg",
+    "Beachball Egg", "Coconut Egg", "Golden Beachball Egg", "Golden Coconut Egg",
+    "Rock Egg", "Geode Egg", "Golden Rock Egg", "Golden Geode Egg",
+    "Snow Egg", "Ice Egg", "Golden Snow Egg", "Golden Ice Egg",
+    "Icicle Egg", "Yeti Egg", "Golden Icicle Egg", "Golden Yeti Egg",
+    "Cactus Egg", "Spiked Egg", "Golden Cactus Egg", "Golden Spiked Egg",
+    "Obsidian Egg", "Magma Egg", "Golden Obsidian Egg", "Golden Magma Egg",
+    "Dominus Egg", "Enchanted Egg", "Golden Enchanted Egg", "Relic Egg",
+    "Golden Relic Egg", "Samurai Egg", "Golden Samurai Egg", "Candy Egg",
+    "Golden Candy Egg", "Haunted Egg", "Golden Haunted Egg", "Hell Egg",
+    "Golden Hell Egg", "Heaven Egg", "Golden Heaven Egg", "Empyrean Egg",
+    "Golden empyrean Egg"
+}
+
+-- Função para abrir o ovo selecionado
+local function openEgg()
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = EggName,
+                [2] = true,
+                [3] = false
+            },
+            [2] = {
+                [1] = false,
+                [2] = false,
+                [3] = false
+            }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("buyx egg"):InvokeServer(unpack(args))
+end
+
+-- Toggle para abrir ovos
+local eggToggle = Window:MakeTab({Name = "Eggs", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+eggToggle:AddToggle({
+    Name = "Open Eggs",
+    Default = false,
+    Callback = function(value)
+        OpeningEggs = value
+        if OpeningEggs then
+            -- Inicia o loop de abertura de ovos
+            eggLoop = task.spawn(function()
+                while OpeningEggs do
+                    openEgg()
+                    task.wait(0.1) -- Intervalo entre cada abertura
+                end
+            end)
+        else
+            -- Para o loop de abertura de ovos
+            if eggLoop then
+                task.cancel(eggLoop)
+            end
+        end
+    end
+})
+
+-- Dropdown para selecionar o nome do ovo
+eggToggle:AddDropdown({
+    Name = "EggName",
+    Default = "Cracked Egg",
+    Options = eggList,
+    Callback = function(selected)
+        EggName = selected
+    end
+})
+
+local MiscTab = Window:MakeTab({
+    Name = "Misc",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+
+
+MiscTab:AddLabel("Auto Buy Potions")
+
+
+MiscTab:AddToggle({
+    Name = "Auto Buy Triple Coins",
+    Default = false,
+    Callback = function(Value)
+        TripleCoinsLoop = Value
+        while TripleCoinsLoop do
+            BuyTripleCoins()
+            wait(120) -- Espera de 2 minutos
+        end
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Buy Triple Damage",
+    Default = false,
+    Callback = function(Value)
+        TripleDamageLoop = Value
+        while TripleDamageLoop do
+            BuyTripleDamage()
+            wait(120) -- Espera de 2 minutos
+        end
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Buy Super Lucky",
+    Default = false,
+    Callback = function(Value)
+        SuperLuckyLoop = Value
+        while SuperLuckyLoop do
+            BuySuperLucky()
+            wait(120) -- Espera de 2 minutos
+        end
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Buy Ultra Lucky",
+    Default = false,
+    Callback = function(Value)
+        UltraLuckyLoop = Value
+        while UltraLuckyLoop do
+            BuyUltraLucky()
+            wait(120) -- Espera de 2 minutos
+        end
+    end
+})
+
+MiscTab:AddLabel("Auto Use Potions")
+
+-- Função para ativar os boosts
+local function activateBoost(boostName)
+    local args = {
+        [1] = {
+            [1] = { [1] = boostName },
+            [2] = { [1] = false }
+        }
+    }
+    game:GetService("TextChatService").__REMOTES:FindFirstChild("activate boost"):FireServer(unpack(args))
+end
+
+-- Variáveis para os loops automáticos
+local autoTripleCoins = false
+local autoTripleDamage = false
+local autoSuperLucky = false
+local autoUltraLucky = false
+
+-- Funções de loop para os toggles
+spawn(function()
+    while task.wait(5) do
+        if autoTripleCoins then
+            activateBoost("Triple Coins")
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait(5) do
+        if autoTripleDamage then
+            activateBoost("Triple Damage")
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait(5) do
+        if autoSuperLucky then
+            activateBoost("Super Lucky")
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait(5) do
+        if autoUltraLucky then
+            activateBoost("Ultra Lucky")
+        end
+    end
+end)
+
+-- Toggles para ativar/desativar os boosts
+MiscTab:AddToggle({
+    Name = "Auto Triple Coins",
+    Default = false,
+    Callback = function(value)
+        autoTripleCoins = value
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Triple Damage",
+    Default = false,
+    Callback = function(value)
+        autoTripleDamage = value
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Super Lucky",
+    Default = false,
+    Callback = function(value)
+        autoSuperLucky = value
+    end
+})
+
+MiscTab:AddToggle({
+    Name = "Auto Ultra Lucky",
+    Default = false,
+    Callback = function(value)
+        autoUltraLucky = value
+    end
+})
+
+
+
+MiscTab:AddLabel("Gui's")
+
+-- Função para abrir GUIs
+local function openGui(guiName)
+    local playerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+    if playerGui and playerGui:FindFirstChild(guiName) then
+        playerGui[guiName].Enabled = not playerGui[guiName].Enabled
+    end
+end
+
+-- Botões para abrir os GUIs
+MiscTab:AddButton({
+    Name = "Dark Matter Machine",
+    Callback = function()
+        openGui("DarkMatter")
+    end
+})
+
+MiscTab:AddButton({
+    Name = "Fuse Machine",
+    Callback = function()
+        openGui("FusePets")
+    end
+})
+
+MiscTab:AddButton({
+    Name = "Golden Machine",
+    Callback = function()
+        openGui("Golden")
+    end
+})
+
+MiscTab:AddButton({
+    Name = "Rainbow Machine",
+    Callback = function()
+        openGui("Rainbow")
+    end
+})
+
+MiscTab:AddButton({
+    Name = "Spooky Upgrades",
+    Callback = function()
+        openGui("SpookyUpgrades")
+    end
+})
+
+local CreatorTab = Window:MakeTab({
+    Name = "Others",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+CreatorTab:AddLabel("By Bomzinho")
+
+-- Supondo que você já tenha a aba CreatorTab criada
+local CreatorTab = Window:CreateTab("Creator")
+
+-- Função para obter a versão do mapa/jogo
+local gameVersion = "Roblox Game Version: " .. tostring(game.PlaceVersion)
+
+-- Adiciona uma Label com a versão no hub
+CreatorTab:AddLabel(gameVersion)
+
+-- Supondo que você já tenha a aba CreatorTab criada
+local CreatorTab = Window:CreateTab("Creator")
+
+-- Função para obter a quantidade de jogadores no servidor
+local totalPlayers = "Total de Jogadores: " .. tostring(#game.Players:GetPlayers())
+
+-- Adiciona uma Label para mostrar o número de jogadores
+CreatorTab:AddLabel(totalPlayers)
+
+-- Função para obter a lista de nomes dos jogadores
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in pairs(game.Players:GetPlayers()) do
+        table.insert(playerNames, player.Name)
+    end
+    return playerNames
+end
+
+-- Cria o Dropdown com a lista de jogadores
+CreatorTab:AddDropdown("Lista de Jogadores", getPlayerNames(), function(selectedPlayer)
+    print("Jogador selecionado:", selectedPlayer)
+end)
+
+-- Supondo que você já tenha a aba CreatorTab criada
+local CreatorTab = Window:CreateTab("Creator")
+
+-- Função para obter a quantidade de amigos no servidor atual
+local function getFriendsInServer()
+    local player = game.Players.LocalPlayer
+    local friendsInServer = 0
+
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if player:IsFriendsWith(otherPlayer.UserId) then
+            friendsInServer = friendsInServer + 1
+        end
+    end
+
+    return friendsInServer
+end
+
+-- Função para obter a quantidade de amigos jogando o mesmo jogo (não necessariamente no mesmo servidor)
+local function getFriendsInGame()
+    local player = game.Players.LocalPlayer
+    local success, friends = pcall(function()
+        return player:GetFriendsOnline()
+    end)
+
+    if success and friends then
+        local friendsInGame = 0
+        for _, friend in pairs(friends) do
+            if friend.PlaceId == game.PlaceId then
+                friendsInGame = friendsInGame + 1
+            end
+        end
+        return friendsInGame
+    end
+
+    return 0
+end
+
+-- Adiciona uma Label para mostrar a quantidade de amigos no servidor
+CreatorTab:AddLabel("Amigos no Servidor: " .. tostring(getFriendsInServer()))
+
+-- Adiciona uma Label para mostrar a quantidade de amigos jogando o mesmo jogo
+CreatorTab:AddLabel("Amigos Jogando Este Jogo: " .. tostring(getFriendsInGame()))
+
+OrionLib:Init()
