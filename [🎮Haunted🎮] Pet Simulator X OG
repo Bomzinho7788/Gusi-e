@@ -113,7 +113,7 @@ local eggList = {
     "Golden Relic Egg", "Samurai Egg", "Golden Samurai Egg", "Candy Egg",
     "Golden Candy Egg", "Haunted Egg", "Golden Haunted Egg", "Hell Egg",
     "Golden Hell Egg", "Heaven Egg", "Golden Heaven Egg", "Empyrean Egg",
-    "Golden empyrean Egg"
+    "Golden empyrean Egg", "Cursed Egg"
 }
 
 -- Função para abrir o ovo selecionado
