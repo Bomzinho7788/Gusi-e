@@ -1,0 +1,455 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({
+    Name = "[😈HELL!] Pet Simulator X OG", 
+    HidePremium = false, 
+    SaveConfig = true, 
+    ConfigFolder = "[😈HELL!]PetSimulatorXOG", 
+    DragEnabled = true  -- Habilita a opção de arrastar a janela
+})
+
+-- Variables for Egg Opening
+local selectedEgg = "Hell Egg"
+local openEggAmount = false  -- Default to opening 1 egg (false = 1 egg)
+local openingEggsAutomatically = false
+
+function openEgg(eggName, amount)
+    local args = {
+        [1] = {
+            [1] = { [1] = eggName, [2] = amount },
+            [2] = { [1] = false, [2] = false }
+        }
+    }
+    workspace.__THINGS.__REMOTES:FindFirstChild("buy egg"):InvokeServer(unpack(args))
+end
+
+-- Tab for Egg Opening
+local EggTab = Window:MakeTab({Name = "Egg Opener", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+EggTab:AddDropdown({
+    Name = "Select Egg",
+    Default = "Cracked Egg",
+    Options = {
+        "Cracked Egg", "Spotted Egg", "Golden Cracked Egg", "Golden Spotted Egg",
+    "Wood Egg", "Grass Egg", "Golden Wood Egg", "Golden Grass Egg",
+    "Beachball Egg", "Coconut Egg", "Golden Beachball Egg", "Golden Coconut Egg",
+    "Rock Egg", "Geode Egg", "Golden Rock Egg", "Golden Geode Egg",
+    "Snow Egg", "Ice Egg", "Golden Snow Egg", "Golden Ice Egg",
+    "Icicle Egg", "Yeti Egg", "Golden Icicle Egg", "Golden Yeti Egg",
+    "Cactus Egg", "Spiked Egg", "Golden Cactus Egg", "Golden Spiked Egg",
+    "Obsidian Egg", "Magma Egg", "Golden Obsidian Egg", "Golden Magma Egg",
+    "Dominus Egg", "Enchanted Egg", "Golden Enchanted Egg", "Relic Egg",
+    "Golden Relic Egg", "Samurai Egg", "Golden Samurai Egg", "Candy Egg",
+    "Golden Candy Egg", "Haunted Egg", "Golden Haunted Egg", "Hell Egg",
+    "Golden Hell Egg", "Heaven Egg", "Golden Heaven Egg", "Empyrean Egg",
+    "Golden Empyrean Egg", 
+        "Tech Egg", "Golden Tech Egg", "Titanium Egg", "Golden Titanium Egg", 
+        "Dark Tech Egg", "Golden Dark Tech Egg", "Steampunk Egg", "Golden Steampunk Egg", 
+        "Mechanical Egg", "Golden Mechanical Egg", "Lab Egg", "Golden Lab Egg", 
+        "Chemical Egg", "Golden Chemical Egg", "Axolotl Egg", "Golden Axolotl Egg", 
+        "Shiny Axolotl Egg", "Golden Shiny Axolotl Egg", "Deep Axolotl Egg", 
+        "Golden Deep Axolotl Egg"
+    },
+    Callback = function(value)
+        selectedEgg = value
+    end
+})
+
+EggTab:AddDropdown({
+    Name = "Select Amount to Open",
+    Default = "1",
+    Options = {"1", "3"},
+    Callback = function(value)
+        openEggAmount = value == "3"  -- If "3" is selected, set to true (open 3 eggs), otherwise false (open 1 egg)
+    end
+})
+
+EggTab:AddToggle({
+    Name = "Open Eggs Automatically",
+    Default = false,
+    Callback = function(value)
+        openingEggsAutomatically = value
+        while openingEggsAutomatically do
+            openEgg(selectedEgg, openEggAmount)
+            wait(0)  -- Wait for 0 seconds before opening another egg
+        end
+    end
+})
+
+-- Add Button for Manual Egg Opening
+EggTab:AddButton({
+    Name = "Open Egg Manually",
+    Callback = function()
+        openEgg(selectedEgg, openEggAmount)
+    end
+})
+
+-- Variables for Potion Buying
+local buyInterval = 120  -- Default is 2 minutes (120 seconds)
+local buyTripleCoins = false
+local buyTripleDamage = false
+local buySuperLucky = false
+local buyUltraLucky = false
+local buyingAutomatically = false
+
+function buyPotion(potionName) 
+    local args = {[1] = {[1] = {[1] = potionName},[2] = {[1] = false}}} 
+    workspace.__THINGS.__REMOTES:FindFirstChild("buy boost"):InvokeServer(unpack(args))
+end
+
+-- Tab for Potion Buying
+local PotionTab = Window:MakeTab({Name = "Buy Potions", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+PotionTab:AddToggle({Name = "Buy Triple Coins", Default = false, Callback = function(value) buyTripleCoins = value end})
+PotionTab:AddToggle({Name = "Buy Triple Damage", Default = false, Callback = function(value) buyTripleDamage = value end})
+PotionTab:AddToggle({Name = "Buy Super Lucky", Default = false, Callback = function(value) buySuperLucky = value end})
+PotionTab:AddToggle({Name = "Buy Ultra Lucky", Default = false, Callback = function(value) buyUltraLucky = value end})
+
+local function buyPotionsAutomatically() 
+    while buyingAutomatically do 
+        if buyTripleCoins then buyPotion("Triple Coins") end 
+        if buyTripleDamage then buyPotion("Triple Damage") end 
+        if buySuperLucky then buyPotion("Super Lucky") end 
+        if buyUltraLucky then buyPotion("Ultra Lucky") end 
+        wait(buyInterval) 
+    end 
+end
+
+PotionTab:AddToggle({Name = "Buy Potions Automatically", Default = false, Callback = function(value) 
+    buyingAutomatically = value 
+    if buyingAutomatically then spawn(function() buyPotionsAutomatically() end) end 
+end})
+
+-- Add Dropdown for selecting interval time
+PotionTab:AddDropdown({
+    Name = "Select Interval Time (Seconds)",
+    Default = "120",
+    Options = {"5", "10", "15", "20", "30", "60", "120", "180", "240"},
+    Callback = function(value)
+        buyInterval = tonumber(value)  -- Update the buyInterval based on selection
+    end
+})
+
+
+
+-- Variables for activating Potions
+local activateTripleCoins = false
+local activateTripleDamage = false
+local activateSuperLucky = false
+local activateUltraLucky = false
+local activatingAutomatically = false
+local activateInterval = 120  -- Default is 2 minutes (120 seconds)
+
+function activatePotion(potionName)
+    local args = {
+        [1] = {
+            [1] = { [1] = potionName },
+            [2] = { [1] = false }
+        }
+    }
+    workspace.__THINGS.__REMOTES:FindFirstChild("activate boost"):FireServer(unpack(args))
+end
+
+-- Tab for Activating Potions
+local PotionActivateTab = Window:MakeTab({Name = "Activate Potions", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+PotionActivateTab:AddToggle({
+    Name = "Activate Triple Coins",
+    Default = false,
+    Callback = function(value) activateTripleCoins = value end
+})
+
+PotionActivateTab:AddToggle({
+    Name = "Activate Triple Damage",
+    Default = false,
+    Callback = function(value) activateTripleDamage = value end
+})
+
+PotionActivateTab:AddToggle({
+    Name = "Activate Super Lucky",
+    Default = false,
+    Callback = function(value) activateSuperLucky = value end
+})
+
+PotionActivateTab:AddToggle({
+    Name = "Activate Ultra Lucky",
+    Default = false,
+    Callback = function(value) activateUltraLucky = value end
+})
+
+local function activatePotionsAutomatically()
+    while activatingAutomatically do
+        if activateTripleCoins then activatePotion("Triple Coins") end
+        if activateTripleDamage then activatePotion("Triple Damage") end
+        if activateSuperLucky then activatePotion("Super Lucky") end
+        if activateUltraLucky then activatePotion("Ultra Lucky") end
+        wait(activateInterval)  -- Wait for the selected interval before activating the potions again
+    end
+end
+
+PotionActivateTab:AddToggle({
+    Name = "Activate Potions Automatically",
+    Default = false,
+    Callback = function(value)
+        activatingAutomatically = value
+        if activatingAutomatically then
+            spawn(function()
+                activatePotionsAutomatically()
+            end)
+        end
+    end
+})
+
+-- Add Dropdown for selecting interval time
+PotionActivateTab:AddDropdown({
+    Name = "Select Interval Time (Seconds)",
+    Default = "120",
+    Options = {"5", "10", "15", "20", "30", "60", "120", "180", "240"},
+    Callback = function(value)
+        activateInterval = tonumber(value)  -- Update the activateInterval based on selection
+    end
+})
+
+-- Variables for buying gems
+local buyDiamondsAmount = 1 -- Default is option 1 (100,000)
+local buyDiamondsSpeed = 10 -- Default is 10 seconds between buys
+local buyingDiamonds = false
+
+function buyDiamonds(amount)
+    local args = {
+        [1] = {
+            [1] = { [1] = amount },
+            [2] = { [1] = false }
+        }
+    }
+    workspace.__THINGS.__REMOTES:FindFirstChild("buy diamondpack"):InvokeServer(unpack(args))
+end
+
+-- Tab for Buying Gems
+local GemBuyTab = Window:MakeTab({Name = "Buy Gems", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+-- Dropdown to select the speed (in seconds) between each purchase
+GemBuyTab:AddDropdown({
+    Name = "Select Speed (Seconds)",
+    Default = "10",
+    Options = {"0", "1", "5", "10", "15", "20", "30", "60"},
+    Callback = function(value)
+        buyDiamondsSpeed = tonumber(value)  -- Update the buyDiamondsSpeed based on selection
+    end
+})
+
+-- Dropdown to select the amount of diamonds to buy (1, 2, 3, 4)
+GemBuyTab:AddDropdown({
+    Name = "Select Diamond Pack",
+    Default = "1",
+    Options = {
+        "1 - 100,000", 
+        "2 - 450,000", 
+        "3 - 2,500,000", 
+        "4 - 15,000,000"
+    },
+    Callback = function(value)
+        -- Map the GUI options to the remote's amount field
+        if value == "1 - 100,000" then
+            buyDiamondsAmount = 1 -- Corresponding to remote [1] = 1
+        elseif value == "2 - 450,000" then
+            buyDiamondsAmount = 2 -- Corresponding to remote [1] = 2
+        elseif value == "3 - 2,500,000" then
+            buyDiamondsAmount = 3 -- Corresponding to remote [1] = 3
+        elseif value == "4 - 15,000,000" then
+            buyDiamondsAmount = 4 -- Corresponding to remote [1] = 4
+        end
+    end
+})
+
+-- Toggle to start or stop buying diamonds
+GemBuyTab:AddToggle({
+    Name = "Buy Diamonds Automatically",
+    Default = false,
+    Callback = function(value)
+        buyingDiamonds = value
+        if buyingDiamonds then
+            spawn(function()
+                while buyingDiamonds do
+                    buyDiamonds(buyDiamondsAmount)  -- Send the selected amount to the remote
+                    wait(buyDiamondsSpeed)  -- Wait for the selected speed before buying again
+                end
+            end)
+        end
+    end
+})
+
+-- Initialize required libraries and variables
+local Library, Blacklist, Functions
+do --//Init
+    repeat
+        wait(1)
+    until game:IsLoaded() and game:GetService('Players').LocalPlayer ~= nil and game:GetService('Players').LocalPlayer:FindFirstChild('__LOADED')
+    Library     = require(game:GetService('ReplicatedStorage').Framework:FindFirstChild('Library'))
+    Functions   = Library.Functions
+    Blacklist   = {}
+end
+
+-- Function to get Pet Info
+function GetPetInfo(uid)
+    for i, v in pairs(Library.Save.Get().Pets) do
+        if v.uid == uid then
+            return v
+        end
+    end
+end
+
+-- Function to convert powers to valid table
+function PetToValidTable(petpowers)
+    local temptable = {}
+    if petpowers then
+        for i, powers in pairs(petpowers) do
+            temptable[powers[1]] = powers[2]
+        end
+    end
+    return temptable
+end
+
+-- Time function to format time difference
+function Time(Tick)
+    if typeof(Tick) ~= "number" then
+        return warn('Integer expected, got', typeof(Tick))
+    end
+    local elapsed = tick() - Tick
+    local Weeks = math.floor(elapsed / (60 * 60 * 24 * 7))
+    local Days = math.floor((elapsed / (60 * 60 * 24)) % 7)
+    local Hours = math.floor((elapsed / (60 * 60)) % 24)
+    local Minutes = math.floor((elapsed / 60) % 60)
+    local Seconds = math.floor(elapsed % 60)
+    local MilliSeconds = math.floor((elapsed - math.floor(elapsed)) * 1000)
+    local Format = ""
+
+    if Weeks > 0 then 
+        Format = Format .. string.format("%d Week/s, ", Weeks)
+    end
+    if Days > 0 then 
+        Format = Format .. string.format("%d Day/s, ", Days)
+    end
+    if Hours > 0 then
+        Format = Format .. string.format("%d Hour/s, ", Hours)
+    end
+    if Minutes > 0 then
+        Format = Format .. string.format("%d Minute/s, ", Minutes)
+    end
+    if Seconds > 0 then
+        Format = Format .. string.format("%d Second/s, ", Seconds)
+    end
+    if MilliSeconds > 0 then
+        Format = Format .. string.format("%d Ms", MilliSeconds)
+    end
+    return Format
+end  
+
+-- Variables for Enchanting
+local selectedEnchant = "Coins" -- Default enchantment
+
+-- Function to trigger auto-enchant
+function autoEnchant()
+    for i, v in pairs(Library.Save.Get().Pets) do
+        if v.e and not Blacklist[v.id] and _G.Stop ~= true then
+            local HasPower = false
+            local startTime = tick()
+            spawn(function()
+                repeat
+                    local petInfo = GetPetInfo(v.uid)
+                    local petPowers = PetToValidTable(petInfo.powers)
+                    
+                    -- Verifica se o pet tem o encantamento selecionado
+                    if petPowers[selectedEnchant] ~= 5 and not HasPower and not _G.Stop then
+                        if #petInfo.powers > 1 then
+                            warn('Pet: ' .. v.nk .. '(' .. v.uid .. ')')
+                            warn("      ", petInfo.powers[1][1], Functions.ToRomanNum(petInfo.powers[1][2]))
+                            warn("      ", petInfo.powers[2][1], Functions.ToRomanNum(petInfo.powers[2][2]) .. "\n------------")
+                        else
+                            for _, power in pairs(petInfo.powers) do
+                                warn('Pet: ' .. v.nk .. '(' .. v.uid .. ')')
+                                warn("      ", power[1], Functions.ToRomanNum(power[2]) .. "\n------------")
+                            end
+                        end
+                        
+                        -- Tenta encantar o pet novamente se ele não tiver o encantamento desejado
+                        Library.Network.Invoke("Enchant Pet", v.uid)
+                    else
+                        local printwith = rconsolewarn or warn
+                        printwith('Pet: ' .. v.nk .. '(' .. v.uid .. ')' .. " tem o encantamento desejado. Tempo: " .. tostring(Time(startTime)))
+                        HasPower = true
+                    end
+                    
+                    task.wait()
+                until HasPower == true or _G.Stop
+            end)
+        end
+    end
+end
+
+-- Tab for Auto Enchant
+local EnchantTab = Window:MakeTab({Name = "Auto Enchant", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+-- Dropdown to select the enchantment
+EnchantTab:AddDropdown({
+    Name = "Select Enchantment",
+    Default = "Coins",
+    Options = {"Coins", "Fantasy Coins", "Tech Coins", "Rainbow Coins"},
+    Callback = function(value)
+        selectedEnchant = value  -- Update the selected enchantment
+    end
+})
+
+-- Button to start the auto-enchant
+EnchantTab:AddButton({
+    Name = "Activate Auto Enchant",
+    Callback = function()
+        autoEnchant()  -- Start auto-enchanting when button is clicked
+    end
+})
+
+-- Função para ativar a máquina Golden
+local function activateGoldenMachine()
+    local goldenMachine = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Golden")
+    if goldenMachine then
+        goldenMachine.Enabled = true  -- Ativa a máquina Golden
+        print("Golden Machine Activated!")
+    else
+        warn("Golden Machine not found!")
+    end
+end
+
+-- Função para ativar a máquina Rainbow
+local function activateRainbowMachine()
+    local rainbowMachine = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Rainbow")
+    if rainbowMachine then
+        rainbowMachine.Enabled = true  -- Ativa a máquina Rainbow
+        print("Rainbow Machine Activated!")
+    else
+        warn("Rainbow Machine not found!")
+    end
+end
+
+-- Criação da aba para ativar as máquinas
+local MachinesTab = Window:MakeTab({
+    Name = "Activate Machines",
+    Icon = "rbxassetid://4483345998",  -- Ícone da aba
+    PremiumOnly = false
+})
+
+-- Botão para ativar a máquina Golden
+MachinesTab:AddButton({
+    Name = "Activate Golden Machine",
+    Callback = function()
+        activateGoldenMachine()  -- Chama a função para ativar a máquina Golden
+    end
+})
+
+-- Botão para ativar a máquina Rainbow
+MachinesTab:AddButton({
+    Name = "Activate Rainbow Machine",
+    Callback = function()
+        activateRainbowMachine()  -- Chama a função para ativar a máquina Rainbow
+    end
+})
+
+OrionLib:Init()
