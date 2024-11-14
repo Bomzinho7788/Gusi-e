@@ -1,9 +1,9 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Window = OrionLib:MakeWindow({
-    Name = "[😈HELL!] Pet Simulator X OG", 
+    Name = "[HEAVEN!] Pet Simulator X OG", 
     HidePremium = false, 
     SaveConfig = true, 
-    ConfigFolder = "[😈HELL!]PetSimulatorXOG", 
+    ConfigFolder = "[HEAVEN!]PetSimulatorXOG", 
     DragEnabled = true  -- Habilita a opção de arrastar a janela
 })
 
