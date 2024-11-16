@@ -119,6 +119,30 @@ PotionTab:AddToggle({Name = "Buy Potions Automatically", Default = false, Callba
     if buyingAutomatically then spawn(function() buyPotionsAutomatically() end) end 
 end})
 
+local customEggName = ""  -- Armazena o nome do ovo personalizado
+
+-- Toggle para habilitar o textbox para o nome do ovo personalizado
+EggTab:AddToggle({
+    Name = "Enable Custom Egg Name",
+    Default = false,
+    Callback = function(value)
+        if value then
+            -- Exibe o textbox para o nome do ovo personalizado
+            EggTab:AddTextbox({
+                Name = "Custom Egg Name",
+                Default = "",
+                Text = customEggName,
+                Callback = function(text)
+                    customEggName = text  -- Armazena o nome personalizado digitado
+                end
+            })
+        else
+            -- Se o toggle for desmarcado, remove o textbox
+            EggTab:RemoveTextbox("Custom Egg Name")  -- Remove o textbox, se necessário
+        end
+    end
+})
+
 -- Add Dropdown for selecting interval time
 PotionTab:AddDropdown({
     Name = "Select Interval Time (Seconds)",
