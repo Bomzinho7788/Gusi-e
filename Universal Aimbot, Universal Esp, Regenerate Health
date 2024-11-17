@@ -620,52 +620,53 @@ tab4:AddButton({
 -- Variáveis de controle de animação
 local toggleState = false
 local hue = 0
-local colorSpeed = 0.1  -- Valor inicial de velocidade (tempo de atualização)
+local colorSpeed = 0.01 -- Velocidade inicial de mudança de cor
 
 -- Função para atualizar a cor com animação RGB
 local function updateColor()
-    local color = Color3.fromHSV(hue, 1, 1)  -- Gera cor em RGB a partir do valor de HSV
+    local color = Color3.fromHSV(hue, 1, 1)
     -- Aplica a cor nos elementos
-    line.Color = color
-    highlight.FillColor = color
-    Line.Color = color
-    espBox.Color = color
-    fovCircle.Color = color
+    if line then line.Color = color end
+    if highlight then highlight.FillColor = color end
+    if Line then Line.Color = color end
+    if espBox then espBox.Color = color end
+    if fovCircle then fovCircle.Color = color end
 
     -- Incrementa o valor de hue para criar a animação de cor
     hue = hue + colorSpeed
     if hue > 1 then
-        hue = 0  -- Se ultrapassar 1, reseta o hue para reiniciar a animação
+        hue = 0 -- Reseta o hue para reiniciar a animação
     end
 end
 
 -- Função do toggle que ativa/desativa a animação
 tab4:AddToggle({
-    Name = "Color Animation Toggle",
+    Name = "Ativar Animação RGB",
     Default = false,
-    Callback = function(State)
-        toggleState = State
+    Callback = function(state)
+        toggleState = state
         if toggleState then
-            -- Ativa a animação
-            while toggleState do
-                updateColor()
-                wait(0.1)  -- Intervalo de tempo de atualização
-            end
+            task.spawn(function()
+                while toggleState do
+                    updateColor()
+                    task.wait(0.05) -- Intervalo para atualização da cor
+                end
+            end)
         end
     end
 })
 
--- Função da textbox para mudar o tempo de atualização
+-- Função da textbox para ajustar a velocidade da animação
 tab4:AddTextbox({
-    Name = "Tempo de Atualização (segundos)",
-    Default = "0.1",
+    Name = "Tempo de Atualização (0.01 a 0.1)",
+    Default = "0.05",
     TextDisappear = false,
     Callback = function(input)
         local inputValue = tonumber(input)
-        if inputValue then
-            colorSpeed = inputValue  -- Atualiza a velocidade com o valor inserido
+        if inputValue and inputValue > 0 and inputValue <= 0.1 then
+            colorSpeed = inputValue
         else
-            print("Por favor, insira um número válido!")
+            print("Por favor, insira um valor válido entre 0.01 e 0.1")
         end
     end
 })
