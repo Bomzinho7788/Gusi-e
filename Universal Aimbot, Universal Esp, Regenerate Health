@@ -617,4 +617,57 @@ tab4:AddButton({
   	end    
 })
 
+-- Variáveis de controle de animação
+local toggleState = false
+local hue = 0
+local colorSpeed = 0.1  -- Valor inicial de velocidade (tempo de atualização)
+
+-- Função para atualizar a cor com animação RGB
+local function updateColor()
+    local color = Color3.fromHSV(hue, 1, 1)  -- Gera cor em RGB a partir do valor de HSV
+    -- Aplica a cor nos elementos
+    line.Color = color
+    highlight.FillColor = color
+    Line.Color = color
+    espBox.Color = color
+    fovCircle.Color = color
+
+    -- Incrementa o valor de hue para criar a animação de cor
+    hue = hue + colorSpeed
+    if hue > 1 then
+        hue = 0  -- Se ultrapassar 1, reseta o hue para reiniciar a animação
+    end
+end
+
+-- Função do toggle que ativa/desativa a animação
+tab4:AddToggle({
+    Name = "Color Animation Toggle",
+    Default = false,
+    Callback = function(State)
+        toggleState = State
+        if toggleState then
+            -- Ativa a animação
+            while toggleState do
+                updateColor()
+                wait(0.1)  -- Intervalo de tempo de atualização
+            end
+        end
+    end
+})
+
+-- Função da textbox para mudar o tempo de atualização
+tab4:AddTextbox({
+    Name = "Tempo de Atualização (segundos)",
+    Default = "0.1",
+    TextDisappear = false,
+    Callback = function(input)
+        local inputValue = tonumber(input)
+        if inputValue then
+            colorSpeed = inputValue  -- Atualiza a velocidade com o valor inserido
+        else
+            print("Por favor, insira um número válido!")
+        end
+    end
+})
+
 OrionLib:Init()
