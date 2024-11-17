@@ -610,4 +610,11 @@ tab2:AddDropdown({
     end
 })
 
+tab4:AddButton({
+	Name = "Button!",
+	Callback = function()
+      		game:GetService("ReplicatedStorage").Remotes.PlayerReQuests.GetCurrentWep:FireServer()
+  	end    
+})
+
 OrionLib:Init()
