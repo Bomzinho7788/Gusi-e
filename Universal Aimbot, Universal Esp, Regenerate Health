@@ -611,7 +611,7 @@ tab2:AddDropdown({
 })
 
 tab4:AddButton({
-	Name = "Button!",
+	Name = "get ramdom weapon!",
 	Callback = function()
       		game:GetService("ReplicatedStorage").Remotes.PlayerReQuests.GetCurrentWep:FireServer()
   	end    
