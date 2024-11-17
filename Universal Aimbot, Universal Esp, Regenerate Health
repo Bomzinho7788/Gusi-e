@@ -1,12 +1,214 @@
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-local window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim", HidePremium = false, SaveConfig = true, IntroText = "Bom_Hub_Aim"})
 
--- Tabelas do hub
-local tab1 = window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998"})
-local tab2 = window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998"})
-local tab3 = window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998"})
+local RunService = game:GetService("RunService")
+local players = game:GetService("Players")
+local workspace = game:GetService("Workspace")
+local plr = players.LocalPlayer
 
--- Configurações e variáveis do FOV
+--> [< Variables >] <--
+
+local hue = 0
+
+local gmEnabled = false
+
+local fireRate = 0.3
+local pelletAmount = 1
+local reloadTime = 0
+local damageDropOff = 0
+local isAuto = true
+local delayedShell = false
+local recoilEnabled = false
+local Recoil = Vector3.new(0, 0, 0)
+
+local e = false
+
+--> [< Variables >] <--
+
+local window = OrionLib:MakeWindow({Name = "Bom_Hub_GGFFA", HidePremium = false, SaveConfig = true, IntroText = "Bom_Hub_Aim"})
+
+local tab1 = window:MakeTab({Name = "Gun Mods", Icon = "rbxassetid://4483345998"})
+
+--> [< Gun Mods >] <--
+tab1:AddToggle({
+    Name = "Gun Mods Enabled",
+    Default = false,
+    Callback = function(Value)
+        gmEnabled = Value
+        
+        -- Notificação ao ativar/desativar
+        if gmEnabled then
+            OrionLib:MakeNotification({
+                Name = "Gun Mod",
+                Content = "Reset to enable!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Gun Mod",
+                Content = "Reset to enable!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        end
+
+        -- Função de loop para modificar as armas
+        while gmEnabled do
+            if plr.Character then
+                local folder = plr.Character:FindFirstChildWhichIsA("Tool")
+                
+                if folder and folder:FindFirstChild("Configuration") then
+                    for _, v in ipairs(folder.Configuration:GetChildren()) do
+                        if v.Name == "FireRate" and not e then
+                            e = true
+                            v.Value = v.Value * fireRate
+                        end
+                        if v.Name == "reloadTime" then
+                            v.Value = reloadTime
+                        end
+                        if v.Name == "DamageDropoff" then
+                            v.Value = damageDropOff
+                        end
+                        if v.Name == "isAuto" then
+                            v.Value = isAuto
+                        end
+                        if v.Name == "DelayedShell" then
+                            v.Value = delayedShell
+                        end
+                        if v.Name == "Recoil" then
+                            if recoilEnabled then
+                                v.Value = Recoil
+                            end
+                        end
+                    end
+
+                    -- Configuração do efeito de hit
+                    if hitEffectEnabled then
+                        local heffect = folder.Configuration:FindFirstChild("HitEffect")
+                        if heffect then
+                            heffect.Value = hitEffect
+                        else
+                            heffect = Instance.new("StringValue")
+                            heffect.Name = "HitEffect"
+                            heffect.Value = hitEffect
+                            heffect.Parent = folder.Configuration
+                        end
+                    end
+                else
+                    e = false
+                end
+            end
+            wait()
+        end
+    end
+})
+
+tab1:AddTextbox({
+    Name = "Fire Rate",
+    Default = "0.3",
+    TextDisappear = false,
+    Callback = function(Value)
+        fireRate = tonumber(Value)
+        if fireRate then
+            OrionLib:MakeNotification({
+                Name = "Fire Rate",
+                Content = "Reset to update!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Error",
+                Content = "Please enter a valid number!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        end
+    end
+})
+tab1:AddTextbox({
+    Name = "Reload Time",
+    Default = "0",
+    TextDisappear = false,
+    Callback = function(Value)
+        reloadTime = tonumber(Value)
+        if reloadTime then
+            OrionLib:MakeNotification({
+                Name = "Reload Time",
+                Content = "Reset to update!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Error",
+                Content = "Please enter a valid number!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        end
+    end
+})
+
+tab1:AddTextbox({
+    Name = "Damage Drop Off",
+    Default = "0",
+    TextDisappear = false,
+    Callback = function(Value)
+        damageDropOff = tonumber(Value)
+        if damageDropOff then
+            OrionLib:MakeNotification({
+                Name = "Damage Drop Off",
+                Content = "Reset to update!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Error",
+                Content = "Please enter a valid number!",
+                Image = "rbxassetid://4483362458",
+                Time = 5
+            })
+        end
+    end
+})
+
+tab1:AddToggle({
+    Name = "Force Auto",
+    Default = true,
+    Callback = function(Value)
+        isAuto = Value
+        OrionLib:MakeNotification({
+            Name = "Force Auto",
+            Content = "Reset to update!",
+            Image = "rbxassetid://4483362458",
+            Time = 5
+        })
+    end
+})
+
+tab1:AddToggle({
+    Name = "Rapid Shotguns",
+    Default = true,
+    Callback = function(Value)
+        delayedShell = not Value
+        OrionLib:MakeNotification({
+            Name = "Rapid Shotguns",
+            Content = "Reset to update!",
+            Image = "rbxassetid://4483362458",
+            Time = 5
+        })
+    end
+})
+
+--> [< Gun Mods >] <--
+
+
+local tab2 = window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998"})
+local tab3 = window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998"})
+local tab4 = window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998"})
+
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -22,9 +224,8 @@ local fovRadius = 50
 local fovEnabled = false
 local aimbotEnabled = false
 local wallcheckEnabled = false
-local espEnabled = false -- Nova variável para controle do ESP
+local espEnabled = false
 
--- Função para atualizar a posição do círculo da FOV
 local function updateFovCircle()
     if fovEnabled then
         local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
@@ -38,22 +239,21 @@ end
 
 RunService.RenderStepped:Connect(updateFovCircle)
 
--- Função para encontrar o jogador mais próximo no FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
     local shortestDistance = fovRadius
 
     for _, targetPlayer in pairs(Players:GetPlayers()) do
         if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
-            local head = targetPlayer.Character[aimPart]
-            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            local part = targetPlayer.Character[aimPart]
+            local screenPos, onScreen = camera:WorldToViewportPoint(part.Position)
             if onScreen then
                 local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
                 local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
 
                 if distance < shortestDistance then
                     shortestDistance = distance
-                    closestPlayer = head
+                    closestPlayer = part
                 end
             end
         end
@@ -62,23 +262,19 @@ local function getClosestPlayerInFOV()
     return closestPlayer
 end
 
--- Ajusta a mira automaticamente
 local function silentAimAtClosestPlayer()
     if aimbotEnabled then
-        local targetHead = getClosestPlayerInFOV()
+        local targetPart = getClosestPlayerInFOV()
 
-        if targetHead then
-            if not wallcheckEnabled or isPlayerVisible(targetHead) then
-                local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
-                camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
-            end
+        if targetPart then
+            local aimPosition = targetPart.Position + Vector3.new(0, 0.5, 0)
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
         end
     end
 end
 
 RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
 
--- Função de regeneração de HP
 local function regenerateHP()
     while wait(0) do
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
@@ -87,16 +283,14 @@ local function regenerateHP()
     end
 end
 
--- Função do ESP (Desenha uma caixa ao redor do jogador)
 local function drawESP(targetPlayer)
     local espBox = Drawing.new("Square")
     espBox.Thickness = 2
-    espBox.Color = Color3.fromRGB(255, 0, 0) -- Cor da caixa do ESP
+    espBox.Color = Color3.fromRGB(255, 0, 0)
     espBox.Filled = false
     espBox.Transparency = 1
-    espBox.Visible = false -- Começa invisível
+    espBox.Visible = false
 
-    -- Função para atualizar a caixa ao redor do jogador
     RunService.RenderStepped:Connect(function()
         if espEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
             local humanoidRootPart = targetPlayer.Character.HumanoidRootPart
@@ -123,7 +317,6 @@ local function drawESP(targetPlayer)
     end)
 end
 
--- Função para adicionar o ESP aos jogadores
 local function addESPToPlayer(player)
     if player.Character then
         drawESP(player)
@@ -141,8 +334,7 @@ end
 
 Players.PlayerAdded:Connect(addESPToPlayer)
 
--- Controles do hub com Orion Lib
-tab1:AddToggle({
+tab2:AddToggle({
     Name = "Ativar FOV",
     Default = fovEnabled,
     Callback = function(state)
@@ -150,7 +342,7 @@ tab1:AddToggle({
     end
 })
 
-tab1:AddToggle({
+tab2:AddToggle({
     Name = "Ativar Aimbot",
     Default = aimbotEnabled,
     Callback = function(state)
@@ -158,22 +350,21 @@ tab1:AddToggle({
     end
 })
 
-tab1:AddTextbox({
-    Name = "Tamanho do FOV (0-100)",
+tab2:AddTextbox({
+    Name = "Tamanho do FOV (0-250)",
     Default = tostring(fovRadius),
     TextDisappear = false,
     Callback = function(input)
         local value = tonumber(input)
-        if value and value >= 0 and value <= 100 then
+        if value and value >= 0 and value <= 250 then
             fovRadius = value
         else
-            print("Por favor, insira um valor entre 0 e 100.")
+            print("Por favor, insira um valor entre 0 e 250.")
         end
     end
 })
 
--- Adiciona o toggle de regeneração de HP na aba "Others"
-tab3:AddToggle({
+tab4:AddToggle({
     Name = "Regenerar HP",
     Default = false,
     Callback = function(state)
@@ -183,8 +374,7 @@ tab3:AddToggle({
     end
 })
 
--- Adiciona toggle para ativar/desativar o ESP na aba "Esp"
-tab2:AddToggle({
+tab3:AddToggle({
     Name = "Ativar ESP Box",
     Default = espEnabled,
     Callback = function(state)
@@ -198,14 +388,14 @@ tab2:AddToggle({
 })
 
 -- Botões da aba "Others"
-tab3:AddButton({
+tab4:AddButton({
     Name = "Fechar Hub",
     Callback = function()
         OrionLib:Destroy()
     end
 })
 
-tab3:AddButton({
+tab4:AddButton({
     Name = "Salvar Configurações",
     Callback = function()
         OrionLib:Save()
@@ -218,17 +408,17 @@ local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local espLineEnabled = false -- Variável para controlar o estado do ESP Line
-local lines = {} -- Armazena as linhas de ESP
+local espLineEnabled = false
+local lines = {}
 
 local function createESPLine(player)
     local Line = Drawing.new("Line")
-    Line.Color = Color3.new(1, 0, 0) -- Vermelho
-    Line.Thickness = 1 -- Linhas mais finas
+    Line.Color = Color3.new(1, 0, 0)
+    Line.Thickness = 1
     Line.Transparency = 1
-    Line.Visible = false -- Inicialmente invisível
+    Line.Visible = false
 
-    lines[player] = Line -- Armazena a linha para o jogador
+    lines[player] = Line
 
     RunService.RenderStepped:Connect(function()
         if espLineEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -236,14 +426,14 @@ local function createESPLine(player)
             local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
 
             if onScreen then
-                Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0) -- Parte de cima da tela (meio)
+                Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)
                 Line.To = Vector2.new(screenPos.X, screenPos.Y)
                 Line.Visible = true
             else
                 Line.Visible = false
             end
         else
-            Line.Visible = false -- Esconde a linha se não estiver ativada
+            Line.Visible = false
         end
     end)
 end
@@ -251,7 +441,7 @@ end
 Players.PlayerAdded:Connect(function(player)
     if player ~= LocalPlayer then
         player.CharacterAdded:Connect(function()
-            wait(0.5) -- Pequeno atraso para garantir que o personagem tenha carregado
+            wait(0)
             createESPLine(player)
         end)
     end
@@ -261,20 +451,19 @@ for _, player in pairs(Players:GetPlayers()) do
     if player ~= LocalPlayer and player.Character then
         createESPLine(player)
         player.CharacterAdded:Connect(function()
-            wait(0.5)
+            wait(0)
             createESPLine(player)
         end)
     end
 end
 
--- Adiciona o toggle para o ESP Line na aba 2
-tab2:AddToggle({
+tab3:AddToggle({
     Name = "Esp Line",
-    Default = espLineEnabled,  -- Estado inicial do toggle
+    Default = espLineEnabled,
     Callback = function(state)
-        espLineEnabled = state -- Atualiza a variável com o estado do toggle
+        espLineEnabled = state
         for _, line in pairs(lines) do
-            line.Visible = state -- Atualiza a visibilidade de todas as linhas com base no estado do toggle
+            line.Visible = state
         end
     end,
 })
@@ -284,7 +473,6 @@ local LocalPlayer = Players.LocalPlayer
 local chamsEnabled = false
 local chamsLoop
 
--- Função para aplicar chams com Highlight
 local function applyChams(player)
     if player ~= LocalPlayer and player.Character and not player.Character:FindFirstChild("Chams") then
         local highlight = Instance.new("Highlight")
@@ -296,10 +484,8 @@ local function applyChams(player)
     end
 end
 
--- Função para ligar e desligar o chams
 local function toggleChams(state)
     if state then
-        -- Ativa o loop para aplicar chams
         chamsLoop = coroutine.wrap(function()
             while chamsEnabled do
                 for _, player in pairs(Players:GetPlayers()) do
@@ -310,7 +496,6 @@ local function toggleChams(state)
         end)
         chamsLoop()
     else
-        -- Desativa o chams removendo os highlights
         for _, player in pairs(Players:GetPlayers()) do
             if player.Character and player.Character:FindFirstChild("Chams") then
                 player.Character.Chams:Destroy()
@@ -319,8 +504,7 @@ local function toggleChams(state)
     end
 end
 
--- Toggle para ativar/desativar o chams na aba 2
-tab2:AddToggle({
+tab3:AddToggle({
     Name = "Chams",
     Default = chamsEnabled,
     Callback = function(state)
@@ -334,9 +518,8 @@ local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local skeletonEnabled = false -- Variável para controlar se o Skeleton ESP está ativado
+local skeletonEnabled = false
 
--- Função para criar o esqueleto
 local function createSkeleton(character)
     local parts = {
         Head = character:FindFirstChild("Head"),
@@ -350,7 +533,7 @@ local function createSkeleton(character)
     local lines = {}
     for i = 1, 7 do
         local line = Drawing.new("Line")
-        line.Color = Color3.new(1, 0, 0) -- Preto
+        line.Color = Color3.new(1, 0, 0)
         line.Thickness = 1
         line.Transparency = 1
         lines[i] = line
@@ -385,7 +568,6 @@ local function createSkeleton(character)
     RunService.RenderStepped:Connect(updateSkeleton)
 end
 
--- Função para lidar com novos jogadores
 Players.PlayerAdded:Connect(function(player)
     if player ~= LocalPlayer then
         player.CharacterAdded:Connect(function(character)
@@ -405,17 +587,27 @@ for _, player in pairs(Players:GetPlayers()) do
     end
 end
 
--- Adicionando o Toggle na aba 2 existente
-tab2:AddToggle({
+tab3:AddToggle({
     Name = "Skeleton ESP",
     Default = false,
     Callback = function(value)
-        skeletonEnabled = value -- Atualiza a variável quando o toggle é ativado/desativado
+        skeletonEnabled = value
     end,
 })
 
-tab3:AddLabel("BybBomzinho")
+tab4:AddLabel("ByBomzinho")
 
+local function setAimPart(selection)
+    aimPart = selection
+end
 
--- Inicializa o hub
+tab2:AddDropdown({
+    Name = "Aim Position",
+    Default = aimPart,
+    Options = {"Head", "Torso"},
+    Callback = function(value)
+        aimPart = value
+    end
+})
+
 OrionLib:Init()
