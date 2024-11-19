@@ -11,97 +11,68 @@ local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", 
 local SilentAimEnabled = false
 local FOV = 100
 local FOVVisible = false
-local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
+local targetPart = "HumanoidRootPart"
 
--- Configurar o círculo de FOV
+-- Configurar círculo de FOV
 FOVCircle.Radius = FOV
 FOVCircle.Thickness = 1
 FOVCircle.Color = Color3.new(1, 1, 1)
 FOVCircle.Transparency = 1
 FOVCircle.Visible = FOVVisible
 FOVCircle.Filled = false
-FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
--- Função para obter a posição da FOV
-local function getFOVPosition()
+-- Função para atualizar a posição do círculo de FOV
+local function updateFOVPosition()
     local camera = workspace.CurrentCamera
-    if FOVPosition == "Center" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    else
-        local mouse = game.Players.LocalPlayer:GetMouse()
-        return Vector2.new(mouse.X, mouse.Y)
-    end
+    FOVCircle.Position = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 end
-
--- Função de Silent Aim
-local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
-
-tab1:AddDropdown({
-    Name = "Parte do Corpo",
-    Options = {"Cabeça", "Barriga"},
-    Default = "Barriga",
-    Callback = function(selected)
-        if selected == "Cabeça" then
-            targetPart = "Head"
-        elseif selected == "Barriga" then
-            targetPart = "HumanoidRootPart"
-        end
-    end
-})
 
 -- Função para verificar se o jogador está dentro do FOV
 local function isPlayerInFOV(player)
-    local mousePos = getFOVPosition()
-    if player.Character and player.Character:FindFirstChild(targetPart) then
-        local charPart = player.Character:FindFirstChild(targetPart)
-        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
-
-        return distance <= FOV
-    end
-    return false
-end
-
--- Função para verificar se há parede no caminho entre a câmera e o alvo
-local function isVisible(target)
-    if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
+    if not player or not player.Character or not player.Character:FindFirstChild(targetPart) then
         return false
     end
 
     local camera = workspace.CurrentCamera
-    local targetPartPos = target.Character[targetPart].Position
-    local rayOrigin = camera.CFrame.Position
-    local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+    local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
 
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
-
-    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
-
-    if raycastResult and raycastResult.Instance then
-        return raycastResult.Instance:IsDescendantOf(target.Character)
+    if not onScreen then
+        return false
     end
 
-    return true
+    local fovPos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local distance = (Vector2.new(screenPos.X, screenPos.Y) - fovPos).Magnitude
+
+    return distance <= FOV
+end
+
+-- Função para verificar se há parede no caminho
+local function isVisible(player)
+    local rayOrigin = workspace.CurrentCamera.CFrame.Position
+    local rayDirection = (player.Character[targetPart].Position - rayOrigin).Unit * (player.Character[targetPart].Position - rayOrigin).Magnitude
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+    local result = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+    return result and result.Instance:IsDescendantOf(player.Character)
 end
 
 -- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
-    local players = game.Players:GetPlayers()
     local closestDistance = FOV
-    local mousePos = getFOVPosition()
 
-    for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
-            local charPart = player.Character:FindFirstChild(targetPart)
-            if charPart then
-                local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
+            local camera = workspace.CurrentCamera
+            local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
 
-                if distance < closestDistance and isVisible(player) then
+            if onScreen and isPlayerInFOV(player) and isVisible(player) then
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - FOVCircle.Position).Magnitude
+                if distance < closestDistance then
                     closestDistance = distance
                     closestPlayer = player
                 end
@@ -121,85 +92,90 @@ local function aimAt(target)
     end
 end
 
+-- Atualizar círculo de FOV
 game:GetService("RunService").RenderStepped:Connect(function()
+    if FOVVisible then
+        updateFOVPosition()
+    end
+
     if SilentAimEnabled then
         local target = getClosestPlayerInFOV()
         if target then
             aimAt(target)
         end
     end
-
-
-
-    -- Atualiza a posição do círculo de FOV
-    FOVCircle.Position = getFOVPosition()
-    FOVCircle.Radius = FOV
-    FOVCircle.Visible = FOVVisible
 end)
 
--- Toggle para ativar/desativar o Silent Aim
+-- GUI com Orion Lib
+local tab1 = Window:MakeTab({
+    Name = "Aimbot",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
 tab1:AddToggle({
-    Name = "Ativar Aimbot",
+    Name = "Ativar Silent Aim",
     Default = false,
     Callback = function(value)
         SilentAimEnabled = value
     end
 })
 
-tab1:AddParagraph("","")
-
-tab1:AddDropdown({
-    Name = "Posição da FOV",
-    Default = "Center",
-    Options = {"Center", "Finger"},
-    Callback = function(option)
-        FOVPosition = option
-    end
-})
-
 tab1:AddTextbox({
-    Name = "Tamanho da FOV (0 - 300)",
+    Name = "Tamanho do FOV",
     Default = "100",
-    TextDisappear = true,
+    TextDisappear = false,
     Callback = function(value)
-        local size = tonumber(value)
-        if size and size >= 0 and size <= 300 then
-            FOV = size
+        local numericValue = tonumber(value)
+        if numericValue and numericValue >= 0 and numericValue <= 3400 then
+            FOV = numericValue
+            FOVCircle.Radius = numericValue
         else
-            warn("Tamanho inválido! Use um valor entre 0 e 300.")
+            print("Por favor, insira um valor entre 0 e 400.")
         end
     end
 })
 
--- Toggle para mostrar/ocultar o círculo de FOV
 tab1:AddToggle({
     Name = "Mostrar FOV",
     Default = false,
     Callback = function(value)
         FOVVisible = value
+        FOVCircle.Visible = value
     end
 })
 
--- Dropdown para selecionar a cor do FOV
-local colors = {
-    ["Branco"] = Color3.new(1, 1, 1),
-    ["Vermelho"] = Color3.new(1, 0, 0),
-    ["Verde"] = Color3.new(0, 1, 0),
-    ["Azul"] = Color3.new(0, 0, 1),
-    ["Amarelo"] = Color3.new(1, 1, 0),
-    ["Roxo"] = Color3.new(0.5, 0, 1),
-    ["Laranja"] = Color3.new(1, 0.5, 0),
-    ["Ciano"] = Color3.new(0, 1, 1),
-    ["Rosa"] = Color3.new(1, 0.5, 0.8),
-    ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
-}
+
 
 tab1:AddDropdown({
-    Name = "Selecione a cor do FOV",
+    Name = "Parte do Corpo",
+    Options = {"Cabeça", "Barriga"},
+    Default = "Barriga",
+    Callback = function(option)
+        targetPart = option == "Cabeça" and "Head" or "HumanoidRootPart"
+    end
+})
+
+tab1:AddParagraph("","")
+
+tab1:AddDropdown({
+    Name = "Cor do FOV",
     Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza"},
     Default = "Branco",
-    Callback = function(selected)
-        FOVCircle.Color = colors[selected]
+    Callback = function(option)
+        local colors = {
+            Branco = Color3.new(1, 1, 1),
+            Vermelho = Color3.new(1, 0, 0),
+            Verde = Color3.new(0, 1, 0),
+            Azul = Color3.new(0, 0, 1),
+            Amarelo = Color3.new(1, 1, 0)
+            Roxo = Color3.new(0.5, 0, 1)
+            Laranja = Color3.new(1, 0.5, 0)
+            Ciano = Color3.new(0, 1, 1)
+            Rosa = Color3.new(1, 0.5, 0.8)
+            Cinza = Color3.new(0.5, 0.5, 0.5)
+        }
+        FOVCircle.Color = colors[option]
     end
 })
 
