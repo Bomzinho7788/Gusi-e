@@ -89,6 +89,70 @@ end
 
 -- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
+-- Função de Silent Aim
+local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
+local teamCheckEnabled = false -- Variável para ativar/desativar o teamcheck
+
+tab1:AddDropdown({
+    Name = "Parte do Corpo",
+    Options = {"Cabeça", "Barriga"},
+    Default = "Barriga",
+    Callback = function(selected)
+        if selected == "Cabeça" then
+            targetPart = "Head"
+        elseif selected == "Barriga" then
+            targetPart = "HumanoidRootPart"
+        end
+    end
+})
+
+tab1:AddToggle({
+    Name = "Habilitar TeamCheck",
+    Default = false,
+    Callback = function(state)
+        teamCheckEnabled = state
+    end
+})
+
+-- Função para verificar se o jogador está dentro do FOV
+local function isPlayerInFOV(player)
+    local mousePos = getFOVPosition()
+    if player.Character and player.Character:FindFirstChild(targetPart) then
+        local charPart = player.Character:FindFirstChild(targetPart)
+        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+        return distance <= FOV
+    end
+    return false
+end
+
+-- Função para verificar se há parede no caminho entre a câmera e o alvo
+local function isVisible(target)
+    if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
+        return false
+    end
+
+    local camera = workspace.CurrentCamera
+    local targetPartPos = target.Character[targetPart].Position
+    local rayOrigin = camera.CFrame.Position
+    local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+    if raycastResult and raycastResult.Instance then
+        return raycastResult.Instance:IsDescendantOf(target.Character)
+    end
+
+    return true
+end
+
+-- Função para pegar o jogador mais próximo dentro do FOV
+local function getClosestPlayerInFOV()
     local closestPlayer = nil
     local players = game.Players:GetPlayers()
     local closestDistance = FOV
@@ -96,6 +160,13 @@ local function getClosestPlayerInFOV()
 
     for _, player in pairs(players) do
         if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
+            -- Verificação do TeamCheck
+            if teamCheckEnabled then
+                if player.Team == game.Players.LocalPlayer.Team then
+                    continue -- Ignorar jogadores do mesmo time
+                end
+            end
+
             local charPart = player.Character:FindFirstChild(targetPart)
             if charPart then
                 local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
@@ -128,6 +199,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
+end)
 
     -- Atualiza a posição do círculo de FOV
     FOVCircle.Position = getFOVPosition()
