@@ -28,11 +28,11 @@ local function getFOVPosition()
     local camera = workspace.CurrentCamera
     if FOVPosition == "Center" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-
--- .CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
-
-
-
+    else
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        return Vector2.new(mouse.X, mouse.Y)
+    end
+end
 
 -- Função de Silent Aim
 local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
@@ -128,6 +128,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
+
 
 
     -- Atualiza a posição do círculo de FOV
