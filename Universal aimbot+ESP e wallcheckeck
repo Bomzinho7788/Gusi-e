@@ -134,15 +134,6 @@ local function aimAt(target)
     end
 end
 
--- Adicionar toggle para ativar/desativar o team check
-tab1:AddToggle({
-    Name = "Ativar Team Check",
-    Default = true,
-    Callback = function(value)
-        TeamCheckEnabled = value
-    end
-})
-
 game:GetService("RunService").RenderStepped:Connect(function()
     if SilentAimEnabled then
         local target = getClosestPlayerInFOV()
@@ -167,7 +158,17 @@ tab1:AddToggle({
     end
 })
 
-tab1:AddParagraph("Paragraph","Paragraph Content")
+
+-- Adicionar toggle para ativar/desativar o team check
+tab1:AddToggle({
+    Name = "Ativar Team Check",
+    Default = true,
+    Callback = function(value)
+        TeamCheckEnabled = value
+    end
+})
+
+tab1:AddParagraph("","")
 
 tab1:AddDropdown({
     Name = "Posição da FOV",
@@ -224,7 +225,7 @@ tab1:AddDropdown({
     end
 })
 
-tab2:AddParagraph("Paragraph","Paragraph Content")
+tab2:AddParagraph("","")
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -335,7 +336,7 @@ tab2:AddDropdown({
     end
 })
 
-tab2:AddParagraph("Paragraph","Paragraph Content")
+tab2:AddParagraph("","")
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -454,7 +455,7 @@ tab2:AddDropdown({
     end,
 })
 
-tab2:AddParagraph("Paragraph","Paragraph Content")
+tab2:AddParagraph("","")
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
