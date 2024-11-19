@@ -28,6 +28,28 @@ local function getFOVPosition()
     local camera = workspace.CurrentCamera
     if FOVPosition == "Center" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+
+-- Variáveis de configuração
+local SilentAimEnabled = false
+local FOV = 100
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
+
+-- Configurar o círculo de FOV
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+
+-- Função para obter a posição da FOV
+local function getFOVPosition()
+    local camera = workspace.CurrentCamera
+    if FOVPosition == "Center" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     else
         local mouse = game.Players.LocalPlayer:GetMouse()
         return Vector2.new(mouse.X, mouse.Y)
@@ -36,7 +58,6 @@ end
 
 -- Função de Silent Aim
 local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
-local teamCheckEnabled = false -- Variável para ativar/desativar o teamcheck
 
 tab1:AddDropdown({
     Name = "Parte do Corpo",
@@ -48,14 +69,6 @@ tab1:AddDropdown({
         elseif selected == "Barriga" then
             targetPart = "HumanoidRootPart"
         end
-    end
-})
-
-tab1:AddToggle({
-    Name = "Habilitar TeamCheck",
-    Default = false,
-    Callback = function(state)
-        teamCheckEnabled = state
     end
 })
 
@@ -105,13 +118,6 @@ local function getClosestPlayerInFOV()
 
     for _, player in pairs(players) do
         if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
-            -- Verificação do TeamCheck
-            if teamCheckEnabled then
-                if player.Team == game.Players.LocalPlayer.Team then
-                    continue -- Ignorar jogadores do mesmo time
-                end
-            end
-
             local charPart = player.Character:FindFirstChild(targetPart)
             if charPart then
                 local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
@@ -144,7 +150,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
-end)
+
 
     -- Atualiza a posição do círculo de FOV
     FOVCircle.Position = getFOVPosition()
