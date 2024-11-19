@@ -312,6 +312,21 @@ tab2:AddDropdown({
     end
 })
 
+tab1:AddDropdown({
+    Name = "ESP Box Fill",
+    Default = "Desativado",
+    Options = {"Ativado", "Desativado"},
+    Callback = function(selected)
+        if selected == "Ativado" then
+            espBox.Filled = true
+        else
+            espBox.Filled = false
+        end
+    end
+})
+
+OrionLib:Init()
+
 tab2:AddParagraph("","")
 
 local Players = game:GetService("Players")
