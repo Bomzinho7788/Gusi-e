@@ -312,18 +312,7 @@ tab2:AddDropdown({
     end
 })
 
-tab2:AddDropdown({
-    Name = "ESP Box Fill",
-    Default = "Desativado",
-    Options = {"Ativado", "Desativado"},
-    Callback = function(selected)
-        if selected == "Ativado" then
-            espBox.Filled = true
-        else
-            espBox.Filled = false
-        end
-    end
-})
+
 
 
 tab2:AddParagraph("","")
@@ -533,7 +522,20 @@ tab2:AddDropdown({
 
 tab3:AddLabel("ByBomzinho")
 
+tab2:AddParagraph("","")
 
+tab2:AddDropdown({
+    Name = "ESP Box Fill",
+    Default = "Desativado",
+    Options = {"Ativado", "Desativado"},
+    Callback = function(selected)
+        if selected == "Ativado" then
+            espBox.Filled = true
+        else
+            espBox.Filled = false
+        end
+    end
+})
 
 
 
