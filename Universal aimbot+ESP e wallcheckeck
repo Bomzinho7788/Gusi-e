@@ -7,7 +7,7 @@ local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", 
 local tab2 = Window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
- Variáveis de configuração
+-- Variáveis de configuração
 local SilentAimEnabled = false
 local FOV = 100
 local FOVVisible = false
@@ -96,14 +96,17 @@ local function getClosestPlayerInFOV()
 
     for _, player in pairs(players) do
         if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
-            local charPart = player.Character:FindFirstChild(targetPart)
-            if charPart then
-                local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+            -- Verificar se o jogador é do time adversário
+            if player.Team ~= game.Players.LocalPlayer.Team then
+                local charPart = player.Character:FindFirstChild(targetPart)
+                if charPart then
+                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
 
-                if distance < closestDistance and isVisible(player) then
-                    closestDistance = distance
-                    closestPlayer = player
+                    if distance < closestDistance and isVisible(player) then
+                        closestDistance = distance
+                        closestPlayer = player
+                    end
                 end
             end
         end
@@ -128,6 +131,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
+end)
 
     -- Atualiza a posição do círculo de FOV
     FOVCircle.Position = getFOVPosition()
