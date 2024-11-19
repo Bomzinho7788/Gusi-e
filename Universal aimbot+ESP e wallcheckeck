@@ -7,14 +7,12 @@ local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", 
 local tab2 = Window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
--- Variáveis de configuração
--- Variáveis de configuração
+ Variáveis de configuração
 local SilentAimEnabled = false
 local FOV = 100
 local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
-local TeamCheckEnabled = true  -- Variável para ativar/desativar o team check
 
 -- Configurar o círculo de FOV
 FOVCircle.Radius = FOV
@@ -89,11 +87,6 @@ local function isVisible(target)
     return true
 end
 
--- Função para verificar se o jogador é inimigo (team check)
-local function isEnemy(targetPlayer)
-    return targetPlayer.Team ~= game.Players.LocalPlayer.Team
-end
-
 -- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
@@ -103,12 +96,6 @@ local function getClosestPlayerInFOV()
 
     for _, player in pairs(players) do
         if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
-            -- Adicionando o check de equipe aqui
-            if TeamCheckEnabled and not isEnemy(player) then
-                -- Ignora jogadores da mesma equipe se o team check estiver ativado
-                continue
-            end
-
             local charPart = player.Character:FindFirstChild(targetPart)
             if charPart then
                 local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
@@ -141,7 +128,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
-end)
 
     -- Atualiza a posição do círculo de FOV
     FOVCircle.Position = getFOVPosition()
@@ -155,16 +141,6 @@ tab1:AddToggle({
     Default = false,
     Callback = function(value)
         SilentAimEnabled = value
-    end
-})
-
-
--- Adicionar toggle para ativar/desativar o team check
-tab1:AddToggle({
-    Name = "Ativar Team Check",
-    Default = true,
-    Callback = function(value)
-        TeamCheckEnabled = value
     end
 })
 
