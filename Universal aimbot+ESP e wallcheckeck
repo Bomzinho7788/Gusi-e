@@ -312,7 +312,7 @@ tab2:AddDropdown({
     end
 })
 
-tab1:AddDropdown({
+tab2:AddDropdown({
     Name = "ESP Box Fill",
     Default = "Desativado",
     Options = {"Ativado", "Desativado"},
