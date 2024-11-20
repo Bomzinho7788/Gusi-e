@@ -107,6 +107,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
+tab1:AddParagraph("Aimbot","")
+
 tab1:AddToggle({
     Name = "Enable Aimbot",
     Default = false,
@@ -129,6 +131,8 @@ tab1:AddTextbox({
         end
     end
 })
+
+tab1:AddParagraph("Fov","")
 
 tab1:AddToggle({
     Name = "Show FOV",
@@ -162,6 +166,8 @@ tab1:AddDropdown({
         end
     end
 })
+
+tab1:AddParagraph("Target Part to Aim","")
 
 tab1:AddDropdown({
     Name = "Target Part",
@@ -240,6 +246,8 @@ for _, targetPlayer in pairs(Players:GetPlayers()) do
 end
 
 Players.PlayerAdded:Connect(addESPToPlayer)
+
+tab2:AddParagraph("Esp Box","")
 
 tab2:AddToggle({
     Name = "Enable ESP Box",
@@ -344,6 +352,8 @@ for _, player in pairs(Players:GetPlayers()) do
     end
 end
 
+tab2:AddParagraph("Esp Line","")
+
 tab2:AddToggle({
     Name = "Enable ESP Line",
     Default = espLineEnabled,
@@ -445,6 +455,8 @@ local function toggleChams(state)
         end
     end
 }
+
+tab2:AddParagraph("Chams","")
 
 tab2:AddToggle({
     Name = "Chams",
@@ -611,8 +623,10 @@ for _, player in pairs(Players:GetPlayers()) do
     end
 end
 
+tab2:AddParagraph("Skeleton","")
+
 tab2:AddToggle({
-    Name = "Enable Stickman",
+    Name = "Enable Skeleton",
     Default = stickmanEnabled,
     Callback = function(state)
         stickmanEnabled = state
@@ -625,7 +639,7 @@ tab2:AddToggle({
 })
 
 tab2:AddDropdown({
-    Name = "Stickman Color",
+    Name = "Skeleton Color",
     Default = "Red",
     Options = {"White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Gray", "RGB"},
     Callback = function(option)
@@ -673,7 +687,7 @@ tab3:AddToggle({
 -- Creators Script
 local tab3 = Window:MakeTab({Name = "Creators", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
-tab3:AddLabel("Creators:")
+tab3:AddParagraph("Creators","")
 
 tab3:AddLabel("Bomzinho")
 tab3:AddLabel("ChatGPT")
