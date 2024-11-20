@@ -7,12 +7,12 @@ local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", 
 local tab2 = Window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
--- Variáveis de configuração
 local SilentAimEnabled = false
 local FOV = 100
 local FOVVisible = false
 local FOVCircle = Drawing.new("Circle")
 local targetPart = "HumanoidRootPart"
+local isRGB = false
 
 -- Configurar círculo de FOV
 FOVCircle.Radius = FOV
@@ -21,6 +21,17 @@ FOVCircle.Color = Color3.new(1, 1, 1)
 FOVCircle.Transparency = 1
 FOVCircle.Visible = FOVVisible
 FOVCircle.Filled = false
+
+-- Função para animação RGB com velocidade reduzida
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1 -- Velocidade mais lenta (0.002 por frame)
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
 
 -- Função para atualizar a posição do círculo de FOV
 local function updateFOVPosition()
@@ -60,13 +71,18 @@ local function isVisible(player)
     return result and result.Instance:IsDescendantOf(player.Character)
 end
 
+-- Função para verificar se os jogadores estão na mesma equipe
+local function isSameTeam(player)
+    return game.Players.LocalPlayer.Team == player.Team
+end
+
 -- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
     local closestDistance = FOV
 
     for _, player in ipairs(game.Players:GetPlayers()) do
-        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
+        if player ~= game.Players.LocalPlayer and not isSameTeam(player) and player.Character and player.Character:FindFirstChild(targetPart) then
             local camera = workspace.CurrentCamera
             local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
 
@@ -104,17 +120,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
             aimAt(target)
         end
     end
+
+    if isRGB then
+        FOVCircle.Color = getRGBColor()
+    end
 end)
 
--- GUI com Orion Lib
-local tab1 = Window:MakeTab({
-    Name = "Aimbot",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
 tab1:AddToggle({
-    Name = "Ativar Silent Aim",
+    Name = "Ativar Aimbot",
     Default = false,
     Callback = function(value)
         SilentAimEnabled = value
@@ -127,11 +140,11 @@ tab1:AddTextbox({
     TextDisappear = false,
     Callback = function(value)
         local numericValue = tonumber(value)
-        if numericValue and numericValue >= 0 and numericValue <= 3400 then
+        if numericValue and numericValue >= 0 and numericValue <= 300 then
             FOV = numericValue
             FOVCircle.Radius = numericValue
         else
-            print("Por favor, insira um valor entre 0 e 400.")
+            print("Por favor, insira um valor entre 0 e 300.")
         end
     end
 })
@@ -145,7 +158,29 @@ tab1:AddToggle({
     end
 })
 
-
+tab1:AddDropdown({
+    Name = "Cor do FOV",
+    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza", "RGB Animado"},
+    Default = "Branco",
+    Callback = function(option)
+        isRGB = (option == "RGB Animado")
+        local colors = {
+            ["Branco"] = Color3.new(1, 1, 1),
+            ["Vermelho"] = Color3.new(1, 0, 0),
+            ["Verde"] = Color3.new(0, 1, 0),
+            ["Azul"] = Color3.new(0, 0, 1),
+            ["Amarelo"] = Color3.new(1, 1, 0),
+            ["Roxo"] = Color3.new(0.5, 0, 0.5),
+            ["Laranja"] = Color3.new(1, 0.5, 0),
+            ["Ciano"] = Color3.new(0, 1, 1),
+            ["Rosa"] = Color3.new(1, 0.75, 0.8),
+            ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
+        }
+        if not isRGB then
+            FOVCircle.Color = colors[option]
+        end
+    end
+})
 
 tab1:AddDropdown({
     Name = "Parte do Corpo",
@@ -156,28 +191,6 @@ tab1:AddDropdown({
     end
 })
 
-tab1:AddParagraph("","")
-
-tab1:AddDropdown({
-    Name = "Cor do FOV",
-    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza"},
-    Default = "Branco",
-    Callback = function(option)
-        local colors = {
-            Branco = Color3.new(1, 1, 1),
-            Vermelho = Color3.new(1, 0, 0),
-            Verde = Color3.new(0, 1, 0),
-            Azul = Color3.new(0, 0, 1),
-            Amarelo = Color3.new(1, 1, 0)
-            Roxo = Color3.new(0.5, 0, 1)
-            Laranja = Color3.new(1, 0.5, 0)
-            Ciano = Color3.new(0, 1, 1)
-            Rosa = Color3.new(1, 0.5, 0.8)
-            Cinza = Color3.new(0.5, 0.5, 0.5)
-        }
-        FOVCircle.Color = colors[option]
-    end
-})
 
 tab2:AddParagraph("","")
 
@@ -201,6 +214,11 @@ end
 
 local getRGBColor = rgbAnimation()
 
+-- Função para verificar se os jogadores estão na mesma equipe
+local function isSameTeam(player)
+    return game.Players.LocalPlayer.Team == player.Team
+end
+
 local function drawESP(targetPlayer)
     local espBox = Drawing.new("Square")
     espBox.Thickness = 1
@@ -210,6 +228,12 @@ local function drawESP(targetPlayer)
 
     RunService.RenderStepped:Connect(function()
         if espEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Verifica se o jogador está na mesma equipe
+            if isSameTeam(targetPlayer) then
+                espBox.Visible = false
+                return
+            end
+
             local humanoidRootPart = targetPlayer.Character.HumanoidRootPart
             local head = targetPlayer.Character:FindFirstChild("Head")
 
@@ -291,8 +315,6 @@ tab2:AddDropdown({
 })
 
 
-
-
 tab2:AddParagraph("","")
 
 local Players = game:GetService("Players")
@@ -303,7 +325,19 @@ local LocalPlayer = Players.LocalPlayer
 local espLineEnabled = false
 local espLineDirection = "Top" -- "Top" ou "Bottom"
 local lineColor = Color3.new(1, 0, 0) -- Cor inicial da linha (vermelho)
+local isRGB = false
 local lines = {}
+
+-- Função para animação RGB com velocidade reduzida
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1 -- Velocidade mais lenta (0.002 por frame)
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
 
 local colors = {
     Color3.new(1, 0, 0),   -- Vermelho
@@ -318,6 +352,11 @@ local colors = {
     Color3.new(0, 0, 0)    -- Preto
 }
 
+-- Função para verificar se os jogadores estão na mesma equipe
+local function isSameTeam(player)
+    return game.Players.LocalPlayer.Team == player.Team
+end
+
 local function createESPLine(player)
     local Line = Drawing.new("Line")
     Line.Color = lineColor
@@ -329,6 +368,12 @@ local function createESPLine(player)
 
     RunService.RenderStepped:Connect(function()
         if espLineEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            -- Verifica se o jogador está na mesma equipe
+            if isSameTeam(player) then
+                Line.Visible = false
+                return
+            end
+
             local rootPart = player.Character.HumanoidRootPart
             local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
 
@@ -339,6 +384,7 @@ local function createESPLine(player)
                     Line.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)  -- Linha vindo de baixo
                 end
                 Line.To = Vector2.new(screenPos.X, screenPos.Y)
+                Line.Color = isRGB and getRGBColor() or lineColor
                 Line.Visible = true
             else
                 Line.Visible = false
@@ -383,28 +429,23 @@ tab2:AddToggle({
 tab2:AddDropdown({
     Name = "Cor da Linha",
     Default = "Vermelho",  -- Cor inicial
-    Options = {"Vermelho", "Verde", "Azul", "Amarelo", "Laranja", "Roxo", "Ciano", "Magenta", "Cinza", "Preto"},
-    Callback = function(selected)
-        if selected == "Vermelho" then
-            lineColor = colors[1]
-        elseif selected == "Verde" then
-            lineColor = colors[2]
-        elseif selected == "Azul" then
-            lineColor = colors[3]
-        elseif selected == "Amarelo" then
-            lineColor = colors[4]
-        elseif selected == "Laranja" then
-            lineColor = colors[5]
-        elseif selected == "Roxo" then
-            lineColor = colors[6]
-        elseif selected == "Ciano" then
-            lineColor = colors[7]
-        elseif selected == "Magenta" then
-            lineColor = colors[8]
-        elseif selected == "Cinza" then
-            lineColor = colors[9]
-        elseif selected == "Preto" then
-            lineColor = colors[10]
+    Options = {"Vermelho", "Verde", "Azul", "Amarelo", "Laranja", "Roxo", "Ciano", "Magenta", "Cinza", "Preto", "RGB Animado"},
+    Callback = function(option)
+        isRGB = (option == "RGB Animado")
+        if not isRGB then
+            local colors = {
+                ["Vermelho"] = Color3.new(1, 0, 0),
+                ["Verde"] = Color3.new(0, 1, 0),
+                ["Azul"] = Color3.new(0, 0, 1),
+                ["Amarelo"] = Color3.new(1, 1, 0),
+                ["Laranja"] = Color3.new(1, 0.5, 0),
+                ["Roxo"] = Color3.new(0.5, 0, 0.5),
+                ["Ciano"] = Color3.new(0, 1, 1),
+                ["Magenta"] = Color3.new(1, 0, 1),
+                ["Cinza"] = Color3.new(0.5, 0.5, 0.5),
+                ["Preto"] = Color3.new(0, 0, 0)
+            }
+            lineColor = colors[option]
         end
         for _, line in pairs(lines) do
             line.Color = lineColor
@@ -419,9 +460,22 @@ local LocalPlayer = Players.LocalPlayer
 local chamsEnabled = false
 local chamsLoop
 local selectedColor = Color3.new(1, 0, 0) -- Cor inicial (vermelho)
+local isRGB = false
+
+-- Função para animação RGB com velocidade reduzida
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1 -- Velocidade mais lenta (0.002 por frame)
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
 
 -- Lista de cores disponíveis para o Chams
 local chamsColors = {
+    {Name = "Branco", Color = Color3.new(1, 1, 1)},
     {Name = "Vermelho", Color = Color3.new(1, 0, 0)},
     {Name = "Verde", Color = Color3.new(0, 1, 0)},
     {Name = "Azul", Color = Color3.new(0, 0, 1)},
@@ -429,14 +483,17 @@ local chamsColors = {
     {Name = "Roxo", Color = Color3.new(0.5, 0, 0.5)},
     {Name = "Laranja", Color = Color3.new(1, 0.5, 0)},
     {Name = "Ciano", Color = Color3.new(0, 1, 1)},
-    {Name = "Magenta", Color = Color3.new(1, 0, 1)},
-    {Name = "Branco", Color = Color3.new(1, 1, 1)},
-    {Name = "Cinza", Color = Color3.new(0.5, 0.5, 0.5)},
-    {Name = "Preto", Color = Color3.new(0, 0, 0)},
+    {Name = "Rosa", Color = Color3.new(1, 0.75, 0.8)},
+    {Name = "Cinza", Color = Color3.new(0.5, 0.5, 0.5)}
 }
 
+-- Função para verificar se os jogadores estão na mesma equipe
+local function isSameTeam(player)
+    return game.Players.LocalPlayer.Team == player.Team
+end
+
 local function applyChams(player)
-    if player ~= LocalPlayer and player.Character and not player.Character:FindFirstChild("Chams") then
+    if player ~= LocalPlayer and not isSameTeam(player) and player.Character and not player.Character:FindFirstChild("Chams") then
         local highlight = Instance.new("Highlight")
         highlight.Name = "Chams"
         highlight.FillColor = selectedColor -- Usar a cor selecionada
@@ -452,6 +509,9 @@ local function toggleChams(state)
             while chamsEnabled do
                 for _, player in pairs(Players:GetPlayers()) do
                     applyChams(player)
+                    if isRGB then
+                        selectedColor = getRGBColor()
+                    end
                 end
                 wait(0.25)
             end
@@ -479,8 +539,9 @@ tab2:AddToggle({
 tab2:AddDropdown({
     Name = "Escolher Cor para Chams",
     Default = chamsColors[1].Name,
-    Options = {chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name, chamsColors[6].Name, chamsColors[7].Name, chamsColors[8].Name, chamsColors[9].Name, chamsColors[10].Name, chamsColors[11].Name},
+    Options = {chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name, chamsColors[6].Name, chamsColors[7].Name, chamsColors[8].Name, chamsColors[9].Name, chamsColors[10].Name, "RGB Animado"},
     Callback = function(selected)
+        isRGB = (selected == "RGB Animado")
         for _, color in pairs(chamsColors) do
             if color.Name == selected then
                 selectedColor = color.Color -- Atualizar a cor selecionada
@@ -496,24 +557,189 @@ tab2:AddDropdown({
     end
 })
 
---others
+tab2:AddParagraph("","")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local stickmanEnabled = false
+local stickmanColor = Color3.new(1, 0, 0) -- Cor inicial (vermelho)
+local isRGB = false
+local stickmen = {}
+
+-- Função para animação RGB com velocidade reduzida
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1 -- Velocidade mais lenta (0.002 por frame)
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
+
+-- Lista de cores disponíveis
+local colors = {
+    ["Branco"] = Color3.new(1, 1, 1),
+    ["Vermelho"] = Color3.new(1, 0, 0),
+    ["Verde"] = Color3.new(0, 1, 0),
+    ["Azul"] = Color3.new(0, 0, 1),
+    ["Amarelo"] = Color3.new(1, 1, 0),
+    ["Roxo"] = Color3.new(0.5, 0, 0.5),
+    ["Laranja"] = Color3.new(1, 0.5, 0),
+    ["Ciano"] = Color3.new(0, 1, 1),
+    ["Rosa"] = Color3.new(1, 0.75, 0.8),
+    ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
+}
+
+-- Função para verificar se os jogadores estão na mesma equipe
+local function isSameTeam(player)
+    return game.Players.LocalPlayer.Team == player.Team
+end
+
+local function drawStickman(player)
+    local stickman = {
+        Head = Drawing.new("Circle"),
+        Body = Drawing.new("Line"),
+        LeftArm = Drawing.new("Line"),
+        RightArm = Drawing.new("Line"),
+        LeftLeg = Drawing.new("Line"),
+        RightLeg = Drawing.new("Line")
+    }
+
+    for _, part in pairs(stickman) do
+        part.Color = stickmanColor
+        part.Thickness = 2
+        part.Transparency = 1
+        part.Visible = false
+    end
+
+    stickmen[player] = stickman
+
+    RunService.RenderStepped:Connect(function()
+        if stickmanEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            -- Verifica se o jogador está na mesma equipe
+            if isSameTeam(player) then
+                for _, part in pairs(stickman) do
+                    part.Visible = false
+                end
+                return
+            end
+
+            local humanoidRootPart = player.Character.HumanoidRootPart
+            local head = player.Character:FindFirstChild("Head")
+            local leftArm = player.Character:FindFirstChild("Left Arm")
+            local rightArm = player.Character:FindFirstChild("Right Arm")
+            local leftLeg = player.Character:FindFirstChild("Left Leg")
+            local rightLeg = player.Character:FindFirstChild("Right Leg")
+
+            if head and leftArm and rightArm and leftLeg and rightLeg then
+                local headPos, onScreen1 = Camera:WorldToViewportPoint(head.Position)
+                local bodyPos, onScreen2 = Camera:WorldToViewportPoint(humanoidRootPart.Position)
+                local leftArmPos, onScreen3 = Camera:WorldToViewportPoint(leftArm.Position)
+                local rightArmPos, onScreen4 = Camera:WorldToViewportPoint(rightArm.Position)
+                local leftLegPos, onScreen5 = Camera:WorldToViewportPoint(leftLeg.Position)
+                local rightLegPos, onScreen6 = Camera:WorldToViewportPoint(rightLeg.Position)
+
+                if onScreen1 and onScreen2 and onScreen3 and onScreen4 and onScreen5 and onScreen6 then
+                    stickman.Head.Position = Vector2.new(headPos.X, headPos.Y)
+                    stickman.Head.Radius = 4
+                    stickman.Head.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.Head.Visible = true
+
+                    stickman.Body.From = Vector2.new(bodyPos.X, bodyPos.Y)
+                    stickman.Body.To = Vector2.new(headPos.X, headPos.Y)
+                    stickman.Body.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.Body.Visible = true
+
+                    stickman.LeftArm.From = Vector2.new(bodyPos.X, bodyPos.Y)
+                    stickman.LeftArm.To = Vector2.new(leftArmPos.X, leftArmPos.Y)
+                    stickman.LeftArm.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.LeftArm.Visible = true
+
+                    stickman.RightArm.From = Vector2.new(bodyPos.X, bodyPos.Y)
+                    stickman.RightArm.To = Vector2.new(rightArmPos.X, rightArmPos.Y)
+                    stickman.RightArm.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.RightArm.Visible = true
+
+                    stickman.LeftLeg.From = Vector2.new(bodyPos.X, bodyPos.Y)
+                    stickman.LeftLeg.To = Vector2.new(leftLegPos.X, leftLegPos.Y)
+                    stickman.LeftLeg.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.LeftLeg.Visible = true
+
+                    stickman.RightLeg.From = Vector2.new(bodyPos.X, bodyPos.Y)
+                    stickman.RightLeg.To = Vector2.new(rightLegPos.X, rightLegPos.Y)
+                    stickman.RightLeg.Color = isRGB and getRGBColor() or stickmanColor
+                    stickman.RightLeg.Visible = true
+                else
+                    for _, part in pairs(stickman) do
+                        part.Visible = false
+                    end
+                end
+            else
+                for _, part in pairs(stickman) do
+                    part.Visible = false
+                end
+            end
+        else
+            for _, part in pairs(stickman) do
+                part.Visible = false
+            end
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawStickman(player)
+        end)
+    end
+end)
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer and player.Character then
+        drawStickman(player)
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawStickman(player)
+        end)
+    end
+end
+
+-- GUI controls
+tab2:AddToggle({
+    Name = "Stickman",
+    Default = stickmanEnabled,
+    Callback = function(state)
+        stickmanEnabled = state
+        for _, stickman in pairs(stickmen) do
+            for _, part in pairs(stickman) do
+                part.Visible = state
+            end
+        end
+    end,
+})
+
+tab2:AddDropdown({
+    Name = "Cor do Stickman",
+    Default = "Vermelho",  -- Cor inicial
+    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza", "RGB Animado"},
+    Callback = function(option)
+        isRGB = (option == "RGB Animado")
+        if not isRGB then
+            stickmanColor = colors[option]
+        end
+    end,
+})
 
 tab3:AddLabel("ByBomzinho")
 
 tab2:AddParagraph("","")
 
-tab2:AddDropdown({
-    Name = "ESP Box Fill",
-    Default = "Desativado",
-    Options = {"Ativado", "Desativado"},
-    Callback = function(selected)
-        if selected == "Ativado" then
-            espBox.Filled = true
-        else
-            espBox.Filled = false
-        end
-    end
-})
 
 
 
