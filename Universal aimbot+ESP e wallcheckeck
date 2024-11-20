@@ -71,11 +71,6 @@ local function isVisible(player)
     return result and result.Instance:IsDescendantOf(player.Character)
 end
 
--- Função para verificar se os jogadores estão na mesma equipe
-local function isSameTeam(player)
-    return game.Players.LocalPlayer.Team == player.Team
-end
-
 -- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
