@@ -42,6 +42,50 @@ local function isPlayerInFOV(player)
     local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
     if not onScreen then
         return false
+-- Aimbot Script
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim_V5", HidePremium = true, SaveConfig = true, ConfigFolder = "SilentAimSettings"})
+
+local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+-- RGB Animation Function
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
+
+local SilentAimEnabled = false
+local FOV = 100
+local FOVVisible = false
+local FOVCircle = Drawing.new("Circle")
+local targetPart = "HumanoidRootPart"
+local isRGB = false
+
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+
+local function updateFOVPosition()
+    local camera = workspace.CurrentCamera
+    FOVCircle.Position = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+end
+
+local function isPlayerInFOV(player)
+    if not player or not player.Character or not player.Character:FindFirstChild(targetPart) then
+        return false
+    end
+    local camera = workspace.CurrentCamera
+    local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
+    if not onScreen then
+        return false
     end
     local fovPos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     local distance = (Vector2.new(screenPos.X, screenPos.Y) - fovPos).Magnitude
@@ -99,6 +143,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
         local target = getClosestPlayerInFOV()
         if target then
             aimAt(target)
+        else
+            print("No target found in FOV")
         end
     end
 
