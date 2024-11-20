@@ -684,8 +684,108 @@ tab3:AddToggle({
     end
 })
 
+-- Add Tab3 for Player Speed, Jump Height, Health adjustments, and Reset Button
+local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+-- Variables to store the speed, jump height, and health values
+local playerSpeed = 16
+local jumpHeight = 50
+local playerHealth = 100
+
+-- Function to update player's speed
+local function updatePlayerSpeed()
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerSpeed
+    end
+end
+
+-- Function to update player's jump height
+local function updateJumpHeight()
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = jumpHeight
+    end
+end
+
+-- Function to update player's health
+local function updatePlayerHealth()
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        game.Players.LocalPlayer.Character.Humanoid.Health = playerHealth
+        game.Players.LocalPlayer.Character.Humanoid.MaxHealth = playerHealth
+    end
+end
+
+-- Function to reset player's attributes
+local function resetPlayerAttributes()
+    playerSpeed = 16
+    jumpHeight = 50
+    playerHealth = 100
+    updatePlayerSpeed()
+    updateJumpHeight()
+    updatePlayerHealth()
+end
+
+-- Add Textbox for player speed
+tab3:AddTextbox({
+    Name = "Player Speed",
+    Default = tostring(playerSpeed),
+    TextDisappear = false,
+    Callback = function(value)
+        local numericValue = tonumber(value)
+        if numericValue then
+            playerSpeed = numericValue
+            updatePlayerSpeed()
+        else
+            print("Please enter a valid number.")
+        end
+    end
+})
+
+-- Add Textbox for jump height
+tab3:AddTextbox({
+    Name = "Jump Height",
+    Default = tostring(jumpHeight),
+    TextDisappear = false,
+    Callback = function(value)
+        local numericValue = tonumber(value)
+        if numericValue then
+            jumpHeight = numericValue
+            updateJumpHeight()
+        else
+            print("Please enter a valid number.")
+        end
+    end
+})
+
+-- Add Textbox for player health
+tab3:AddTextbox({
+    Name = "Player Health",
+    Default = tostring(playerHealth),
+    TextDisappear = false,
+    Callback = function(value)
+        local numericValue = tonumber(value)
+        if numericValue then
+            playerHealth = numericValue
+            updatePlayerHealth()
+        else
+            print("Please enter a valid number.")
+        end
+    end
+})
+
+-- Add Button for resetting player attributes
+tab3:AddButton({
+    Name = "Reset Attributes",
+    Callback = function()
+        resetPlayerAttributes()
+    end
+})
+
+-- Update player's speed, jump height, and health when the script runs
+updatePlayerSpeed()
+updateJumpHeight()
+updatePlayerHealth()
+
 -- Creators Script
-local tab3 = Window:MakeTab({Name = "Creators", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
 tab3:AddParagraph("Creators","")
 
