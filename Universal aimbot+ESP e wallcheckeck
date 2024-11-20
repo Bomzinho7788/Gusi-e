@@ -127,7 +127,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 tab1:AddToggle({
-    Name = "Ativar Aimbot",
+    Name = "Activate Aimbot",
     Default = false,
     Callback = function(value)
         SilentAimEnabled = value
@@ -135,7 +135,7 @@ tab1:AddToggle({
 })
 
 tab1:AddTextbox({
-    Name = "Tamanho do FOV",
+    Name = "FOV Size",
     Default = "100",
     TextDisappear = false,
     Callback = function(value)
@@ -150,7 +150,7 @@ tab1:AddTextbox({
 })
 
 tab1:AddToggle({
-    Name = "Mostrar FOV",
+    Name = "Show FOV",
     Default = false,
     Callback = function(value)
         FOVVisible = value
@@ -159,22 +159,22 @@ tab1:AddToggle({
 })
 
 tab1:AddDropdown({
-    Name = "Cor do FOV",
-    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza", "RGB Animado"},
-    Default = "Branco",
+    Name = "Fov Color",
+    Default = "White",
+    Options = {"White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Gray", "Animated RGB"},
     Callback = function(option)
-        isRGB = (option == "RGB Animado")
+        isRGB = (option == "Animated RGB")
         local colors = {
-            ["Branco"] = Color3.new(1, 1, 1),
-            ["Vermelho"] = Color3.new(1, 0, 0),
-            ["Verde"] = Color3.new(0, 1, 0),
-            ["Azul"] = Color3.new(0, 0, 1),
-            ["Amarelo"] = Color3.new(1, 1, 0),
-            ["Roxo"] = Color3.new(0.5, 0, 0.5),
-            ["Laranja"] = Color3.new(1, 0.5, 0),
-            ["Ciano"] = Color3.new(0, 1, 1),
-            ["Rosa"] = Color3.new(1, 0.75, 0.8),
-            ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
+            ["White"] = Color3.fromRGB(255, 255, 255),
+            ["Red"] = Color3.fromRGB(255, 0, 0),
+            ["Green"] = Color3.fromRGB(0, 255, 0),
+            ["Blue"] = Color3.fromRGB(0, 0, 255),
+            ["Yellow"] = Color3.fromRGB(255, 255, 0),
+            ["Purple"] = Color3.fromRGB(128, 0, 128),
+            ["Orange"] = Color3.fromRGB(255, 165, 0),
+            ["Cyan"] = Color3.fromRGB(0, 255, 255),
+            ["Pink"] = Color3.fromRGB(255, 192, 203),
+            ["Gray"] = Color3.fromRGB(128, 128, 128)
         }
         if not isRGB then
             FOVCircle.Color = colors[option]
@@ -183,11 +183,11 @@ tab1:AddDropdown({
 })
 
 tab1:AddDropdown({
-    Name = "Parte do Corpo",
-    Options = {"Cabeça", "Barriga"},
-    Default = "Barriga",
+    Name = "Body Part",
+    Options = {"Head", "HumanoidRootPart"},
+    Default = "HumanoidRootPart",
     Callback = function(option)
-        targetPart = option == "Cabeça" and "Head" or "HumanoidRootPart"
+        targetPart = option == "Head" and "Head" or "HumanoidRootPart"
     end
 })
 
@@ -278,7 +278,7 @@ Players.PlayerAdded:Connect(addESPToPlayer)
 
 
 tab2:AddToggle({
-    Name = "Ativar ESP Box",
+    Name = "Activate ESP Box",
     Default = espEnabled,
     Callback = function(state)
         espEnabled = state
@@ -291,22 +291,22 @@ tab2:AddToggle({
 })
 
 tab2:AddDropdown({
-    Name = "Cor da ESP Box",
-    Default = "Branco",
-    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza", "RGB Animado"},
+    Name = "ESP Box Color",
+    Default = "White",
+    Options = {"White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Gray", "Animated RGB"},
     Callback = function(option)
-        isRGB = (option == "RGB Animado")
+        isRGB = (option == "Animated RGB")
         local colors = {
-            ["Branco"] = Color3.fromRGB(255, 255, 255),
-            ["Vermelho"] = Color3.fromRGB(255, 0, 0),
-            ["Verde"] = Color3.fromRGB(0, 255, 0),
-            ["Azul"] = Color3.fromRGB(0, 0, 255),
-            ["Amarelo"] = Color3.fromRGB(255, 255, 0),
-            ["Roxo"] = Color3.fromRGB(128, 0, 128),
-            ["Laranja"] = Color3.fromRGB(255, 165, 0),
-            ["Ciano"] = Color3.fromRGB(0, 255, 255),
-            ["Rosa"] = Color3.fromRGB(255, 192, 203),
-            ["Cinza"] = Color3.fromRGB(128, 128, 128)
+            ["White"] = Color3.fromRGB(255, 255, 255),
+            ["Red"] = Color3.fromRGB(255, 0, 0),
+            ["Green"] = Color3.fromRGB(0, 255, 0),
+            ["Blue"] = Color3.fromRGB(0, 0, 255),
+            ["Yellow"] = Color3.fromRGB(255, 255, 0),
+            ["Purple"] = Color3.fromRGB(128, 0, 128),
+            ["Orange"] = Color3.fromRGB(255, 165, 0),
+            ["Cyan"] = Color3.fromRGB(0, 255, 255),
+            ["Pink"] = Color3.fromRGB(255, 192, 203),
+            ["Gray"] = Color3.fromRGB(128, 128, 128)
         }
         if not isRGB then
             espColor = colors[option]
@@ -427,24 +427,24 @@ tab2:AddToggle({
 })
 
 tab2:AddDropdown({
-    Name = "Cor da Linha",
-    Default = "Vermelho",  -- Cor inicial
-    Options = {"Vermelho", "Verde", "Azul", "Amarelo", "Laranja", "Roxo", "Ciano", "Magenta", "Cinza", "Preto", "RGB Animado"},
+    Name = "Line Color",
+    Default = "White",
+    Options = {"White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Gray", "Animated RGB"},
     Callback = function(option)
-        isRGB = (option == "RGB Animado")
+        isRGB = (option == "Animated RGB")
+        local colors = {
+            ["White"] = Color3.fromRGB(255, 255, 255),
+            ["Red"] = Color3.fromRGB(255, 0, 0),
+            ["Green"] = Color3.fromRGB(0, 255, 0),
+            ["Blue"] = Color3.fromRGB(0, 0, 255),
+            ["Yellow"] = Color3.fromRGB(255, 255, 0),
+            ["Purple"] = Color3.fromRGB(128, 0, 128),
+            ["Orange"] = Color3.fromRGB(255, 165, 0),
+            ["Cyan"] = Color3.fromRGB(0, 255, 255),
+            ["Pink"] = Color3.fromRGB(255, 192, 203),
+            ["Gray"] = Color3.fromRGB(128, 128, 128)
+        }
         if not isRGB then
-            local colors = {
-                ["Vermelho"] = Color3.new(1, 0, 0),
-                ["Verde"] = Color3.new(0, 1, 0),
-                ["Azul"] = Color3.new(0, 0, 1),
-                ["Amarelo"] = Color3.new(1, 1, 0),
-                ["Laranja"] = Color3.new(1, 0.5, 0),
-                ["Roxo"] = Color3.new(0.5, 0, 0.5),
-                ["Ciano"] = Color3.new(0, 1, 1),
-                ["Magenta"] = Color3.new(1, 0, 1),
-                ["Cinza"] = Color3.new(0.5, 0.5, 0.5),
-                ["Preto"] = Color3.new(0, 0, 0)
-            }
             lineColor = colors[option]
         end
         for _, line in pairs(lines) do
@@ -475,16 +475,16 @@ local getRGBColor = rgbAnimation()
 
 -- Lista de cores disponíveis para o Chams
 local chamsColors = {
-    {Name = "Branco", Color = Color3.new(1, 1, 1)},
-    {Name = "Vermelho", Color = Color3.new(1, 0, 0)},
-    {Name = "Verde", Color = Color3.new(0, 1, 0)},
-    {Name = "Azul", Color = Color3.new(0, 0, 1)},
-    {Name = "Amarelo", Color = Color3.new(1, 1, 0)},
-    {Name = "Roxo", Color = Color3.new(0.5, 0, 0.5)},
-    {Name = "Laranja", Color = Color3.new(1, 0.5, 0)},
-    {Name = "Ciano", Color = Color3.new(0, 1, 1)},
-    {Name = "Rosa", Color = Color3.new(1, 0.75, 0.8)},
-    {Name = "Cinza", Color = Color3.new(0.5, 0.5, 0.5)}
+    {Name = "White", Color = Color3.new(1, 1, 1)},
+    {Name = "Red", Color = Color3.new(1, 0, 0)},
+    {Name = "Green", Color = Color3.new(0, 1, 0)},
+    {Name = "Blue", Color = Color3.new(0, 0, 1)},
+    {Name = "Yellow", Color = Color3.new(1, 1, 0)},
+    {Name = "Purple", Color = Color3.new(0.5, 0, 0.5)},
+    {Name = "Orange", Color = Color3.new(1, 0.5, 0)},
+    {Name = "Cyan", Color = Color3.new(0, 1, 1)},
+    {Name = "Pink", Color = Color3.new(1, 0.75, 0.8)},
+    {Name = "Gray", Color = Color3.new(0.5, 0.5, 0.5)}
 }
 
 -- Função para verificar se os jogadores estão na mesma equipe
@@ -537,11 +537,11 @@ tab2:AddToggle({
 
 -- Adicionar o Dropdown para escolher a cor
 tab2:AddDropdown({
-    Name = "Escolher Cor para Chams",
+    Name = "Set Chams Color",
     Default = chamsColors[1].Name,
     Options = {chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name, chamsColors[6].Name, chamsColors[7].Name, chamsColors[8].Name, chamsColors[9].Name, chamsColors[10].Name, "RGB Animado"},
     Callback = function(selected)
-        isRGB = (selected == "RGB Animado")
+        isRGB = (selected == "Animated RGB")
         for _, color in pairs(chamsColors) do
             if color.Name == selected then
                 selectedColor = color.Color -- Atualizar a cor selecionada
@@ -582,16 +582,16 @@ local getRGBColor = rgbAnimation()
 
 -- Lista de cores disponíveis
 local colors = {
-    ["Branco"] = Color3.new(1, 1, 1),
-    ["Vermelho"] = Color3.new(1, 0, 0),
-    ["Verde"] = Color3.new(0, 1, 0),
-    ["Azul"] = Color3.new(0, 0, 1),
-    ["Amarelo"] = Color3.new(1, 1, 0),
-    ["Roxo"] = Color3.new(0.5, 0, 0.5),
-    ["Laranja"] = Color3.new(1, 0.5, 0),
-    ["Ciano"] = Color3.new(0, 1, 1),
-    ["Rosa"] = Color3.new(1, 0.75, 0.8),
-    ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
+    ["White"] = Color3.new(1, 1, 1),
+    ["Red"] = Color3.new(1, 0, 0),
+    ["Green"] = Color3.new(0, 1, 0),
+    ["Blue"] = Color3.new(0, 0, 1),
+    ["Yellow"] = Color3.new(1, 1, 0),
+    ["Purple"] = Color3.new(0.5, 0, 0.5),
+    ["Orange"] = Color3.new(1, 0.5, 0),
+    ["Cyan"] = Color3.new(0, 1, 1),
+    ["Pink"] = Color3.new(1, 0.75, 0.8),
+    ["Gray"] = Color3.new(0.5, 0.5, 0.5)
 }
 
 -- Função para verificar se os jogadores estão na mesma equipe
@@ -726,10 +726,10 @@ tab2:AddToggle({
 
 tab2:AddDropdown({
     Name = "Cor do Stickman",
-    Default = "Vermelho",  -- Cor inicial
-    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza", "RGB Animado"},
+    Default = "White",  -- Cor inicial
+    Options = {"White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Gray", "Animated RGB"},
     Callback = function(option)
-        isRGB = (option == "RGB Animado")
+        isRGB = (option == "Animated RGB")
         if not isRGB then
             stickmanColor = colors[option]
         end
