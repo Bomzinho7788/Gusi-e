@@ -1,20 +1,30 @@
--- Carregar a biblioteca Orion
+-- Load Orion Library
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 local Window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim_V5", HidePremium = true, SaveConfig = true, ConfigFolder = "SilentAimSettings"})
 
--- Configurar a aba principal
+-- Create Tabs
 local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", PremiumOnly = false})
-local tab2 = Window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local tab2 = Window:MakeTab({Name = "ESP", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local tab3 = Window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local tab4 = Window:MakeTab({Name = "Credits", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
--- Variáveis de configuração
+-- Add Paragraphs
+tab1:AddParagraph("Aimbot", "The aimbot functionality allows players to automatically aim at their targets with high precision. This feature helps in gaining a competitive edge by enhancing aiming accuracy, ensuring that the player's aim snaps directly to the opponent's hitbox, usually the head or torso. The aimbot can be customized with different FOV sizes, colors, and target parts to suit the player's preferences.")
+tab2:AddParagraph("ESP Box", "The ESP Box feature enables players to see the bounding boxes around other players. This visual enhancement helps identify the position and movement of opponents, even through walls and obstacles. The ESP Box can be personalized with various colors and an optional RGB animation for a dynamic visual experience.")
+tab2:AddParagraph("ESP Line", "ESP Line provides a visual line that connects the player to their opponents, indicating the direction and distance of the targets. This feature aids in tracking enemy movement and positioning, offering a strategic advantage in gameplay. The ESP Line can be customized with different colors, including RGB animation.")
+tab2:AddParagraph("Chams", "Chams is a visual modification that changes the appearance of player models, making them brightly colored and more visible. This feature helps in distinguishing opponents easily, especially in complex environments. Chams can be configured with a variety of colors and an RGB animation to enhance the visual effect.")
+tab2:AddParagraph("Skeleton", "The Skeleton feature draws a stickman-like overlay on players, highlighting their limbs and joints. This visual aid helps in understanding the exact movements and positions of opponents, providing a clear view of their actions. The Skeleton can be customized with different colors and an RGB animation for a more dynamic display.")
+tab3:AddParagraph("Attributes", "The Attributes section allows players to adjust various character attributes such as speed, jump height, and health. These settings can be modified to enhance the player's in-game performance and adaptability. Additionally, a reset button is available to revert all attributes to their default values.")
+tab3:AddParagraph("Empty", "")
+
+-- Aimbot Script
 local SilentAimEnabled = false
 local FOV = 100
 local FOVVisible = false
 local FOVCircle = Drawing.new("Circle")
 local targetPart = "HumanoidRootPart"
+local isRGB = false
 
--- Configurar círculo de FOV
 FOVCircle.Radius = FOV
 FOVCircle.Thickness = 1
 FOVCircle.Color = Color3.new(1, 1, 1)
@@ -22,32 +32,35 @@ FOVCircle.Transparency = 1
 FOVCircle.Visible = FOVVisible
 FOVCircle.Filled = false
 
--- Função para atualizar a posição do círculo de FOV
+local function rgbAnimation()
+    local hue = 0
+    return function()
+        hue = (hue + 0.002) % 1
+        return Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local getRGBColor = rgbAnimation()
+
 local function updateFOVPosition()
     local camera = workspace.CurrentCamera
     FOVCircle.Position = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 end
 
--- Função para verificar se o jogador está dentro do FOV
 local function isPlayerInFOV(player)
     if not player or not player.Character or not player.Character:FindFirstChild(targetPart) then
         return false
     end
-
     local camera = workspace.CurrentCamera
     local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
-
     if not onScreen then
         return false
     end
-
     local fovPos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     local distance = (Vector2.new(screenPos.X, screenPos.Y) - fovPos).Magnitude
-
     return distance <= FOV
 end
 
--- Função para verificar se há parede no caminho
 local function isVisible(player)
     local rayOrigin = workspace.CurrentCamera.CFrame.Position
     local rayDirection = (player.Character[targetPart].Position - rayOrigin).Unit * (player.Character[targetPart].Position - rayOrigin).Magnitude
@@ -60,7 +73,6 @@ local function isVisible(player)
     return result and result.Instance:IsDescendantOf(player.Character)
 end
 
--- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
     local closestDistance = FOV
@@ -83,7 +95,6 @@ local function getClosestPlayerInFOV()
     return closestPlayer
 end
 
--- Função para mirar no jogador
 local function aimAt(target)
     if target and target.Character and target.Character:FindFirstChild(targetPart) then
         local camera = workspace.CurrentCamera
@@ -92,7 +103,6 @@ local function aimAt(target)
     end
 end
 
--- Atualizar círculo de FOV
 game:GetService("RunService").RenderStepped:Connect(function()
     if FOVVisible then
         updateFOVPosition()
@@ -102,22 +112,26 @@ game:GetService("RunService").RenderStepped:Connect(function()
         local target = getClosestPlayerInFOV()
         if target then
             aimAt(target)
+        else
+            print("No target found in FOV")
         end
+    end
+
+    if isRGB then
+        FOVCircle.Color = getRGBColor()
     end
 end)
 
-
-
 tab1:AddToggle({
-    Name = "Ativar Aimbot",
+    Name = "Enable Aimbot",
     Default = false,
     Callback = function(value)
         SilentAimEnabled = value
     end
-})b
+})
 
 tab1:AddTextbox({
-    Name = "Tamanho do FOV",
+    Name = "FOV Size",
     Default = "100",
     TextDisappear = false,
     Callback = function(value)
@@ -126,13 +140,13 @@ tab1:AddTextbox({
             FOV = numericValue
             FOVCircle.Radius = numericValue
         else
-            print("Por favor, insira um valor entre 0 e 300.")
+            print("Please enter a value between 0 and 300.")
         end
     end
 })
 
 tab1:AddToggle({
-    Name = "Mostrar FOV",
+    Name = "Show FOV",
     Default = false,
     Callback = function(value)
         FOVVisible = value
@@ -189,63 +203,27 @@ tab1:AddDropdown({
     end
 })
 
-tab1:AddDropdown({
-    Name = "Parte do Corpo",
-    Options = {"Cabeça", "Barriga"},
-    Default = "Barriga",
-    Callback = function(option)
-        targetPart = option == "Cabeça" and "Head" or "HumanoidRootPart"
-    end
-})
-
-
-tab2:AddParagraph("","")
-
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local camera = game.Workspace.CurrentCamera
-
+-- ESP Box Script
 local espEnabled = false
-local espColor = Color3.fromRGB(255, 255, 255) -- Branco padrão
-local isRGB = false
-
--- Função para animação RGB com velocidade reduzida
-local function rgbAnimation()
-    local hue = 0
-    return function()
-        hue = (hue + 0.002) % 1 -- Velocidade mais lenta (0.002 por frame)
-        return Color3.fromHSV(hue, 1, 1)
-    end
-end
-
-local getRGBColor = rgbAnimation()
+local espColor = Color3.fromRGB(255, 255, 255) -- Default white
+local espIsRGB = false
 
 local function drawESP(targetPlayer)
     local espBox = Drawing.new("Square")
     espBox.Thickness = 1
     espBox.Filled = false
     espBox.Transparency = 1
-    espBox.Visible = false
+    espBox.Color = espColor
 
     RunService.RenderStepped:Connect(function()
         if espEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local humanoidRootPart = targetPlayer.Character.HumanoidRootPart
-            local head = targetPlayer.Character:FindFirstChild("Head")
-
-            if humanoidRootPart and head then
-                local rootPos, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                local headPos, _ = camera:WorldToViewportPoint(head.Position)
-                local distance = (headPos - rootPos).magnitude
-
-                if onScreen then
-                    espBox.Size = Vector2.new(distance * 2, distance * 3)
-                    espBox.Position = Vector2.new(rootPos.X - espBox.Size.X / 2, rootPos.Y - espBox.Size.Y / 2)
-                    espBox.Color = isRGB and getRGBColor() or espColor
-                    espBox.Visible = true
-                else
-                    espBox.Visible = false
-                end
+            local rootPart = targetPlayer.Character.HumanoidRootPart
+            local screenPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+            if onScreen then
+                espBox.Size = Vector2.new(50, 50) -- Change this based on your need
+                espBox.Position = Vector2.new(screenPos.X - espBox.Size.X / 2, screenPos.Y - espBox.Size.Y / 2)
+                espBox.Color = espIsRGB and getRGBColor() or espColor
+                espBox.Visible = true
             else
                 espBox.Visible = false
             end
@@ -255,34 +233,29 @@ local function drawESP(targetPlayer)
     end)
 end
 
-local function addESPToPlayer(player)
-    if player.Character then
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
         drawESP(player)
-    end
-    player.CharacterAdded:Connect(function()
-        drawESP(player)
-    end)
-end
-
-for _, targetPlayer in pairs(Players:GetPlayers()) do
-    if targetPlayer ~= LocalPlayer then
-        addESPToPlayer(targetPlayer)
+        player.CharacterAdded:Connect(function()
+            drawESP(player)
+        end)
     end
 end
 
-Players.PlayerAdded:Connect(addESPToPlayer)
-
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        drawESP(player)
+        player.CharacterAdded:Connect(function()
+            drawESP(player)
+        end)
+    end
+end)
 
 tab2:AddToggle({
-    Name = "Ativar ESP Box",
+    Name = "Enable ESP Box",
     Default = espEnabled,
     Callback = function(state)
         espEnabled = state
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                addESPToPlayer(player)
-            end
-        end
     end
 })
 
@@ -290,136 +263,50 @@ tab2:AddDropdown({
     Name = "ESP Box Color",
     Default = "White",
     Options = {
-        "White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Brown", "Black", 
-        "Gray", "Lime", "Magenta", "Rose", "Violet", "Navy", "Olive", "Gold", "Silver", "Maroon", 
-        "Mint", "Coral", "Turquoise", "Chocolate", "Cream", "Teal", "Crimson", "Ruby", "Amber", 
+        "White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Pink", "Brown", "Black",
+        "Gray", "Lime", "Magenta", "Rose", "Violet", "Navy", "Olive", "Gold", "Silver", "Maroon",
+        "Mint", "Coral", "Turquoise", "Chocolate", "Cream", "Teal", "Crimson", "Ruby", "Amber",
         "Jade", "Lavender", "RGB"
     },
     Callback = function(option)
-        local colors = {
-            White = Color3.fromRGB(255, 255, 255),
-            Red = Color3.fromRGB(255, 0, 0),
-            Green = Color3.fromRGB(0, 255, 0),
-            Blue = Color3.fromRGB(0, 0, 255),
-            Yellow = Color3.fromRGB(255, 255, 0),
-            Purple = Color3.fromRGB(128, 0, 128),
-            Orange = Color3.fromRGB(255, 165, 0),
-            Cyan = Color3.fromRGB(0, 255, 255),
-            Pink = Color3.fromRGB(255, 192, 203),
-            Brown = Color3.fromRGB(165, 42, 42),
-            Black = Color3.fromRGB(0, 0, 0),
-            Gray = Color3.fromRGB(128, 128, 128),
-            Lime = Color3.fromRGB(0, 255, 0),
-            Magenta = Color3.fromRGB(255, 0, 255),
-            Rose = Color3.fromRGB(255, 102, 204),
-            Violet = Color3.fromRGB(238, 130, 238),
-            Navy = Color3.fromRGB(0, 0, 128),
-            Olive = Color3.fromRGB(128, 128, 0),
-            Gold = Color3.fromRGB(255, 215, 0),
-            Silver = Color3.fromRGB(192, 192, 192),
-            Maroon = Color3.fromRGB(128, 0, 0),
-            Mint = Color3.fromRGB(189, 252, 201),
-            Coral = Color3.fromRGB(255, 127, 80),
-            Turquoise = Color3.fromRGB(64, 224, 208),
-            Chocolate = Color3.fromRGB(210, 105, 30),
-            Cream = Color3.fromRGB(255, 253, 208),
-            Teal = Color3.fromRGB(0, 128, 128),
-            Crimson = Color3.fromRGB(220, 20, 60),
-            Ruby = Color3.fromRGB(224, 17, 95),
-            Amber = Color3.fromRGB(255, 191, 0),
-            Jade = Color3.fromRGB(0, 168, 107),
-            Lavender = Color3.fromRGB(230, 230, 250)
-        }
-
         if option == "RGB" then
-            isRGB = true
+            espIsRGB = true
         else
-            isRGB = false
+            espIsRGB = false
             espColor = colors[option]
         end
     end
 })
 
-
-
-
-tab2:AddParagraph("","")
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = game.Workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-local espLineEnabled = false
-local espLineDirection = "Top" -- "Top" ou "Bottom"
-local lineColor = Color3.new(1, 0, 0) -- Cor inicial da linha (vermelho)
+-- ESP Line Script
 local lines = {}
 
-local colors = {
-    Color3.new(1, 0, 0),   -- Vermelho
-    Color3.new(0, 1, 0),   -- Verde
-    Color3.new(0, 0, 1),   -- Azul
-    Color3.new(1, 1, 0),   -- Amarelo
-    Color3.new(1, 0.5, 0), -- Laranja
-    Color3.new(0.5, 0, 0.5), -- Roxo
-    Color3.new(0, 1, 1),   -- Ciano
-    Color3.new(1, 0, 1),   -- Magenta
-    Color3.new(0.5, 0.5, 0.5), -- Cinza
-    Color3.new(0, 0, 0),    -- Preto
-    Color3.new(1, 1, 1),    -- Branco
-    Color3.new(0.75, 0.75, 0.75), -- Prata
-    Color3.new(0.5, 0.4, 0.3), -- Marrom
-    Color3.new(0.3, 0.3, 0.6), -- Azul Escuro
-    Color3.new(0.6, 0.2, 0.2), -- Vermelho Escuro
-    Color3.new(0.4, 0.4, 0.2), -- Verde Oliva
-    Color3.new(0.8, 0.8, 0.2), -- Amarelo Claro
-    Color3.new(0.7, 0.2, 0.5), -- Rosa
-    Color3.new(0.2, 0.7, 0.8), -- Turquesa
-    Color3.new(0.8, 0.5, 0.2), -- Laranja Queimada
-    Color3.new(0.2, 0.8, 0.3), -- Verde Limão
-    Color3.new(0.6, 0.4, 0.6), -- Lavanda
-    Color3.new(0.8, 0.8, 0.8)  -- Cinza Claro
-}
-
 local function createESPLine(player)
-    local Line = Drawing.new("Line")
-    Line.Color = lineColor
-    Line.Thickness = 1
-    Line.Transparency = 1
-    Line.Visible = false
+    local line = Drawing.new("Line")
+    line.Color = espColor
+    line.Thickness = 1
+    line.Transparency = 1
+    line.Visible = false
 
-    lines[player] = Line
+    lines[player] = line
 
     RunService.RenderStepped:Connect(function()
-        if espLineEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        if espEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local rootPart = player.Character.HumanoidRootPart
-            local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-
+            local screenPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
             if onScreen then
-                if espLineDirection == "Top" then
-                    Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)  -- Linha vindo de cima
-                elseif espLineDirection == "Bottom" then
-                    Line.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)  -- Linha vindo de baixo
-                end
-                Line.To = Vector2.new(screenPos.X, screenPos.Y)
-                Line.Visible = true
+                line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, 0)
+                line.To = Vector2.new(screenPos.X, screenPos.Y)
+                line.Color = espIsRGB and getRGBColor() or espColor
+                line.Visible = true
             else
-                Line.Visible = false
+                line.Visible = false
             end
         else
-            Line.Visible = false
+            line.Visible = false
         end
     end)
 end
-
-Players.PlayerAdded:Connect(function(player)
-    if player ~= LocalPlayer then
-        player.CharacterAdded:Connect(function()
-            wait(0)
-            createESPLine(player)
-        end)
-    end
-end)
 
 for _, player in pairs(Players:GetPlayers()) do
     if player ~= LocalPlayer and player.Character then
@@ -431,24 +318,36 @@ for _, player in pairs(Players:GetPlayers()) do
     end
 end
 
--- GUI controls
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            createESPLine(player)
+        end)
+    end
+end)
+
 tab2:AddToggle({
-    Name = "Esp Line",
-    Default = espLineEnabled,
+    Name = "Enable ESP Line",
+    Default = espEnabled,
     Callback = function(state)
-        espLineEnabled = state
+        espEnabled = state
         for _, line in pairs(lines) do
             line.Visible = state
         end
-    end,
+    end
 })
 
 tab2:AddDropdown({
     Name = "Line Color",
-    Default = "Red",  -- Initial color
-    Options = {"Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Gray", "Black", "White", "Silver", "Brown", "Dark Blue", "Dark Red", "Olive", "Light Yellow", "Pink", "Turquoise", "Burnt Orange", "Lime Green", "Lavender", "Light Gray", "RGB"},
+    Default = "Red",
+    Options = {
+        "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Gray", "Black", "White",
+        "Silver", "Brown", "Dark Blue", "Dark Red", "Olive", "Light Yellow", "Pink", "Turquoise",
+        "Burnt Orange", "Lime Green", "Lavender", "Light Gray", "RGB"
+    },
     Callback = function(selected)
-        isRGB = (selected == "RGB")
+        espIsRGB = (selected == "RGB")
         local colorsMap = {
             ["Red"] = colors[1],
             ["Green"] = colors[2],
@@ -474,24 +373,19 @@ tab2:AddDropdown({
             ["Lavender"] = colors[22],
             ["Light Gray"] = colors[23]
         }
-        if not isRGB then
-            lineColor = colorsMap[selected]
-        end
-        for _, line in pairs(lines) do
-            line.Color = lineColor
+        if not espIsRGB then
+            espColor = colorsMap[selected]
         end
     end
 })
 
-tab2:AddParagraph("","")
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+-- Chams Script
 local chamsEnabled = false
 local chamsLoop
-local selectedColor = Color3.new(1, 0, 0) -- Cor inicial (vermelho)
+local selectedColor = Color3.new(1, 0, 0) -- Initial color (red)
+local isRGB = false
 
--- Lista de cores disponíveis para o Chams
+-- List of available colors for Chams
 local chamsColors = {
     {Name = "Red", Color = Color3.new(1, 0, 0)},
     {Name = "Green", Color = Color3.new(0, 1, 0)},
@@ -504,6 +398,7 @@ local chamsColors = {
     {Name = "White", Color = Color3.new(1, 1, 1)},
     {Name = "Gray", Color = Color3.new(0.5, 0.5, 0.5)},
     {Name = "Black", Color = Color3.new(0, 0, 0)},
+    {Name = "Brown", Color = Color3.new(0.65,
     {Name = "Brown", Color = Color3.new(0.65, 0.16, 0.16)},
     {Name = "Silver", Color = Color3.new(0.75, 0.75, 0.75)},
     {Name = "Pink", Color = Color3.new(1, 0.75, 0.8)},
@@ -525,50 +420,88 @@ local chamsColors = {
     {Name = "Lavender", Color = Color3.new(0.9, 0.9, 0.98)}
 }
 
-local function applyChams(player)
-    if player ~= LocalPlayer and player.Character and not player.Character:FindFirstChild("Chams") then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "Chams"
-        highlight.FillColor = selectedColor -- Usar a cor selecionada
-        highlight.FillTransparency = 0.5
-        highlight.OutlineTransparency = 1
-        highlight.Parent = player.Character
-    end
-end
-
-local function toggleChams(state)
-    if state then
-        chamsLoop = coroutine.wrap(function()
-            while chamsEnabled do
-                for _, player in pairs(Players:GetPlayers()) do
-                    applyChams(player)
-                end
-                wait(0.25)
-            end
-        end)
-        chamsLoop()
-    else
-        for _, player in pairs(Players:GetPlayers()) do
-            if player.Character and player.Character:FindFirstChild("Chams") then
-                player.Character.Chams:Destroy()
-            end
-        end
-    end
-end
-
-tab2:AddToggle({
-    Name = "Chams",
-    Default = chamsEnabled,
-    Callback = function(state)
-        chamsEnabled = state
-        toggleChams(state)
-    end
-})
-
--- Adicionar o Dropdown para escolher a cor
 tab2:AddDropdown({
     Name = "Choose Chams Color",
     Default = chamsColors[1].Name,
     Options = {
-        chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name, 
-        chamsColors[6].Nap
+        chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name,
+        chamsColors[6].Name, chamsColors[7].Name, chamsColors[8].Name, chamsColors[9].Name, chamsColors[10].Name,
+        chamsColors[11].Name, chamsColors[12].Name, chamsColors[13].Name, chamsColors[14].Name, chamsColors[15].Name,
+        chamsColors[16].Name, chamsColors[17].Name, chamsColors[18].Name, chamsColors[19].Name, chamsColors[20].Name,
+        chamsColors[21].Name, chamsColors[22].Name, chamsColors[23].Name, chamsColors[24].Name, chamsColors[25].Name,
+        chamsColors[26].Name, chamsColors[27].Name, chamsColors[28].Name, chamsColors[29].Name, chamsColors[30].Name,
+        "RGB"
+    },
+    Callback = function(selected)
+        if selected == "RGB" then
+            isRGB = true
+        else
+            isRGB = false
+            for _, color in pairs(chamsColors) do
+                if color.Name == selected then
+                    selectedColor = color.Color -- Atualizar a cor selecionada
+                    break
+                end
+            end
+        end
+
+        -- Se o Chams estiver ativado, desativa e ativa novamente para aplicar a nova cor
+        if chamsEnabled then
+            toggleChams(false)
+            toggleChams(true)
+        end
+    end
+})
+
+-- Skeleton Script
+local skeletonEnabled = false
+local skeletonColor = Color3.new(1, 0, 0) -- Initial color (red)
+local skeletonIsRGB = false
+local skeletonLines = {}
+
+local function drawSkeleton(player)
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    -- Create lines for each part of the skeleton
+    local parts = {
+        head = character:FindFirstChild("Head"),
+        torso = character:FindFirstChild("HumanoidRootPart"),
+        leftArm = character:FindFirstChild("LeftUpperArm"),
+        rightArm = character:FindFirstChild("RightUpperArm"),
+        leftLeg = character:FindFirstChild("LeftUpperLeg"),
+        rightLeg = character:FindFirstChild("RightUpperLeg")
+    }
+    
+    if not (parts.head and parts.torso and parts.leftArm and parts.rightArm and parts.leftLeg and parts.rightLeg) then return end
+
+    -- Initialize skeleton lines if not already done
+    if not skeletonLines[player] then
+        skeletonLines[player] = {
+            headToTorso = Drawing.new("Line"),
+            leftArm = Drawing.new("Line"),
+            rightArm = Drawing.new("Line"),
+            leftLeg = Drawing.new("Line"),
+            rightLeg = Drawing.new("Line")
+        }
+    end
+    
+    local lines = skeletonLines[player]
+    
+    -- Function to update line positions
+    local function updateLine(line, part1, part2)
+        local screenPos1, onScreen1 = workspace.CurrentCamera:WorldToViewportPoint(part1.Position)
+        local screenPos2, onScreen2 = workspace.CurrentCamera:WorldToViewportPoint(part2.Position)
+        line.Visible = onScreen1 and onScreen2 and skeletonEnabled
+        if line.Visible then
+            line.From = Vector2.new(screenPos1.X, screenPos1.Y)
+            line.To = Vector2.new(screenPos2.X, screenPos2.Y)
+            line.Color = skeletonIsRGB and getRGBColor() or skeletonColor
+            line.Thickness = 2
+        end
+    end
+
+    -- Update positions of all lines in render loop
+    RunService.RenderStepped:Connect(function()
+        if player and player.Character then
+            updateLine(lines.headToTorso, 
