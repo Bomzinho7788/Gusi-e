@@ -1,287 +1,45 @@
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+   Name = "Esp",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Rayfield Interface Suite",
+   LoadingSubtitle = "by Sirius",
+   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
-local RunService = game:GetService("RunService")
-local players = game:GetService("Players")
-local workspace = game:GetService("Workspace")
-local plr = players.LocalPlayer
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
 
---> [< Variables >] <--
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
 
-local hue = 0
+   Discord = {
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
 
-local gmEnabled = false
-
-local fireRate = 0.3
-local pelletAmount = 1
-local reloadTime = 0
-local damageDropOff = 0
-local isAuto = true
-local delayedShell = false
-local recoilEnabled = false
-local Recoil = Vector3.new(0, 0, 0)
-
-local e = false
-
---> [< Variables >] <--
-
-local window = OrionLib:MakeWindow({Name = "Bom_Hub_GGFFA", HidePremium = false, SaveConfig = true, IntroText = "Bom_Hub_Aim"})
-
-local tab1 = window:MakeTab({Name = "Gun Mods", Icon = "rbxassetid://4483345998"})
-
---> [< Gun Mods >] <--
-tab1:AddToggle({
-    Name = "Gun Mods Enabled",
-    Default = false,
-    Callback = function(Value)
-        gmEnabled = Value
-        
-        -- Notificação ao ativar/desativar
-        if gmEnabled then
-            OrionLib:MakeNotification({
-                Name = "Gun Mod",
-                Content = "Reset to enable!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Gun Mod",
-                Content = "Reset to enable!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        end
-
-        -- Função de loop para modificar as armas
-        while gmEnabled do
-            if plr.Character then
-                local folder = plr.Character:FindFirstChildWhichIsA("Tool")
-                
-                if folder and folder:FindFirstChild("Configuration") then
-                    for _, v in ipairs(folder.Configuration:GetChildren()) do
-                        if v.Name == "FireRate" and not e then
-                            e = true
-                            v.Value = v.Value * fireRate
-                        end
-                        if v.Name == "reloadTime" then
-                            v.Value = reloadTime
-                        end
-                        if v.Name == "DamageDropoff" then
-                            v.Value = damageDropOff
-                        end
-                        if v.Name == "isAuto" then
-                            v.Value = isAuto
-                        end
-                        if v.Name == "DelayedShell" then
-                            v.Value = delayedShell
-                        end
-                        if v.Name == "Recoil" then
-                            if recoilEnabled then
-                                v.Value = Recoil
-                            end
-                        end
-                    end
-
-                    -- Configuração do efeito de hit
-                    if hitEffectEnabled then
-                        local heffect = folder.Configuration:FindFirstChild("HitEffect")
-                        if heffect then
-                            heffect.Value = hitEffect
-                        else
-                            heffect = Instance.new("StringValue")
-                            heffect.Name = "HitEffect"
-                            heffect.Value = hitEffect
-                            heffect.Parent = folder.Configuration
-                        end
-                    end
-                else
-                    e = false
-                end
-            end
-            wait()
-        end
-    end
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+   }
 })
 
-tab1:AddTextbox({
-    Name = "Fire Rate",
-    Default = "0.3",
-    TextDisappear = false,
-    Callback = function(Value)
-        fireRate = tonumber(Value)
-        if fireRate then
-            OrionLib:MakeNotification({
-                Name = "Fire Rate",
-                Content = "Reset to update!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Error",
-                Content = "Please enter a valid number!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        end
-    end
-})
-tab1:AddTextbox({
-    Name = "Reload Time",
-    Default = "0",
-    TextDisappear = false,
-    Callback = function(Value)
-        reloadTime = tonumber(Value)
-        if reloadTime then
-            OrionLib:MakeNotification({
-                Name = "Reload Time",
-                Content = "Reset to update!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Error",
-                Content = "Please enter a valid number!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        end
-    end
-})
-
-tab1:AddTextbox({
-    Name = "Damage Drop Off",
-    Default = "0",
-    TextDisappear = false,
-    Callback = function(Value)
-        damageDropOff = tonumber(Value)
-        if damageDropOff then
-            OrionLib:MakeNotification({
-                Name = "Damage Drop Off",
-                Content = "Reset to update!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Error",
-                Content = "Please enter a valid number!",
-                Image = "rbxassetid://4483362458",
-                Time = 5
-            })
-        end
-    end
-})
-
-tab1:AddToggle({
-    Name = "Force Auto",
-    Default = true,
-    Callback = function(Value)
-        isAuto = Value
-        OrionLib:MakeNotification({
-            Name = "Force Auto",
-            Content = "Reset to update!",
-            Image = "rbxassetid://4483362458",
-            Time = 5
-        })
-    end
-})
-
-tab1:AddToggle({
-    Name = "Rapid Shotguns",
-    Default = true,
-    Callback = function(Value)
-        delayedShell = not Value
-        OrionLib:MakeNotification({
-            Name = "Rapid Shotguns",
-            Content = "Reset to update!",
-            Image = "rbxassetid://4483362458",
-            Time = 5
-        })
-    end
-})
-
---> [< Gun Mods >] <--
-
-
-local tab2 = window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998"})
-local tab3 = window:MakeTab({Name = "Esp", Icon = "rbxassetid://4483345998"})
-local tab4 = window:MakeTab({Name = "Others", Icon = "rbxassetid://4483345998"})
+local tab2 = Window:CreateTab("Esp", 4483362458) -- Title, Image
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local camera = game.Workspace.CurrentCamera
-local aimPart = "Head"
-local fovCircle = Drawing.new("Circle")
-fovCircle.Thickness = 1
-fovCircle.Filled = false
-fovCircle.Color = Color3.new(1, 0, 0)
-fovCircle.Transparency = 0.5
-fovCircle.Visible = false
-local fovRadius = 50
-local fovEnabled = false
-local aimbotEnabled = false
-local wallcheckEnabled = false
 local espEnabled = false
-
-local function updateFovCircle()
-    if fovEnabled then
-        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-        fovCircle.Position = mousePos
-        fovCircle.Radius = fovRadius
-        fovCircle.Visible = true
-    else
-        fovCircle.Visible = false
-    end
-end
-
-RunService.RenderStepped:Connect(updateFovCircle)
-
-local function getClosestPlayerInFOV()
-    local closestPlayer = nil
-    local shortestDistance = fovRadius
-
-    for _, targetPlayer in pairs(Players:GetPlayers()) do
-        if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
-            local part = targetPlayer.Character[aimPart]
-            local screenPos, onScreen = camera:WorldToViewportPoint(part.Position)
-            if onScreen then
-                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
-
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closestPlayer = part
-                end
-            end
-        end
-    end
-
-    return closestPlayer
-end
-
-local function silentAimAtClosestPlayer()
-    if aimbotEnabled then
-        local targetPart = getClosestPlayerInFOV()
-
-        if targetPart then
-            local aimPosition = targetPart.Position + Vector3.new(0, 0.5, 0)
-            camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
-        end
-    end
-end
-
-RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
-
-local function regenerateHP()
-    while wait(0) do
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.Health = LocalPlayer.Character.Humanoid.MaxHealth
-        end
-    end
-end
 
 local function drawESP(targetPlayer)
     local espBox = Drawing.new("Square")
@@ -334,287 +92,23 @@ end
 
 Players.PlayerAdded:Connect(addESPToPlayer)
 
-tab2:AddToggle({
-    Name = "Ativar FOV",
-    Default = fovEnabled,
-    Callback = function(state)
-        fovEnabled = state
-    end
+local Toggle = tab2:CreateToggle({
+   Name = "Enable Esp Box",
+   CurrentValue = espEnabled,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   espEnabled = state
+    for _, player in pairs(Players:GetPlayers()) do
+     if player ~= LocalPlayer then
+       addESPToPlayer(player)
+   end,
 })
 
-tab2:AddToggle({
-    Name = "Ativar Aimbot",
-    Default = aimbotEnabled,
-    Callback = function(state)
-        aimbotEnabled = state
+local ColorPicker = tab2:CreateColorPicker({
+    Name = "Esp Box Color",
+    Color = Color3.fromRGB(1,0,0),
+    Flag = "ColorPicker1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+       espBox.Color = value
     end
 })
-
-tab2:AddTextbox({
-    Name = "Tamanho do FOV (0-250)",
-    Default = tostring(fovRadius),
-    TextDisappear = false,
-    Callback = function(input)
-        local value = tonumber(input)
-        if value and value >= 0 and value <= 250 then
-            fovRadius = value
-        else
-            print("Por favor, insira um valor entre 0 e 250.")
-        end
-    end
-})
-
-tab4:AddToggle({
-    Name = "Regenerar HP",
-    Default = false,
-    Callback = function(state)
-        if state then
-            spawn(regenerateHP)
-        end
-    end
-})
-
-tab3:AddToggle({
-    Name = "Ativar ESP Box",
-    Default = espEnabled,
-    Callback = function(state)
-        espEnabled = state
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                addESPToPlayer(player)
-            end
-        end
-    end
-})
-
--- Botões da aba "Others"
-tab4:AddButton({
-    Name = "Fechar Hub",
-    Callback = function()
-        OrionLib:Destroy()
-    end
-})
-
-tab4:AddButton({
-    Name = "Salvar Configurações",
-    Callback = function()
-        OrionLib:Save()
-        print("Configurações salvas!")
-    end
-})
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = game.Workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-local espLineEnabled = false
-local lines = {}
-
-local function createESPLine(player)
-    local Line = Drawing.new("Line")
-    Line.Color = Color3.new(1, 0, 0)
-    Line.Thickness = 1
-    Line.Transparency = 1
-    Line.Visible = false
-
-    lines[player] = Line
-
-    RunService.RenderStepped:Connect(function()
-        if espLineEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local rootPart = player.Character.HumanoidRootPart
-            local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-
-            if onScreen then
-                Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)
-                Line.To = Vector2.new(screenPos.X, screenPos.Y)
-                Line.Visible = true
-            else
-                Line.Visible = false
-            end
-        else
-            Line.Visible = false
-        end
-    end)
-end
-
-Players.PlayerAdded:Connect(function(player)
-    if player ~= LocalPlayer then
-        player.CharacterAdded:Connect(function()
-            wait(0)
-            createESPLine(player)
-        end)
-    end
-end)
-
-for _, player in pairs(Players:GetPlayers()) do
-    if player ~= LocalPlayer and player.Character then
-        createESPLine(player)
-        player.CharacterAdded:Connect(function()
-            wait(0)
-            createESPLine(player)
-        end)
-    end
-end
-
-tab3:AddToggle({
-    Name = "Esp Line",
-    Default = espLineEnabled,
-    Callback = function(state)
-        espLineEnabled = state
-        for _, line in pairs(lines) do
-            line.Visible = state
-        end
-    end,
-})
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local chamsEnabled = false
-local chamsLoop
-
-local function applyChams(player)
-    if player ~= LocalPlayer and player.Character and not player.Character:FindFirstChild("Chams") then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "Chams"
-        highlight.FillColor = Color3.new(1, 0, 0) -- Vermelho
-        highlight.FillTransparency = 0.5
-        highlight.OutlineTransparency = 1
-        highlight.Parent = player.Character
-    end
-end
-
-local function toggleChams(state)
-    if state then
-        chamsLoop = coroutine.wrap(function()
-            while chamsEnabled do
-                for _, player in pairs(Players:GetPlayers()) do
-                    applyChams(player)
-                end
-                wait(0.25)
-            end
-        end)
-        chamsLoop()
-    else
-        for _, player in pairs(Players:GetPlayers()) do
-            if player.Character and player.Character:FindFirstChild("Chams") then
-                player.Character.Chams:Destroy()
-            end
-        end
-    end
-end
-
-tab3:AddToggle({
-    Name = "Chams",
-    Default = chamsEnabled,
-    Callback = function(state)
-        chamsEnabled = state
-        toggleChams(state)
-    end
-})
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = game.Workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-local skeletonEnabled = false
-
-local function createSkeleton(character)
-    local parts = {
-        Head = character:FindFirstChild("Head"),
-        Torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso"),
-        LeftArm = character:FindFirstChild("Left Arm") or character:FindFirstChild("LeftUpperArm"),
-        RightArm = character:FindFirstChild("Right Arm") or character:FindFirstChild("RightUpperArm"),
-        LeftLeg = character:FindFirstChild("Left Leg") or character:FindFirstChild("LeftUpperLeg"),
-        RightLeg = character:FindFirstChild("Right Leg") or character:FindFirstChild("RightUpperLeg")
-    }
-
-    local lines = {}
-    for i = 1, 7 do
-        local line = Drawing.new("Line")
-        line.Color = Color3.new(1, 0, 0)
-        line.Thickness = 1
-        line.Transparency = 1
-        lines[i] = line
-    end
-
-    local function updateSkeleton()
-        if skeletonEnabled and character.Parent and parts.Head and parts.Torso and parts.LeftArm and parts.RightArm and parts.LeftLeg and parts.RightLeg then
-            local headPos, headVis = Camera:WorldToViewportPoint(parts.Head.Position)
-            local torsoPos, torsoVis = Camera:WorldToViewportPoint(parts.Torso.Position)
-            local leftArmPos, leftArmVis = Camera:WorldToViewportPoint(parts.LeftArm.Position)
-            local rightArmPos, rightArmVis = Camera:WorldToViewportPoint(parts.RightArm.Position)
-            local leftLegPos, leftLegVis = Camera:WorldToViewportPoint(parts.LeftLeg.Position)
-            local rightLegPos, rightLegVis = Camera:WorldToViewportPoint(parts.RightLeg.Position)
-
-            if headVis and torsoVis and leftArmVis and rightArmVis and leftLegVis and rightLegVis then
-                lines[1].From, lines[1].To = Vector2.new(headPos.X, headPos.Y), Vector2.new(torsoPos.X, torsoPos.Y)
-                lines[2].From, lines[2].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(leftArmPos.X, leftArmPos.Y)
-                lines[3].From, lines[3].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(rightArmPos.X, rightArmPos.Y)
-                lines[4].From, lines[4].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(leftLegPos.X, leftLegPos.Y)
-                lines[5].From, lines[5].To = Vector2.new(torsoPos.X, torsoPos.Y), Vector2.new(rightLegPos.X, rightLegPos.Y)
-                lines[6].From, lines[6].To = Vector2.new(leftArmPos.X, leftArmPos.Y), Vector2.new(leftLegPos.X, leftLegPos.Y)
-                lines[7].From, lines[7].To = Vector2.new(rightArmPos.X, rightArmPos.Y), Vector2.new(rightLegPos.X, rightLegPos.Y)
-                for _, line in pairs(lines) do line.Visible = true end
-            else
-                for _, line in pairs(lines) do line.Visible = false end
-            end
-        else
-            for _, line in pairs(lines) do line.Visible = false end
-        end
-    end
-
-    RunService.RenderStepped:Connect(updateSkeleton)
-end
-
-Players.PlayerAdded:Connect(function(player)
-    if player ~= LocalPlayer then
-        player.CharacterAdded:Connect(function(character)
-            wait(0.5)
-            createSkeleton(character)
-        end)
-    end
-end)
-
-for _, player in pairs(Players:GetPlayers()) do
-    if player ~= LocalPlayer and player.Character then
-        createSkeleton(player.Character)
-        player.CharacterAdded:Connect(function(character)
-            wait(0.5)
-            createSkeleton(character)
-        end)
-    end
-end
-
-tab3:AddToggle({
-    Name = "Skeleton ESP",
-    Default = false,
-    Callback = function(value)
-        skeletonEnabled = value
-    end,
-})
-
-tab4:AddLabel("ByBomzinho")
-
-local function setAimPart(selection)
-    aimPart = selection
-end
-
-tab2:AddDropdown({
-    Name = "Aim Position",
-    Default = aimPart,
-    Options = {"Head", "Torso"},
-    Callback = function(value)
-        aimPart = value
-    end
-})
-
-tab4:AddButton({
-	Name = "get ramdom weapon!",
-	Callback = function()
-      		game:GetService("ReplicatedStorage").Remotes.PlayerReQuests.GetCurrentWep:FireServer()
-  	end    
-})
-
-OrionLib:Init()
