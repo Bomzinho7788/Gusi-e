@@ -349,29 +349,29 @@ tab2:AddDropdown({
     Callback = function(selected)
         espIsRGB = (selected == "RGB")
         local colorsMap = {
-            ["Red"] = colors[1],
-            ["Green"] = colors[2],
-            ["Blue"] = colors[3],
-            ["Yellow"] = colors[4],
-            ["Orange"] = colors[5],
-            ["Purple"] = colors[6],
-            ["Cyan"] = colors[7],
-            ["Magenta"] = colors[8],
-            ["Gray"] = colors[9],
-            ["Black"] = colors[10],
-            ["White"] = colors[11],
-            ["Silver"] = colors[12],
-            ["Brown"] = colors[13],
-            ["Dark Blue"] = colors[14],
-            ["Dark Red"] = colors[15],
-            ["Olive"] = colors[16],
-            ["Light Yellow"] = colors[17],
-            ["Pink"] = colors[18],
-            ["Turquoise"] = colors[19],
-            ["Burnt Orange"] = colors[20],
-            ["Lime Green"] = colors[21],
-            ["Lavender"] = colors[22],
-            ["Light Gray"] = colors[23]
+            ["Red"] = Color3.new(1, 0, 0),
+            ["Green"] = Color3.new(0, 1, 0),
+            ["Blue"] = Color3.new(0, 0, 1),
+            ["Yellow"] = Color3.new(1, 1, 0),
+            ["Orange"] = Color3.new(1, 0.5, 0),
+            ["Purple"] = Color3.new(0.5, 0, 0.5),
+            ["Cyan"] = Color3.new(0, 1, 1),
+            ["Magenta"] = Color3.new(1, 0, 1),
+            ["Gray"] = Color3.new(0.5, 0.5, 0.5),
+            ["Black"] = Color3.new(0, 0, 0),
+            ["White"] = Color3.new(1, 1, 1),
+            ["Silver"] = Color3.new(0.75, 0.75, 0.75),
+            ["Brown"] = Color3.new(0.65, 0.16, 0.16),
+            ["Dark Blue"] = Color3.new(0.3, 0.3, 0.6),
+            ["Dark Red"] = Color3.new(0.6, 0.2, 0.2),
+            ["Olive"] = Color3.new(0.5, 0.5, 0.2),
+            ["Light Yellow"] = Color3.new(0.8, 0.8, 0.2),
+            ["Pink"] = Color3.new(1, 0.75, 0.8),
+            ["Turquoise"] = Color3.new(0.25, 0.88, 0.82),
+            ["Burnt Orange"] = Color3.new(0.8, 0.5, 0.2),
+            ["Lime Green"] = Color3.new(0, 1, 0.2),
+            ["Lavender"] = Color3.new(0.9, 0.9, 0.98),
+            ["Light Gray"] = Color3.new(0.8, 0.8, 0.8)
         }
         if not espIsRGB then
             espColor = colorsMap[selected]
@@ -381,7 +381,6 @@ tab2:AddDropdown({
 
 -- Chams Script
 local chamsEnabled = false
-local chamsLoop
 local selectedColor = Color3.new(1, 0, 0) -- Initial color (red)
 local isRGB = false
 
@@ -398,7 +397,6 @@ local chamsColors = {
     {Name = "White", Color = Color3.new(1, 1, 1)},
     {Name = "Gray", Color = Color3.new(0.5, 0.5, 0.5)},
     {Name = "Black", Color = Color3.new(0, 0, 0)},
-    {Name = "Brown", Color = Color3.new(0.65,
     {Name = "Brown", Color = Color3.new(0.65, 0.16, 0.16)},
     {Name = "Silver", Color = Color3.new(0.75, 0.75, 0.75)},
     {Name = "Pink", Color = Color3.new(1, 0.75, 0.8)},
@@ -420,24 +418,48 @@ local chamsColors = {
     {Name = "Lavender", Color = Color3.new(0.9, 0.9, 0.98)}
 }
 
+-- Function to toggle Chams on or off
+local function toggleChams(state)
+    chamsEnabled = state
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            for _, part in pairs(player.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    if chamsEnabled then
+                        part.Color = isRGB and getRGBColor() or selectedColor
+                        part.Material = Enum.Material.Neon
+                    else
+                        part.Material = Enum.Material.Plastic
+                    end
+                end
+            end
+        end
+    end
+end
+
+tab2:AddToggle({
+    Name = "Enable Chams",
+    Default = chamsEnabled,
+    Callback = function(state)
+        toggleChams(state)
+    end
+})
+
 tab2:AddDropdown({
     Name = "Choose Chams Color",
-    Default = chamsColors[1].Name,
+    Default = "Red",
     Options = {
-        chamsColors[1].Name, chamsColors[2].Name, chamsColors[3].Name, chamsColors[4].Name, chamsColors[5].Name,
-        chamsColors[6].Name, chamsColors[7].Name, chamsColors[8].Name, chamsColors[9].Name, chamsColors[10].Name,
-        chamsColors[11].Name, chamsColors[12].Name, chamsColors[13].Name, chamsColors[14].Name, chamsColors[15].Name,
-        chamsColors[16].Name, chamsColors[17].Name, chamsColors[18].Name, chamsColors[19].Name, chamsColors[20].Name,
-        chamsColors[21].Name, chamsColors[22].Name, chamsColors[23].Name, chamsColors[24].Name, chamsColors[25].Name,
-        chamsColors[26].Name, chamsColors[27].Name, chamsColors[28].Name, chamsColors[29].Name, chamsColors[30].Name,
-        "RGB"
+        "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Magenta", "White", "Gray", "Black",
+        "Brown", "Silver", "Pink", "Lime", "Violet", "Navy", "Olive", "Gold", "Mint", "Coral",
+        "Turquoise", "Chocolate", "Cream", "Teal", "Crimson", "Ruby", "Amber", "Jade", "Lavender", "RGB"
     },
     Callback = function(selected)
         if selected == "RGB" then
             isRGB = true
         else
             isRGB = false
-            for _, color in pairs(chamsColors) do
+            for _, color in ipairs(chamsColors) do
                 if color.Name == selected then
                     selectedColor = color.Color -- Atualizar a cor selecionada
                     break
@@ -585,5 +607,131 @@ tab2:AddDropdown({
     end
 })
 
+local function drawSkeleton(player)
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    -- Create lines for each part of the skeleton
+    local parts = {
+        head = character:FindFirstChild("Head"),
+        torso = character:FindFirstChild("HumanoidRootPart"),
+        leftArm = character:FindFirstChild("LeftUpperArm"),
+        rightArm = character:FindFirstChild("RightUpperArm"),
+        leftLeg = character:FindFirstChild("LeftUpperLeg"),
+        rightLeg = character:FindFirstChild("RightUpperLeg")
+    }
+    
+    if not (parts.head and parts.torso and parts.leftArm and parts.rightArm and parts.leftLeg and parts.rightLeg) then return end
+
+    -- Initialize skeleton lines if not already done
+    if not skeletonLines[player] then
+        skeletonLines[player] = {
+            headToTorso = Drawing.new("Line"),
+            leftArm = Drawing.new("Line"),
+            rightArm = Drawing.new("Line"),
+            leftLeg = Drawing.new("Line"),
+            rightLeg = Drawing.new("Line")
+        }
+    end
+    
+    local lines = skeletonLines[player]
+    
+    -- Function to update line positions
+    local function updateLine(line, part1, part2)
+        local screenPos1, onScreen1 = workspace.CurrentCamera:WorldToViewportPoint(part1.Position)
+        local screenPos2, onScreen2 = workspace.CurrentCamera:WorldToViewportPoint(part2.Position)
+        line.Visible = onScreen1 and onScreen2 and skeletonEnabled
+        if line.Visible then
+            line.From = Vector2.new(screenPos1.X, screenPos1.Y)
+            line.To = Vector2.new(screenPos2.X, screenPos2.Y)
+            line.Color = skeletonIsRGB and getRGBColor() or skeletonColor
+            line.Thickness = 2
+        end
+    end
+
+    -- Update positions of all lines in render loop
+    RunService.RenderStepped:Connect(function()
+        if player and player.Character then
+            updateLine(lines.headToTorso, parts.head, parts.torso)
+            updateLine(lines.leftArm, parts.torso, parts.leftArm)
+            updateLine(lines.rightArm, parts.torso, parts.rightArm)
+            updateLine(lines.leftLeg, parts.torso, parts.leftLeg)
+            updateLine(lines.rightLeg, parts.torso, parts.rightLeg)
+        else
+            for _, line in pairs(lines) do
+                line.Visible = false
+            end
+        end
+    end)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        drawSkeleton(player)
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawSkeleton(player)
+        end)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    if player ~= game.Players.LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawSkeleton(player)
+        end)
+    end
+end)
+
+tab2:AddToggle({
+    Name = "Enable Skeleton",
+    Default = skeletonEnabled,
+    Callback = function(state)
+        skeletonEnabled = state
+    end
+})
+
+tab2:AddDropdown({
+    Name = "Skeleton Color",
+    Default = "Red",
+    Options = {
+        "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Gray", "Black", "White",
+        "Silver", "Brown", "Dark Blue", "Dark Red", "Olive", "Light Yellow", "Pink", "Turquoise",
+        "Burnt Orange", "Lime Green", "Lavender", "Light Gray", "RGB"
+    },
+    Callback = function(selected)
+        skeletonIsRGB = (selected == "RGB")
+        local colorsMap = {
+            ["Red"] = Color3.new(1, 0, 0),
+            ["Green"] = Color3.new(0, 1, 0),
+            ["Blue"] = Color3.new(0, 0, 1),
+            ["Yellow"] = Color3.new(1, 1, 0),
+            ["Orange"] = Color3.new(1, 0.5, 0),
+            ["Purple"] = Color3.new(0.5, 0, 0.5),
+            ["Cyan"] = Color3.new(0, 1, 1),
+            ["Magenta"] = Color3.new(1, 0, 1),
+            ["Gray"] = Color3.new(0.5, 0.5, 0.5),
+            ["Black"] = Color3.new(0, 0, 0),
+            ["White"] = Color3.new(1, 1, 1),
+            ["Silver"] = Color3.new(0.75, 0.75, 0.75),
+            ["Brown"] = Color3.new(0.65, 0.16, 0.16),
+            ["Dark Blue"] = Color3.new(0.3, 0.3, 0.6),
+            ["Dark Red"] = Color3.new(0.6, 0.2, 0.2),
+            ["Olive"] = Color3.new(0.5, 0.5, 0.2),
+            ["Light Yellow"] = Color3.new(0.8, 0.8, 0.2),
+            ["Pink"] = Color3.new(1, 0.75, 0.8),
+            ["Turquoise"] = Color3.new(0.25, 0.88, 0.82),
+            ["Burnt Orange"] = Color3.new(0.8, 0.5, 0.2),
+            ["Lime Green"] = Color3.new(0, 1, 0.2),
+            ["Lavender"] = Color3.new(0.9, 0.9, 0.98),
+            ["Light Gray"] = Color3.new(0.8, 0.8, 0.8)
+        }
+        if not skeletonIsRGB then
+            skeletonColor = colorsMap[selected]
+        end
+    end
+})
+
 -- Initialize Orion
-OrionLib:Init()-- Load Orion Library
+OrionLib:Init()
