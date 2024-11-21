@@ -504,4 +504,86 @@ local function drawSkeleton(player)
     -- Update positions of all lines in render loop
     RunService.RenderStepped:Connect(function()
         if player and player.Character then
-            updateLine(lines.headToTorso, 
+            updateLine(lines.headToTorso, parts.head, parts.torso)
+            updateLine(lines.leftArm, parts.torso, parts.leftArm)
+            updateLine(lines.rightArm, parts.torso, parts.rightArm)
+            updateLine(lines.leftLeg, parts.torso, parts.leftLeg)
+            updateLine(lines.rightLeg, parts.torso, parts.rightLeg)
+        else
+            for _, line in pairs(lines) do
+                line.Visible = false
+            end
+        end
+    end)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        drawSkeleton(player)
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawSkeleton(player)
+        end)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            wait(0)
+            drawSkeleton(player)
+        end)
+    end
+end)
+
+tab2:AddToggle({
+    Name = "Enable Skeleton",
+    Default = skeletonEnabled,
+    Callback = function(state)
+        skeletonEnabled = state
+    end
+})
+
+tab2:AddDropdown({
+    Name = "Skeleton Color",
+    Default = "Red",
+    Options = {
+        "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Magenta", "Gray", "Black", "White",
+        "Silver", "Brown", "Dark Blue", "Dark Red", "Olive", "Light Yellow", "Pink", "Turquoise",
+        "Burnt Orange", "Lime Green", "Lavender", "Light Gray", "RGB"
+    },
+    Callback = function(selected)
+        skeletonIsRGB = (selected == "RGB")
+        local colorsMap = {
+            ["Red"] = Color3.new(1, 0, 0),
+            ["Green"] = Color3.new(0, 1, 0),
+            ["Blue"] = Color3.new(0, 0, 1),
+            ["Yellow"] = Color3.new(1, 1, 0),
+            ["Orange"] = Color3.new(1, 0.5, 0),
+            ["Purple"] = Color3.new(0.5, 0, 0.5),
+            ["Cyan"] = Color3.new(0, 1, 1),
+            ["Magenta"] = Color3.new(1, 0, 1),
+            ["Gray"] = Color3.new(0.5, 0.5, 0.5),
+            ["Black"] = Color3.new(0, 0, 0),
+            ["White"] = Color3.new(1, 1, 1),
+            ["Silver"] = Color3.new(0.75, 0.75, 0.75),
+            ["Brown"] = Color3.new(0.65, 0.16, 0.16),
+            ["Dark Blue"] = Color3.new(0.3, 0.3, 0.6),
+            ["Dark Red"] = Color3.new(0.6, 0.2, 0.2),
+            ["Olive"] = Color3.new(0.5, 0.5, 0.2),
+            ["Light Yellow"] = Color3.new(0.8, 0.8, 0.2),
+            ["Pink"] = Color3.new(1, 0.75, 0.8),
+            ["Turquoise"] = Color3.new(0.25, 0.88, 0.82),
+            ["Burnt Orange"] = Color3.new(0.8, 0.5, 0.2),
+            ["Lime Green"] = Color3.new(0, 1, 0.2),
+            ["Lavender"] = Color3.new(0.9, 0.9, 0.98),
+            ["Light Gray"] = Color3.new(0.8, 0.8, 0.8)
+        }
+        if not skeletonIsRGB then
+            skeletonColor = colorsMap[selected]
+        end
+    end
+})
+
+-- Initialize Orion
+OrionLib:Init()-- Load Orion Library
