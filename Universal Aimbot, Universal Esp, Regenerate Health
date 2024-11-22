@@ -1,114 +1,742 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-   Name = "Esp",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Rayfield Interface Suite",
-   LoadingSubtitle = "by Sirius",
-   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+local Window = OrionLib:MakeWindow({Name = "ESP Settings", HidePremium = false, SaveConfig = true, ConfigFolder = "ESPConfig"})
 
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+local ESP = {
+    Box = true,
+    BoxThickness = 2,
+    BoxTransparency = 1,
+    BoxColor = Color3.new(1, 1, 1),
 
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Big Hub"
-   },
+    Tracers = true,
+    TracerThickness = 1,
+    TracerTransparency = 1,
+    TracerColor = Color3.new(1, 0, 0),
 
-   Discord = {
-      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
+    Name = true,
+    NameSize = 20,
+    NameColor = Color3.new(1, 1, 0),
 
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Untitled",
-      Subtitle = "Key System",
-      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
-      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-   }
-})
+    Skeleton = true,
+    SkeletonThickness = 1,
+    SkeletonTransparency = 1,
+    SkeletonColor = Color3.new(0, 1, 0),
 
-local tab2 = Window:CreateTab("Esp", 4483362458) -- Title, Image
+    HealthBars = true,
+    HealthBarThickness = 2,
+    HealthBarTransparency = 1,
+    HealthBarColor = Color3.new(0, 1, 0),
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local camera = game.Workspace.CurrentCamera
-local espEnabled = false
+    HeadDots = true,
+    HeadDotThickness = 2,
+    HeadDotTransparency = 1,
+    HeadDotColor = Color3.new(1, 0, 0),
 
-local function drawESP(targetPlayer)
-    local espBox = Drawing.new("Square")
-    espBox.Thickness = 2
-    espBox.Color = Color3.fromRGB(255, 0, 0)
-    espBox.Filled = false
-    espBox.Transparency = 1
-    espBox.Visible = false
+    LookTracers = true,
+    LookTracerThickness = 1,
+    LookTracerTransparency = 1,
+    LookTracerColor = Color3.new(0, 0, 1)
+}
 
-    RunService.RenderStepped:Connect(function()
-        if espEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local humanoidRootPart = targetPlayer.Character.HumanoidRootPart
-            local head = targetPlayer.Character:FindFirstChild("Head")
+local function updateESP(player)
+    local espData = playerESP[player]
+    if espData then
+        espData.box.Thickness = ESP.BoxThickness
+        espData.box.Transparency = ESP.BoxTransparency
+        espData.box.Color = ESP.BoxColor
 
-            if humanoidRootPart and head then
-                local rootPos, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                local headPos, _ = camera:WorldToViewportPoint(head.Position)
-                local distance = (headPos - rootPos).magnitude
+        espData.tracer.Thickness = ESP.TracerThickness
+        espData.tracer.Transparency = ESP.TracerTransparency
+        espData.tracer.Color = ESP.TracerColor
 
-                if onScreen then
-                    espBox.Size = Vector2.new(distance * 2, distance * 3) -- Ajusta o tamanho da caixa
-                    espBox.Position = Vector2.new(rootPos.X - espBox.Size.X / 2, rootPos.Y - espBox.Size.Y / 2)
-                    espBox.Visible = true
-                else
-                    espBox.Visible = false
-                end
+        espData.name.Size = ESP.NameSize
+        espData.name.Color = ESP.NameColor
+
+        espData.skeleton.Thickness = ESP.SkeletonThickness
+        espData.skeleton.Transparency = ESP.SkeletonTransparency
+        espData.skeleton.Color = ESP.SkeletonColor
+
+        espData.healthBar.Thickness = ESP.HealthBarThickness
+        espData.healthBar.Transparency = ESP.HealthBarTransparency
+        espData.healthBar.Color = ESP.HealthBarColor
+
+        espData.headDot.Thickness = ESP.HeadDotThickness
+        espData.headDot.Transparency = ESP.HeadDotTransparency
+        espData.headDot.Color = ESP.HeadDotColor
+
+        espData.lookTracer.Thickness = ESP.LookTracerThickness
+        espData.lookTracer.Transparency = ESP.LookTracerTransparency
+        espData.lookTracer.Color = ESP.LookTracerColor
+    end
+end
+
+local function createESP(player)
+    local character = player.Character
+    if not character then return end
+
+    local box = Drawing.new("Square")
+    box.Visible = ESP.Box
+    box.Thickness = ESP.BoxThickness
+    box.Transparency = ESP.BoxTransparency
+    box.Color = ESP.BoxColor
+
+    local tracer = Drawing.new("Line")
+    tracer.Visible = ESP.Tracers
+    tracer.Thickness = ESP.TracerThickness
+    tracer.Transparency = ESP.TracerTransparency
+    tracer.Color = ESP.TracerColor
+
+    local name = Drawing.new("Text")
+    name.Visible = ESP.Name
+    name.Text = player.Name
+    name.Color = ESP.NameColor
+    name.Size = ESP.NameSize
+    name.Center = true
+    name.Outline = true
+
+    local skeleton = Drawing.new("Line")
+    skeleton.Visible = ESP.Skeleton
+    skeleton.Thickness = ESP.SkeletonThickness
+    skeleton.Transparency = ESP.SkeletonTransparency
+    skeleton.Color = ESP.SkeletonColor
+
+    local healthBar = Drawing.new("Square")
+    healthBar.Visible = ESP.HealthBars
+    healthBar.Thickness = ESP.HealthBarThickness
+    healthBar.Transparency = ESP.HealthBarTransparency
+    healthBar.Color = ESP.HealthBarColor
+
+    local headDot = Drawing.new("Circle")
+    headDot.Visible = ESP.HeadDots
+    headDot.Thickness = ESP.HeadDotThickness
+    headDot.Transparency = ESP.HeadDotTransparency
+    headDot.Color = ESP.HeadDotColor
+
+    local lookTracer = Drawing.new("Line")
+    lookTracer.Visible = ESP.LookTracers
+    lookTracer.Thickness = ESP.LookTracerThickness
+    lookTracer.Transparency = ESP.LookTracerTransparency
+    lookTracer.Color = ESP.LookTracerColor
+
+    playerESP[player] = {
+        box = box,
+        tracer = tracer,
+        name = name,
+        skeleton = skeleton,
+        healthBar = healthBar,
+        headDot = headDot,
+        lookTracer = lookTracer
+    }
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local head = character:FindFirstChild("Head")
+
+            local rootPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+            local headPos = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
+
+            if onScreen then
+                box.Size = Vector2.new(2000 / rootPos.Z, 3000 / rootPos.Z)
+                box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
+                box.Visible = ESP.Box
+
+                tracer.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                tracer.To = Vector2.new(rootPos.X, rootPos.Y)
+                tracer.Visible = ESP.Tracers
+
+                name.Position = Vector2.new(rootPos.X, rootPos.Y - box.Size.Y / 2 - 20)
+                name.Visible = ESP.Name
+
+                skeleton.From = Vector2.new(rootPos.X, rootPos.Y)
+                skeleton.To = Vector2.new(headPos.X, headPos.Y)
+                skeleton.Visible = ESP.Skeleton
+
+                healthBar.Size = Vector2.new(5, box.Size.Y * (character.Humanoid.Health / character.Humanoid.MaxHealth))
+                healthBar.Position = Vector2.new(box.Position.X - 10, box.Position.Y + box.Size.Y - healthBar.Size.Y)
+                healthBar.Visible = ESP.HealthBars
+
+                headDot.Position = Vector2.new(headPos.X, headPos.Y)
+                headDot.Radius = 5
+                headDot.Visible = ESP.HeadDots
+
+                lookTracer.From = Vector2.new(rootPos.X, rootPos.Y)
+                lookTracer.To = Vector2.new(rootPos.X + rootPart.CFrame.LookVector.X * 50, rootPos.Y + rootPart.CFrame.LookVector.Y * 50)
+                lookTracer.Visible = ESP.LookTracers
             else
-                espBox.Visible = false
+                box.Visible = false
+                tracer.Visible = false
+                name.Visible = false
+                skeleton.Visible = false
+                healthBar.Visible = false
+                headDot.Visible = false
+                lookTracer.Visible = false
             end
         else
-            espBox.Visible = false
+            removeESP(player)
         end
     end)
 end
 
-local function addESPToPlayer(player)
-    if player.Character then
-        drawESP(player)
-    end
+game:GetService("Players").PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
-        drawESP(player)
+        createESP(player)
+    end)
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function(player)
+    removeESP(player)
+end)
+
+-- GUI
+local ESPBox = Window:MakeTab({
+    Name = "Box ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPBox:AddToggle({
+    Name = "Enable Box ESP",
+    Default = true,
+    Callback = function(value)
+        ESP.Box = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPBox:AddSlider({
+    Name = "Box Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 2,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.BoxThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPBox:AddSlider({
+    Name = "Box Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.BoxTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPBox:AddColorPicker({
+    Name = "Box Color",
+    Default = Color3.fromRGB(255, 255, 255),
+    Callback = function(value)
+        ESP.BoxColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Repita o mesmo para as outras funcionalidades (Tracers, Name, Skeleton, HealthBars, HeadDots, LookTracers)
+local ESPTracers = Window:MakeTab({
+    Name = "Tracers ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPTracers:AddToggle({
+    Name = "Enable Tracers ESP",
+    Default = true,
+    Callback = function(value)
+        ESP.Tracers = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPTracers:AddSlider({
+    Name = "Tracer Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.TracerThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPTracers:AddSlider({
+    Name = "Tracer Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.TracerTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPTracers:AddColorPicker({
+    Name = "Tracer Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(value)
+        ESP.TracerColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Adicione mais tabs e elementos para Name ESP
+local ESPName = Window:MakeTab({
+    Name = "Name ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPName:AddToggle({
+    Name = "Enable Name ESP",
+    Default = true,
+    Callback = function(value)
+        ESP.Name = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPName:AddSlider({
+    Name = "Name Size",
+    Min = 10,
+    Max = 30,
+    Default = 20,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Size",
+    Callback = function(value)
+        ESP.NameSize = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPName:AddColorPicker({
+    Name = "Name Color",
+    Default = Color3.fromRGB(255, 255, 0),
+    Callback = function(value)
+        ESP.NameColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Repita o mesmo para Skeleton, HealthBars, HeadDots e LookTracers
+local ESPSkeleton = Window:MakeTab({
+    Name = "Skeleton ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPSkeleton:AddToggle({
+    Name = "Enable Skeleton ESP",
+    Default = true,
+    Callback = function(value)
+        ESP.Skeleton = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPSkeleton:AddSlider({
+    Name = "Skeleton Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.SkeletonThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPSkeleton:AddSlider({
+    Name = "Skeleton Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.SkeletonTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPSkeleton:AddColorPicker({
+    Name = "Skeleton Color",
+    Default = Color3.fromRGB(0, 255, 0),
+    Callback = function(value)
+        ESP.SkeletonColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+local ESPHealthBars = Window:MakeTab({
+    Name = "Health Bars",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPHealthBars:AddToggle({
+    Name = "Enable Health Bars",
+    Default = true,
+    Callback = function(value)
+        ESP.HealthBars = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHealthBars:AddSlider({
+    Name = "Health Bar Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 2,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.HealthBarThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHealthBars:AddSlider({
+    Name = "Health Bar Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.HealthBarTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHealthBars:AddColorPicker({
+    Name = "Health Bar Color",
+    Default = Color3.fromRGB(0, 255, 0),
+    Callback = function(value)
+        ESP.HealthBarColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Repita o mesmo para HeadDots
+local ESPHeadDots = Window:MakeTab({
+    Name = "Head Dots",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPHeadDots:AddToggle({
+    Name = "Enable Head Dots",
+    Default = true,
+    Callback = function(value)
+        ESP.HeadDots = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHeadDots:AddSlider({
+    Name = "Head Dot Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 2,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.HeadDotThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHeadDots:AddSlider({
+    Name = "Head Dot Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.HeadDotTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPHeadDots:AddColorPicker({
+    Name = "Head Dot Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(value)
+        ESP.HeadDotColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Repita o mesmo para LookTracers
+local ESPLookTracers = Window:MakeTab({
+    Name = "Look Tracers",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+ESPLookTracers:AddToggle({
+    Name = "Enable Look Tracers",
+    Default = true,
+    Callback = function(value)
+        ESP.LookTracers = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPLookTracers:AddSlider({
+    Name = "Look Tracer Thickness",
+    Min = 1,
+    Max = 10,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Thickness",
+    Callback = function(value)
+        ESP.LookTracerThickness = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPLookTracers:AddSlider({
+    Name = "Look Tracer Transparency",
+    Min = 0,
+    Max = 1,
+    Default = 1,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "Transparency",
+    Callback = function(value)
+        ESP.LookTracerTransparency = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+ESPLookTracers:AddColorPicker({
+    Name = "Look Tracer Color",
+    Default = Color3.fromRGB(0, 0, 255),
+    Callback = function(value)
+        ESP.LookTracerColor = value
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            updateESP(player)
+        end
+    end
+})
+
+-- Certifique-se de atualizar a função updateESP para modificar as propriedades de todos os desenhos baseados nas novas configurações
+local function updateESP(player)
+    local espData = playerESP[player]
+    if espData then
+        espData.box.Thickness = ESP.BoxThickness
+        espData.box.Transparency = ESP.BoxTransparency
+        espData.box.Color = ESP.BoxColor
+
+        espData.tracer.Thickness = ESP.TracerThickness
+        espData.tracer.Transparency = ESP.TracerTransparency
+        espData.tracer.Color = ESP.TracerColor
+
+        espData.name.Size = ESP.NameSize
+        espData.name.Color = ESP.NameColor
+
+        espData.skeleton.Thickness = ESP.SkeletonThickness
+        espData.skeleton.Transparency = ESP.SkeletonTransparency
+        espData.skeleton.Color = ESP.SkeletonColor
+
+        espData.healthBar.Thickness = ESP.HealthBarThickness
+        espData.healthBar.Transparency = ESP.HealthBarTransparency
+        espData.healthBar.Color = ESP.HealthBarColor
+
+        espData.headDot.Thickness = ESP.HeadDotThickness
+        espData.headDot.Transparency = ESP.HeadDotTransparency
+        espData.headDot.Color = ESP.HeadDotColor
+
+        espData.lookTracer.Thickness = ESP.LookTracerThickness
+        espData.lookTracer.Transparency = ESP.LookTracerTransparency
+        espData.lookTracer.Color = ESP.LookTracerColor
+    end
+end
+
+-- Garanta que a função createESP esteja chamando updateESP quando criada
+local function createESP(player)
+    local character = player.Character
+    if not character then return end
+
+    local box = Drawing.new("Square")
+    box.Visible = ESP.Box
+    box.Thickness = ESP.BoxThickness
+    box.Transparency = ESP.BoxTransparency
+    box.Color = ESP.BoxColor
+
+    local tracer = Drawing.new("Line")
+    tracer.Visible = ESP.Tracers
+    tracer.Thickness = ESP.TracerThickness
+    tracer.Transparency = ESP.TracerTransparency
+    tracer.Color = ESP.TracerColor
+
+    local name = Drawing.new("Text")
+    name.Visible = ESP.Name
+    name.Text = player.Name
+    name.Color = ESP.NameColor
+    name.Size = ESP.NameSize
+    name.Center = true
+    name.Outline = true
+
+    local skeleton = Drawing.new("Line")
+    skeleton.Visible = ESP.Skeleton
+    skeleton.Thickness = ESP.SkeletonThickness
+    skeleton.Transparency = ESP.SkeletonTransparency
+    skeleton.Color = ESP.SkeletonColor
+
+    local healthBar = Drawing.new("Square")
+    healthBar.Visible = ESP.HealthBars
+    healthBar.Thickness = ESP.HealthBarThickness
+    healthBar.Transparency = ESP.HealthBarTransparency
+    healthBar.Color = ESP.HealthBarColor
+
+    local headDot = Drawing.new("Circle")
+    headDot.Visible = ESP.HeadDots
+    headDot.Thickness = ESP.HeadDotThickness
+    headDot.Transparency = ESP.HeadDotTransparency
+    headDot.Color = ESP.HeadDotColor
+
+    local lookTracer = Drawing.new("Line")
+    lookTracer.Visible = ESP.LookTracers
+    lookTracer.Thickness = ESP.LookTracerThickness
+    lookTracer.Transparency = ESP.LookTracerTransparency
+    lookTracer.Color = ESP.LookTracerColor
+
+    playerESP[player] = {
+        box = box,
+        tracer = tracer,
+        name = name,
+        skeleton = skeleton,
+        healthBar = healthBar,
+        headDot = headDot,
+        lookTracer = lookTracer
+    }
+
+game:GetService("RunService").RenderStepped:Connect(function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local head = character:FindFirstChild("Head")
+
+            local rootPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+            local headPos = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
+
+            if onScreen then
+                box.Size = Vector2.new(2000 / rootPos.Z, 3000 / rootPos.Z)
+                box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
+                box.Visible = ESP.Box
+
+                tracer.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                tracer.To = Vector2.new(rootPos.X, rootPos.Y)
+                tracer.Visible = ESP.Tracers
+
+                name.Position = Vector2.new(rootPos.X, rootPos.Y - box.Size.Y / 2 - 20)
+                name.Visible = ESP.Name
+
+                skeleton.From = Vector2.new(rootPos.X, rootPos.Y)
+                skeleton.To = Vector2.new(headPos.X, headPos.Y)
+                skeleton.Visible = ESP.Skeleton
+
+                healthBar.Size = Vector2.new(5, box.Size.Y * (character.Humanoid.Health / character.Humanoid.MaxHealth))
+                healthBar.Position = Vector2.new(box.Position.X - 10, box.Position.Y + box.Size.Y - healthBar.Size.Y)
+                healthBar.Visible = ESP.HealthBars
+
+                headDot.Position = Vector2.new(headPos.X, headPos.Y)
+                headDot.Radius = 5
+                headDot.Visible = ESP.HeadDots
+
+                lookTracer.From = Vector2.new(rootPos.X, rootPos.Y)
+                lookTracer.To = Vector2.new(rootPos.X + rootPart.CFrame.LookVector.X * 50, rootPos.Y + rootPart.CFrame.LookVector.Y * 50)
+                lookTracer.Visible = ESP.LookTracers
+            else
+                box.Visible = false
+                tracer.Visible = false
+                name.Visible = false
+                skeleton.Visible = false
+                healthBar.Visible = false
+                headDot.Visible = false
+                lookTracer.Visible = false
+            end
+        else
+            removeESP(player)
+        end
     end)
 end
 
-for _, targetPlayer in pairs(Players:GetPlayers()) do
-    if targetPlayer ~= LocalPlayer then
-        addESPToPlayer(targetPlayer)
-    end
-end
-
-Players.PlayerAdded:Connect(addESPToPlayer)
-
-local Toggle = tab2:CreateToggle({
-   Name = "Enable Esp Box",
-   CurrentValue = espEnabled,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-   Callback = function(Value)
-   espEnabled = state
-    for _, player in pairs(Players:GetPlayers()) do
-     if player ~= LocalPlayer then
-       addESPToPlayer(player)
-   end,
-})
-
-local ColorPicker = tab2:CreateColorPicker({
-    Name = "Esp Box Color",
-    Color = Color3.fromRGB(1,0,0),
-    Flag = "ColorPicker1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-       espBox.Color = value
-    end
-})
+OrionLib:Init()
