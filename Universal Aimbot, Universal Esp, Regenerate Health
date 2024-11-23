@@ -141,6 +141,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
+local Paragraph = tab1:CreateParagraph({
+    Title = "Aimbot",
+    Content = "Um aimbot é uma ferramenta usada em jogos para ajudar os jogadores a mirar automaticamente em seus oponentes. Ele funciona detectando inimigos na tela e ajustando a mira do jogador para atingi-los com precisão."
+})
+
 local Toggle = tab1:CreateToggle({
    Name = "Enable Aimbot",
    CurrentValue = false,
@@ -157,6 +162,11 @@ local Toggle = tab1:CreateToggle({
    Callback = function(Value)
        VisibleCheck = Value
    end,
+})
+
+local Paragraph = tab1:CreateParagraph({
+    Title = "FOV do Aimbot",
+    Content = "FOV (Field of View) do aimbot é a área em que o aimbot procura por alvos. É como um cone de visão onde o aimbot detecta e trava nos oponentes. Configurar a FOV permite ajustar a precisão e a área de atuação do aimbot."
 })
 
 local Slider = tab1:CreateSlider({
