@@ -446,7 +446,197 @@ local RGBToggle = Tab:CreateToggle({
     end,
 })
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
+local ESP = {
+    Enabled = false,  -- Inicialmente desativado
+    LineThickness = 2,
+    LineTransparency = 1,
+    LineColor = Color3.new(1, 1, 1),
+    Visible = false,  -- Inicialmente invisível
+    RGBEnabled = false,  -- Inicialmente sem RGB
+    OriginalColor = Color3.new(1, 1, 1) -- Cor original para voltar depois do RGB
+}
+
+local playerESP = {}
+
+local function updateESPVisibility()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and playerESP[player] then
+            playerESP[player].Visible = ESP.Visible
+        end
+    end
+end
+
+local function updateESPSettings()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and playerESP[player] then
+            playerESP[player].Thickness = ESP.LineThickness
+            playerESP[player].Transparency = ESP.LineTransparency
+            playerESP[player].Color = ESP.LineColor
+        end
+    end
+end
+
+local function createESP(player)
+    if player == LocalPlayer then return end
+
+    local character = player.Character
+    if not character then return end
+
+    local line = Drawing.new("Line")
+    line.Visible = ESP.Visible
+    line.Thickness = ESP.LineThickness
+    line.Transparency = ESP.LineTransparency
+    line.Color = ESP.LineColor
+
+    local function update()
+    if character and character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = character.HumanoidRootPart
+
+        -- Posição do jogador alvo na tela
+        local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
+        -- Define o ponto inicial como o topo da tela
+        local topOfScreen = Vector2.new(Camera.ViewportSize.X / 2, 0)
+
+        if rootOnScreen then
+            line.From = topOfScreen
+            line.To = Vector2.new(rootPos.X, rootPos.Y)
+            line.Visible = ESP.Visible
+
+            -- Atualiza a cor RGB, se habilitado
+            if ESP.RGBEnabled then
+                local hue = tick() % 5 / 5
+                line.Color = Color3.fromHSV(hue, 1, 1)
+            else
+                line.Color = ESP.OriginalColor
+            end
+        else
+            -- Desativa a linha se o jogador não estiver visível
+            line.Visible = false
+        end
+    else
+        -- Desativa a linha se não for possível acessar os humanoids
+        line.Visible = false
+    end
+end
+
+RunService.RenderStepped:Connect(update)
+
+    player.CharacterRemoving:Connect(function()
+        line:Remove()
+    end)
+
+    playerESP[player] = line
+end
+
+local function addESPToPlayer(player)
+    if player.Character then
+        createESP(player)
+    end
+    player.CharacterAdded:Connect(function()
+        createESP(player)
+    end)
+end
+
+Players.PlayerAdded:Connect(addESPToPlayer)
+
+for _, player in ipairs(Players:GetPlayers()) do
+    addESPToPlayer(player)
+end
+
+-- Função de callback para o toggle de visibilidade
+local function toggleESPVisibility(value)
+    ESP.Visible = value
+    updateESPVisibility()
+end
+
+-- Função para atualizar configurações da ESP
+local function updateESPSettings()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and playerESP[player] then
+            playerESP[player].Thickness = ESP.LineThickness
+            playerESP[player].Transparency = ESP.LineTransparency
+            playerESP[player].Color = ESP.LineColor
+        end
+    end
+end
+
+-- Função de callback para o toggle RGB
+local function toggleRGB(value)
+    ESP.RGBEnabled = value
+    if not value then
+        ESP.LineColor = ESP.OriginalColor
+        updateESPSettings()
+    end
+end
+
+
+
+-- Adicionando o toggle de exemplo
+local Toggle = Tab:CreateToggle({
+   Name = "Enable ESP Line",
+   CurrentValue = ESP.Visible,
+   Flag = "EnableESPLine", 
+   Callback = function(value)
+       toggleESPVisibility(value)
+   end,
+})
+
+-- Adicionando sliders para espessura e transparência ao GUI usando a Rayfield Library
+Tab:CreateSlider({
+    Name = "Line Thickness",
+    Range = {1, 5},
+    Increment = 0.1,
+    Suffix = "Thickness",
+    CurrentValue = ESP.LineThickness,
+    Flag = "LineThickness",
+    Callback = function(value)
+        ESP.LineThickness = value
+        updateESPSettings()
+    end
+})
+
+Tab:CreateSlider({
+    Name = "Line Transparency",
+    Range = {0, 1},
+    Increment = 0.1,
+    Suffix = "Transparency",
+    CurrentValue = ESP.LineTransparency,
+    Flag = "LineTransparency",
+    Callback = function(value)
+        ESP.LineTransparency = value
+        updateESPSettings()
+    end
+})
+
+-- Adicionando Color Picker para o GUI usando a Rayfield Library
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Line Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "LineColor",
+    Callback = function(value)
+        ESP.LineColor = value
+        ESP.OriginalColor = value
+        updateESPSettings()
+    end
+})
+
+-- Adicionando Toggle para RGB Animation
+local RGBToggle = Tab:CreateToggle({
+    Name = "Enable RGB",
+    CurrentValue = ESP.RGBEnabled,
+    Flag = "RGBToggle",
+    Callback = function(value)
+        toggleRGB(value)
+    end,
+})
+
+Rayfield:LoadConfiguration()
 
 
 
