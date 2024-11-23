@@ -396,6 +396,11 @@ end
 -- Criando a aba "Box ESP" com uma imagem
 local Tab = Window:CreateTab("Box ESP", 4483362458)
 
+local Paragraph = Tab:CreateParagraph({
+    Title = "ESP Box",
+    Content = "ESP Box é uma ferramenta usada em jogos que desenha uma caixa ao redor dos oponentes, permitindo que os jogadores os vejam através de paredes e outros obstáculos. Isso ajuda a rastrear a posição dos inimigos, oferecendo uma visão clara e contínua de sua localização no jogo."
+})
+
 -- Adicionando o toggle de exemplo
 local Toggle = Tab:CreateToggle({
    Name = "Enable ESP",
@@ -583,7 +588,10 @@ local function toggleRGB(value)
     end
 end
 
-
+local Paragraph = Tab:CreateParagraph({
+    Title = "ESP Line",
+    Content = "ESP Line é uma ferramenta usada em jogos que desenha linhas dos jogadores até os oponentes. Isso ajuda a visualizar a direção e a distância dos inimigos, permitindo que os jogadores rastreiem e localizem os adversários de forma mais eficaz."
+})
 
 -- Adicionando o toggle de exemplo
 local Toggle = Tab:CreateToggle({
@@ -719,6 +727,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
         applyHighlights()
     end
 end)
+
+local Paragraph = Tab:CreateParagraph({
+    Title = "Chams",
+    Content = "Chams é uma técnica usada em jogos para destacar personagens ou objetos com cores brilhantes e translúcidas. Isso permite que os jogadores vejam através de obstáculos, facilitando a localização e rastreamento dos adversários. Chams melhora a visibilidade e fornece uma vantagem estratégica ao mostrar a posição dos inimigos de maneira clara."
+})
 
 -- Toggle para ativar/desativar o ESP
 Tab:CreateToggle({
@@ -876,6 +889,11 @@ for _, player in ipairs(Players:GetPlayers()) do
     addHealthBar(player)
 end
 
+local Paragraph = Tab:CreateParagraph({
+    Title = "Health Bar",
+    Content = "Health Bar é uma ferramenta visual em jogos que mostra a quantidade de vida restante de um jogador ou personagem. Geralmente representada por uma barra colorida que diminui à medida que o personagem sofre danos, a Health Bar permite que os jogadores monitorem facilmente sua saúde e ajustem suas estratégias de acordo."
+})
+
 local Tab = Window:CreateTab("Health Bar Settings")
 Tab:CreateToggle({
     Name = "Enable Health Bars",
@@ -887,18 +905,6 @@ Tab:CreateToggle({
         end
     end
 })
-
-Tab:CreateColorPicker({
-    Name = "Bar Color",
-    Color = HealthBarSettings.BarColor,
-    Callback = function(value)
-        HealthBarSettings.BarColor = value
-        for _, bar in pairs(healthBars) do
-            bar.Color = value
-        end
-    end
-})
-
 
 
 
