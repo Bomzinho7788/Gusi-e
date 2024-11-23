@@ -1,12 +1,10 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
 local Window = Rayfield:CreateWindow({
    Name = "Universal Aimbot Hub",
    Icon = 0, 
    LoadingTitle = "Loading ...",
-   LoadingSubtitle = "by Bomzinho",
+   LoadingSubtitle = "by: Bomzinho/Sx_Mods",
    Theme = "Default",
 
    DisableRayfieldPrompts = false,
@@ -30,7 +28,7 @@ local Window = Rayfield:CreateWindow({
       Subtitle = "Key = BomTrial",
       Note = "Key is on Subtitle",
       FileName = "Bomtrial", 
-      SaveKey = true,
+      SaveKey = false,
       GrabKeyFromSite = false,
       Key = {"BomTrial"}
    }
@@ -636,7 +634,6 @@ local RGBToggle = Tab:CreateToggle({
     end,
 })
 
-Rayfield:LoadConfiguration()
 
 
 
