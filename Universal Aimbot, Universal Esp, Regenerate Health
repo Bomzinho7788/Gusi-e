@@ -767,7 +767,129 @@ Tab:CreateColorPicker({
     end
 })
 
-Rayfield:LoadConfiguration()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local HealthBarSettings = {
+    Enabled = false,
+    BarColor = Color3.new(0, 1, 0), -- Cor inicial (verde)
+    BarWidth = 5, -- Largura fixa da barra
+}
+
+local healthBars = {}
+
+-- Função para criar uma barra de vida
+local function createHealthBar()
+    local bar = Drawing.new("Square")
+    bar.Thickness = 1
+    bar.Filled = true
+    bar.Transparency = 1
+    bar.Color = HealthBarSettings.BarColor
+    bar.Visible = false
+    return bar
+end
+
+-- Atualiza a posição e tamanho da barra de vida
+local function updateHealthBar(bar, character)
+    if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Humanoid") then
+        bar.Visible = false
+        return
+    end
+
+    local humanoid = character.Humanoid
+    local rootPart = character.HumanoidRootPart
+    local rootPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
+    if onScreen then
+        -- Calcula o tamanho da ESP Box
+        local distance = (Camera.CFrame.Position - rootPart.Position).Magnitude
+        local boxHeight = math.clamp(3000 / distance, 10, 300) -- Altura ajustada pela distância
+        local boxWidth = boxHeight / 2 -- Proporção da largura para a altura
+
+        -- Calcula o topo da ESP Box
+        local topPos = Vector2.new(rootPos.X - boxWidth / 2, rootPos.Y - boxHeight / 2)
+        
+        -- Calcula a posição da barra de vida ao lado da ESP Box
+        local barHeight = boxHeight * (humanoid.Health / humanoid.MaxHealth) -- Proporcional à vida
+        bar.Size = Vector2.new(HealthBarSettings.BarWidth, barHeight)
+        bar.Position = Vector2.new(topPos.X - HealthBarSettings.BarWidth - 2, topPos.Y + boxHeight - barHeight) -- Ajustado ao lado esquerdo da ESP Box
+        bar.Color = Color3.new(1 - humanoid.Health / humanoid.MaxHealth, humanoid.Health / humanoid.MaxHealth, 0) -- Gradiente vermelho para verde
+        bar.Visible = HealthBarSettings.Enabled
+    else
+        bar.Visible = false
+    end
+end
+
+-- Adiciona a barra de vida ao jogador
+local function addHealthBar(player)
+    if player == LocalPlayer then return end
+
+    local healthBar = createHealthBar()
+    healthBars[player] = healthBar
+
+    local function characterAdded(character)
+        local conn
+        conn = RunService.RenderStepped:Connect(function()
+            if not character.Parent then
+                healthBar.Visible = false
+                conn:Disconnect()
+            else
+                updateHealthBar(healthBar, character)
+            end
+        end)
+    end
+
+    if player.Character then
+        characterAdded(player.Character)
+    end
+    player.CharacterAdded:Connect(characterAdded)
+
+    player.CharacterRemoving:Connect(function()
+        healthBar.Visible = false
+    end)
+end
+
+-- Remove a barra de vida ao jogador sair
+local function removeHealthBar(player)
+    if healthBars[player] then
+        healthBars[player]:Remove()
+        healthBars[player] = nil
+    end
+end
+
+-- Conecta os eventos de jogador
+Players.PlayerAdded:Connect(addHealthBar)
+Players.PlayerRemoving:Connect(removeHealthBar)
+for _, player in ipairs(Players:GetPlayers()) do
+    addHealthBar(player)
+end
+
+local Tab = Window:CreateTab("Health Bar Settings")
+Tab:CreateToggle({
+    Name = "Enable Health Bars",
+    CurrentValue = HealthBarSettings.Enabled,
+    Callback = function(value)
+        HealthBarSettings.Enabled = value
+        for _, bar in pairs(healthBars) do
+            bar.Visible = value
+        end
+    end
+})
+
+Tab:CreateColorPicker({
+    Name = "Bar Color",
+    Color = HealthBarSettings.BarColor,
+    Callback = function(value)
+        HealthBarSettings.BarColor = value
+        for _, bar in pairs(healthBars) do
+            bar.Color = value
+        end
+    end
+})
+
+
 
 
 
