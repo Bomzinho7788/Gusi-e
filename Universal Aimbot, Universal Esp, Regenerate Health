@@ -634,7 +634,140 @@ local RGBToggle = Tab:CreateToggle({
     end,
 })
 
+local ESP = {
+    Enabled = false,
+    Transparency = 0.5,
+    FillColor = Color3.fromRGB(255, 0, 0),
+    OutlineColor = Color3.fromRGB(0, 0, 0),
+    RGBEnabled = false -- Controle para o RGB
+}
 
+-- Função para criar ou atualizar Highlight
+local function updateHighlight(player)
+    if player.Character and player ~= game.Players.LocalPlayer then
+        local highlight = player.Character:FindFirstChild("Highlight")
+        if not highlight then
+            highlight = Instance.new("Highlight")
+            highlight.Name = "Highlight"
+            highlight.Parent = player.Character
+            highlight.Adornee = player.Character
+        end
+
+        -- Define as cores dinamicamente
+        if ESP.RGBEnabled then
+            local rgbColor = Color3.fromHSV(tick() % 5 / 5, 1, 1) -- Gera a cor RGB animada
+            highlight.FillColor = rgbColor
+            highlight.OutlineColor = rgbColor
+        else
+            highlight.FillColor = ESP.FillColor
+            highlight.OutlineColor = ESP.OutlineColor
+        end
+
+        highlight.FillTransparency = ESP.Transparency
+        highlight.OutlineTransparency = 0
+        highlight.Enabled = ESP.Enabled
+    end
+end
+
+-- Aplica o Highlight em todos os jogadores
+local function applyHighlights()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            updateHighlight(player)
+        end
+    end
+end
+
+-- Configura eventos para aplicar o Highlight em jogadores renascidos
+local function setupPlayerHighlight(player)
+    if player.Character then
+        updateHighlight(player)
+    end
+
+    player.CharacterAdded:Connect(function()
+        task.wait(1) -- Dá tempo para o personagem carregar
+        updateHighlight(player)
+    end)
+end
+
+-- Configura os eventos para jogadores existentes e futuros
+for _, player in ipairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        setupPlayerHighlight(player)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    if player ~= game.Players.LocalPlayer then
+        setupPlayerHighlight(player)
+    end
+end)
+
+-- Atualiza as cores RGB dinamicamente
+game:GetService("RunService").RenderStepped:Connect(function()
+    if ESP.RGBEnabled and ESP.Enabled then
+        applyHighlights()
+    end
+end)
+
+-- Toggle para ativar/desativar o ESP
+Tab:CreateToggle({
+    Name = "Enable Chams",
+    CurrentValue = ESP.Enabled,
+    Flag = "EnableChams",
+    Callback = function(value)
+        ESP.Enabled = value
+        applyHighlights()
+    end
+})
+
+-- Toggle para ativar/desativar o RGB
+Tab:CreateToggle({
+    Name = "Enable RGB",
+    CurrentValue = ESP.RGBEnabled,
+    Flag = "EnableRGB",
+    Callback = function(value)
+        ESP.RGBEnabled = value
+        applyHighlights()
+    end
+})
+
+-- Slider para ajustar a transparência do fill
+Tab:CreateSlider({
+    Name = "Fill Transparency",
+    Range = {0, 1},
+    Increment = 0.1,
+    CurrentValue = ESP.Transparency,
+    Flag = "FillTransparency",
+    Callback = function(value)
+        ESP.Transparency = value
+        applyHighlights()
+    end
+})
+
+-- ColorPicker para ajustar a cor do Fill
+Tab:CreateColorPicker({
+    Name = "Fill Color",
+    Color = ESP.FillColor,
+    Flag = "FillColor",
+    Callback = function(value)
+        ESP.FillColor = value
+        applyHighlights()
+    end
+})
+
+-- ColorPicker para ajustar a cor do Outline
+Tab:CreateColorPicker({
+    Name = "Outline Color",
+    Color = ESP.OutlineColor,
+    Flag = "OutlineColor",
+    Callback = function(value)
+        ESP.OutlineColor = value
+        applyHighlights()
+    end
+})
+
+Rayfield:LoadConfiguration()
 
 
 
