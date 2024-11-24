@@ -241,10 +241,12 @@ local function addBoxESPToPlayer(player)
 end
 
 Players.PlayerAdded:Connect(addBoxESPToPlayer)
-
-for _, player in ipairs(Players:GetPlayers()) do
-    addBoxESPToPlayer(player
-    end)
+Players.PlayerRemoving:Connect(function(player)
+    if playerESP[player] then
+        playerESP[player]:Remove()
+        playerESP[player] = nil
+    end
+end)
 
 -- Função de callback para o toggle de visibilidade
 local function toggleESPVisibility(value)
