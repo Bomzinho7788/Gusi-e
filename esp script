@@ -180,7 +180,7 @@ local function createBoxESP(player)
     if player == localPlayer or (ESP_SETTINGS.Teamcheck and player.Team == localPlayer.Team) then return end
 
     local character = player.Character
-    if not character then return end
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
 
     local box = Drawing.new("Square")
     box.Visible = ESP_SETTINGS.BoxVisible
