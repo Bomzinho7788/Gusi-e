@@ -19,7 +19,11 @@ local ESP_SETTINGS = {
     DistanceColor = Color3.new(1, 1, 1), -- Cor da distância
     HealthThickness = 2,  -- Espessura inicial da barra de saúde
     DistanceRGB = false,
-    NameRGB = false
+    NameRGB = false,
+    BoxRGBEnabled = false, -- Adicionando opção RGB para Box ESP
+    BoxVisible = false, -- Adicionando visibilidade para Box ESP
+    BoxThickness = 2, -- Adicionando espessura para Box ESP
+    BoxTransparency = 1 -- Adicionando transparência para Box ESP
 }
 
 local function create(class, properties)
@@ -172,29 +176,116 @@ local function updateEsp()
     end
 end
 
+local function createBoxESP(player)
+    if player == localPlayer or (ESP_SETTINGS.Teamcheck and player.Team == localPlayer.Team) then return end
+
+    local character = player.Character
+    if not character then return end
+
+    local box = Drawing.new("Square")
+    box.Visible = ESP_SETTINGS.BoxVisible
+    box.Thickness = ESP_SETTINGS.BoxThickness
+    box.Transparency = ESP_SETTINGS.BoxTransparency
+    box.Color = ESP_SETTINGS.BoxColor
+
+    local function update()
+        if ESP_SETTINGS.Enabled and character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local head = character:FindFirstChild("Head")
+
+            if head then
+                local headPos, headOnScreen = camera:WorldToViewportPoint(head.Position)
+                local rootPos, rootOnScreen = camera:WorldToViewportPoint(rootPart.Position)
+
+                if headOnScreen and rootOnScreen then
+                    local height = math.abs(headPos.Y - rootPos.Y) * 3
+                    local width = height / 2
+
+                    box.Size = Vector2.new(width, height)
+                    box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
+                    box.Visible = ESP_SETTINGS.BoxVisible
+
+                    if ESP_SETTINGS.BoxRGBEnabled then
+                        box.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                    end
+                else
+                    box.Visible = false
+                end
+            else
+                box.Visible = false
+            end
+        else
+            box.Visible = false
+        end
+    end
+
+    RunService.RenderStepped:Connect(update)
+
+    player.CharacterRemoving:Connect(function()
+        box:Remove()
+    end)
+
+    playerESP[player] = box
+end
+
+local function addBoxESPToPlayer(player)
+    if player.Character then
+        createBoxESP(player)
+    end
+    player.CharacterAdded:Connect(function()
+        createBoxESP(player)
+    end)
+end
+
+Players.PlayerAdded:Connect(addBoxESPToPlayer)
+
 for _, player in ipairs(Players:GetPlayers()) do
     if player ~= localPlayer then
-        createEsp(player)
+        createBoxESP(player)
     end
 end
 
-Players.PlayerAdded:Connect(function(player)
-    if player ~= localPlayer then
-        createEsp(player)
-    end
-end)
-
 Players.PlayerRemoving:Connect(function(player)
-    removeEsp(player)
-end)
-
-RunService.RenderStepped:Connect(function()
-    updateEsp()
-
-    if isRGB then
-        FOVCircle.Color = getRGBColor()
+    if playerESP[player] then
+        playerESP[player]:Remove()
+        playerESP[player] = nil
     end
 end)
+
+-- Função de callback para o toggle de visibilidade do Box ESP
+local function toggleESPVisibility(value)
+    ESP_SETTINGS.BoxVisible = value
+    updateESPVisibility()
+end
+
+-- Função para atualizar configurações da ESP Box
+local function updateESPSettings()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer and playerESP[player] then
+            playerESP[player].Thickness = ESP_SETTINGS.BoxThickness
+            playerESP[player].Transparency = ESP_SETTINGS.BoxTransparency
+            playerESP[player].Color = ESP_SETTINGS.BoxColor
+        end
+    end
+end
+
+-- Função de callback para o toggle RGB no Box ESP
+local function toggleRGB(value)
+    ESP_SETTINGS.BoxRGBEnabled = value
+end
+
+-- Função de callback para o toggle Teamcheck principal
+local function toggleMainTeamcheck(value)
+    ESP_SETTINGS.Teamcheck = value
+    -- Remover e recriar ESP para todos os jogadores para aplicar a mudança
+    for player, box in pairs(playerESP) do
+        box:Remove()
+        playerESP[player] = nil
+    end
+    for _, player in ipairs(Players:GetPlayers()) do
+        addBoxESPToPlayer(player)
+    end
+end
 
 -- Configurando a Rayfield UI com Key System
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -234,6 +325,7 @@ local Window = Rayfield:CreateWindow({
 
 local tab1 = Window:CreateTab("Aimbot", 4483362458) 
 local tab2 = Window:CreateTab("ESP", 4483362458)
+local tab3 = Window:CreateTab("Box ESP", 4483362458)
 
 -- Configurando o Aimbot
 local SilentAimEnabled = false
@@ -260,7 +352,6 @@ local function isPlayerInFOV(player)
     if not player or not player.Character or not player.Character:FindFirstChild(targetPart) or (ESP_SETTINGS.Teamcheck and player.Team == localPlayer.Team) then
         return false
     end
-    local camera = workspace.CurrentCamera
     local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
     if not onScreen then
         return false
@@ -289,7 +380,6 @@ local function getClosestPlayerInFOV()
     for _, player in ipairs(game.Players:GetPlayers()) do
         if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
             if not VisibleCheck or (VisibleCheck and isVisible(player)) then
-                local camera = workspace.CurrentCamera
                 local screenPos, onScreen = camera:WorldToViewportPoint(player.Character[targetPart].Position)
 
                 if onScreen and isPlayerInFOV(player) then
@@ -308,13 +398,12 @@ end
 
 local function aimAt(target)
     if target and target.Character and target.Character:FindFirstChild(targetPart) then
-        local camera = workspace.CurrentCamera
         local aimPosition = target.Character[targetPart].Position
         camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
     end
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if FOVVisible then
         updateFOVPosition()
     end
@@ -327,7 +416,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 
     if isRGB then
-        FOVCircle.Color = getRGBColor()
+        FOVCircle.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
     end
 
     updateEsp()  -- Atualiza o ESP em cada frame
@@ -512,6 +601,7 @@ local ToggleTeamcheck = tab2:CreateToggle({
     Flag = "Teamcheck",
     Callback = function(value)
         ESP_SETTINGS.Teamcheck = value
+        toggleMainTeamcheck(value)  -- Chama a função para aplicar o teamcheck também no Box ESP
         updateEsp()
     end,
 })
@@ -568,6 +658,66 @@ local ToggleNameRGB = tab2:CreateToggle({
     Callback = function(value)
         ESP_SETTINGS.NameRGB = value
         updateEsp()
+    end,
+})
+
+-- Adicionando configuração de Box ESP
+local ParagraphBoxESP = tab3:CreateParagraph({
+    Title = "ESP Box",
+    Content = "ESP Box é uma ferramenta usada em jogos que desenha uma caixa ao redor dos oponentes, permitindo que os jogadores os vejam através de paredes e outros obstáculos. Isso ajuda a rastrear a posição dos inimigos, oferecendo uma visão clara e contínua de sua localização no jogo."
+})
+
+local ToggleBoxESP = tab3:CreateToggle({
+   Name = "Ativar ESP Box",
+   CurrentValue = ESP_SETTINGS.BoxVisible,
+   Flag = "EnableESPBox", 
+   Callback = function(value)
+       toggleESPVisibility(value)
+   end,
+})
+
+local SliderBoxThickness = tab3:CreateSlider({
+    Name = "Espessura do Box",
+    Range = {1, 5},
+    Increment = 0.1,
+    Suffix = "Thickness",
+    CurrentValue = ESP_SETTINGS.BoxThickness,
+    Flag = "BoxThickness",
+    Callback = function(value)
+        ESP_SETTINGS.BoxThickness = value
+        updateESPSettings()
+    end
+})
+
+local SliderBoxTransparency = tab3:CreateSlider({
+    Name = "Transparência do Box",
+    Range = {0, 1},
+    Increment = 0.1,
+    Suffix = "Transparency",
+    CurrentValue = ESP_SETTINGS.BoxTransparency,
+    Flag = "BoxTransparency",
+    Callback = function(value)
+        ESP_SETTINGS.BoxTransparency = value
+        updateESPSettings()
+    end
+})
+
+local ColorPickerBox = tab3:CreateColorPicker({
+    Name = "Cor do Box",
+    Color = ESP_SETTINGS.BoxColor,
+    Flag = "BoxColor",
+    Callback = function(value)
+        ESP_SETTINGS.BoxColor = value
+        updateESPSettings()
+    end
+})
+
+local ToggleBoxRGB = tab3:CreateToggle({
+    Name = "Ativar Cor RGB no Box",
+    CurrentValue = ESP_SETTINGS.BoxRGBEnabled,
+    Flag = "RGBBoxToggle",
+    Callback = function(value)
+        toggleRGB(value)
     end,
 })
 
