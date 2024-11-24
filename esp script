@@ -258,7 +258,11 @@ end)
 -- Função de callback para o toggle de visibilidade do Box ESP
 local function toggleESPVisibility(value)
     ESP_SETTINGS.BoxVisible = value
-    updateESPVisibility()
+    for _, esp in pairs(playerESP) do
+        if esp then
+            esp.Visible = value
+        end
+    end
 end
 
 -- Função para atualizar configurações da ESP Box
