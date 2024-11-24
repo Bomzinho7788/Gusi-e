@@ -449,18 +449,6 @@ Tab:CreateToggle({
     end
 })
 
--- Adicionando dropdown para tipo de caixa
-Tab:CreateDropdown({
-    Name = "Box Type",
-    Options = {"2D", "Corner Box Esp"},
-    CurrentOption = ESP_SETTINGS.BoxType,
-    Flag = "BoxType",
-    Callback = function(value)
-        ESP_SETTINGS.BoxType = value
-        updateEsp()
-    end
-})
-
 -- Adicionando toggle para mostrar nomes
 Tab:CreateToggle({
     Name = "Show Names",
@@ -490,17 +478,6 @@ Tab:CreateToggle({
     Flag = "ShowDistance",
     Callback = function(value)
         ESP_SETTINGS.ShowDistance = value
-        updateEsp()
-    end,
-})
-
--- Adicionando toggle para mostrar esqueletos
-Tab:CreateToggle({
-    Name = "Show Skeletons",
-    CurrentValue = ESP_SETTINGS.ShowSkeletons,
-    Flag = "ShowSkeletons",
-    Callback = function(value)
-        ESP_SETTINGS.ShowSkeletons = value
         updateEsp()
     end,
 })
@@ -538,13 +515,42 @@ Tab:CreateColorPicker({
     end
 })
 
--- Adicionando color picker para cor do esqueleto
 Tab:CreateColorPicker({
-    Name = "Skeletons Color",
-    Color = ESP_SETTINGS.SkeletonsColor,
-    Flag = "SkeletonsColor",
+    Name = "Health Outline Color",
+    Color = ESP_SETTINGS.HealthOutlineColor,
+    Flag = "Outline",
     Callback = function(value)
-        ESP_SETTINGS.SkeletonsColor = value
+        ESP_SETTINGS.HealthOutlineColor = value
+        updateEsp()
+    end
+})
+
+Tab:CreateColorPicker({
+    Name = "Health High Color",
+    Color = ESP_SETTINGS.HealthHighColor,
+    Flag = "High",
+    Callback = function(value)
+        ESP_SETTINGS.HealthHighColor = value
+        updateEsp()
+    end
+})
+
+Tab:CreateColorPicker({
+    Name = "Health Low Color",
+    Color = ESP_SETTINGS. HealthLowColor,
+    Flag = "low",
+    Callback = function(value)
+       ESP_SETTINGS.HealthLowColor = value
+        updateEsp()
+    end
+})
+
+Tab:CreateColorPicker({
+    Name = "Box Outline Color",
+    Color = ESP_SETTINGS. HealthLowColor,
+    Flag = "low",
+    Callback = function(value)
+       ESP_SETTINGS.BoxOutlineColor = value
         updateEsp()
     end
 })
@@ -574,6 +580,8 @@ Tab:CreateToggle({
     end,
 })
 
+
+
 -- Adicionando toggle para WallCheck
 Tab:CreateToggle({
     Name = "WallCheck",
@@ -581,6 +589,16 @@ Tab:CreateToggle({
     Flag = "WallCheck",
     Callback = function(value)
         ESP_SETTINGS.WallCheck = value
+        updateEsp()
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Tracer",
+    CurrentValue = ESP_SETTINGS.WallCheck,
+    Flag = "Tracer",
+    Callback = function(value)
+        ESP_SETTINGS.ShowTracer = value
         updateEsp()
     end,
 })
