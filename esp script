@@ -248,7 +248,7 @@ end
 Players.PlayerRemoving:Connect(function(player)
     if playerESP[player] then
         playerESP[player]:Remove()
-        playerESP[player] = nil
+        playerESP[player] = 0
     end
 end)
 
@@ -280,7 +280,7 @@ local function toggleMainTeamcheck(value)
     -- Remover e recriar ESP para todos os jogadores para aplicar a mudança
     for player, box in pairs(playerESP) do
         box:Remove()
-        playerESP[player] = nil
+        playerESP[player] = 0
     end
     for _, player in ipairs(Players:GetPlayers()) do
         addBoxESPToPlayer(player)
