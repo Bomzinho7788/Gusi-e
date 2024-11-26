@@ -288,11 +288,3 @@ local Dropdown = tab1:CreateDropdown({
     end,
 })
 
-local Toggle = tab1:CreateToggle({
-    Name = "Check de Time",
-    CurrentValue = false,
-    Flag = "TeamCheck",
-    Callback = function(Value)
-        TeamCheck = Value
-    end,
-})
