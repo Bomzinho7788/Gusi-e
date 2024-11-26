@@ -197,6 +197,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
+-- Tab 1: Aimbot
 local Toggle = tab1:CreateToggle({
     Name = "Check de Time",
     CurrentValue = false,
@@ -324,11 +325,6 @@ local Dropdown = tab1:CreateDropdown({
 })
 
 -- Tab 2: ESP
-local Paragraph = tab2:CreateParagraph({
-    Title = "ESP",
-    Content = "O ESP (Extra Sensory Perception) é uma funcionalidade que permite aos jogadores verem seus oponentes através de obstáculos, desenhando caixas ao redor dos personagens inimigos para melhor percepção no jogo."
-})
-
 local Toggle = tab2:CreateToggle({
     Name = "Ativar ESP",
     CurrentValue = false,
