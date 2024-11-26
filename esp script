@@ -143,6 +143,20 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 local Paragraph = tab1:CreateParagraph({
+    Title = "Check de Time",
+    Content = "O Check de Time verifica se o jogador inimigo está no mesmo time que você, evitando que o aimbot mire em aliados. Isso é aplicável a todos os outros itens que você configurar para garantir que apenas inimigos sejam afetados."
+})
+
+local Toggle = tab1:CreateToggle({
+    Name = "Check de Time",
+    CurrentValue = false,
+    Flag = "TeamCheck",
+    Callback = function(Value)
+        TeamCheck = Value
+    end,
+})
+
+local Paragraph = tab1:CreateParagraph({
     Title = "Aimbot",
     Content = "Um aimbot é uma ferramenta usada em jogos para ajudar os jogadores a mirar automaticamente em seus oponentes. Ele funciona detectando inimigos na tela e ajustando a mira do jogador para atingi-los com precisão."
 })
@@ -168,20 +182,6 @@ local Toggle = tab1:CreateToggle({
    Callback = function(Value)
        VisibleCheck = Value
    end,
-})
-
-local Paragraph = tab1:CreateParagraph({
-    Title = "Check de Time",
-    Content = "O Check de Time verifica se o jogador inimigo está no mesmo time que você, evitando que o aimbot mire em aliados. É uma função útil para garantir que o aimbot só mire em adversários."
-})
-
-local Toggle = tab1:CreateToggle({
-    Name = "Check de Time",
-    CurrentValue = false,
-    Flag = "TeamCheck",
-    Callback = function(Value)
-        TeamCheck = Value
-    end,
 })
 
 local Paragraph = tab1:CreateParagraph({
