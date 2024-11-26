@@ -35,6 +35,8 @@ local Window = Rayfield:CreateWindow({
 })
 
 local tab1 = Window:CreateTab("Aimbot", 4483362458) 
+local tab2 = Window:CreateTab("ESP", 4483362458) 
+local tab3 = Window:CreateTab("Descrições", 4483362458)
 
 local SilentAimEnabled = false
 local VisibleCheck = false
@@ -44,6 +46,12 @@ local FOVCircle = Drawing.new("Circle")
 local targetPart = "HumanoidRootPart"
 local isRGB = false
 local TeamCheck = false
+local espEnabled = false
+local espColor = Color3.fromRGB(255, 255, 255)
+local espIsRGB = false
+local espThickness = 1
+local espTransparency = 1
+local espTeamColor = false
 
 FOVCircle.Radius = FOV
 FOVCircle.Thickness = 1
@@ -125,6 +133,53 @@ local function aimAt(target)
     end
 end
 
+local function drawESP(targetPlayer)
+    local espBox = Drawing.new("Square")
+    espBox.Thickness = espThickness
+    espBox.Filled = false
+    espBox.Transparency = espTransparency
+    espBox.Color = espColor
+
+    RunService.RenderStepped:Connect(function()
+        if espEnabled and SilentAimEnabled and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if not TeamCheck or (TeamCheck and targetPlayer.TeamColor ~= game.Players.LocalPlayer.TeamColor) then
+                local rootPart = targetPlayer.Character.HumanoidRootPart
+                local screenPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+                if onScreen then
+                    espBox.Size = Vector2.new(50, 50) -- Change this based on your need
+                    espBox.Position = Vector2.new(screenPos.X - espBox.Size.X / 2, screenPos.Y - espBox.Size.Y / 2)
+                    espBox.Color = espIsRGB and getRGBColor() or (espTeamColor and targetPlayer.TeamColor.Color or espColor)
+                    espBox.Visible = true
+                else
+                    espBox.Visible = false
+                end
+            else
+                espBox.Visible = false
+            end
+        else
+            espBox.Visible = false
+        end
+    end)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        drawESP(player)
+        player.CharacterAdded:Connect(function()
+            drawESP(player)
+        end)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        drawESP(player)
+        player.CharacterAdded:Connect(function()
+            drawESP(player)
+        end)
+    end
+end)
+
 game:GetService("RunService").RenderStepped:Connect(function()
     if FOVVisible then
         updateFOVPosition()
@@ -142,11 +197,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
-local Paragraph = tab1:CreateParagraph({
-    Title = "Check de Time",
-    Content = "O Check de Time verifica se o jogador inimigo está no mesmo time que você, evitando que o aimbot mire em aliados. Isso é aplicável a todos os outros itens que você configurar para garantir que apenas inimigos sejam afetados."
-})
-
 local Toggle = tab1:CreateToggle({
     Name = "Check de Time",
     CurrentValue = false,
@@ -154,11 +204,6 @@ local Toggle = tab1:CreateToggle({
     Callback = function(Value)
         TeamCheck = Value
     end,
-})
-
-local Paragraph = tab1:CreateParagraph({
-    Title = "Aimbot",
-    Content = "Um aimbot é uma ferramenta usada em jogos para ajudar os jogadores a mirar automaticamente em seus oponentes. Ele funciona detectando inimigos na tela e ajustando a mira do jogador para atingi-los com precisão."
 })
 
 local Toggle = tab1:CreateToggle({
@@ -170,11 +215,6 @@ local Toggle = tab1:CreateToggle({
    end,
 })
 
-local Paragraph = tab1:CreateParagraph({
-    Title = "Check de Visibilidade",
-    Content = "Check de Visibilidade é uma funcionalidade em jogos que verifica se um oponente está dentro da linha de visão direta do jogador. Isso ajuda a determinar se os adversários estão visíveis ou ocultos por obstáculos, permitindo estratégias mais precisas e eficazes durante o jogo."
-})
-
 local Toggle = tab1:CreateToggle({
    Name = "Check de Visibilidade",
    CurrentValue = false,
@@ -182,11 +222,6 @@ local Toggle = tab1:CreateToggle({
    Callback = function(Value)
        VisibleCheck = Value
    end,
-})
-
-local Paragraph = tab1:CreateParagraph({
-    Title = "FOV do Aimbot",
-    Content = "FOV (Field of View) do aimbot é a área em que o aimbot procura por alvos. É como um cone de visão onde o aimbot detecta e trava nos oponentes. Configurar a FOV permite ajustar a precisão e a área de atuação do aimbot."
 })
 
 local Slider = tab1:CreateSlider({
@@ -288,3 +323,104 @@ local Dropdown = tab1:CreateDropdown({
     end,
 })
 
+-- Tab 2: ESP
+local Paragraph = tab2:CreateParagraph({
+    Title = "ESP",
+    Content = "O ESP (Extra Sensory Perception) é uma funcionalidade que permite aos jogadores verem seus oponentes através de obstáculos, desenhando caixas ao redor dos personagens inimigos para melhor percepção no jogo."
+})
+
+local Toggle = tab2:CreateToggle({
+    Name = "Ativar ESP",
+    CurrentValue = false,
+    Flag = "ESPEnabled", 
+    Callback = function(Value)
+        espEnabled = Value
+    end,
+})
+
+local Slider = tab2:CreateSlider({
+    Name = "Espessura do ESP",
+    Range = {0, 5},
+    Increment = 0.1,
+    Suffix = "Units",
+    CurrentValue = 1,
+    Flag = "ESPThickness", 
+    Callback = function(value)
+        if value >= 0 and value <= 5 then
+            espThickness = value
+        else
+            print("Please enter a value between 0 and 5.")
+        end
+    end,
+})
+
+local Slider = tab2:CreateSlider({
+    Name = "Transparência do ESP",
+    Range = {0, 1},
+    Increment = 0.1,
+    Suffix = "Units",
+    CurrentValue = 1,
+    Flag = "ESPTransparency", 
+    Callback = function(value)
+        if value >= 0 and value <= 1 then
+            espTransparency = value
+        else
+            print("Please enter a value between 0 and 1.")
+        end
+    end,
+})
+
+local ColorPicker = tab2:CreateColorPicker({
+    Name = "Cor do ESP",
+    Color = Color3.fromRGB(255, 255, 255), 
+    Flag = "ESPColorPicker", 
+    Callback = function(value)
+        if not espIsRGB then
+            espColor = value
+        end
+    end,
+})
+
+local ToggleRGB = tab2:CreateToggle({
+    Name = "Ativar Cor RGB no ESP",
+    CurrentValue = false,
+    Flag = "EnableESP_RGB", 
+    Callback = function(Value)
+        espIsRGB = Value
+    end,
+})
+
+local Toggle = tab2:CreateToggle({
+    Name = "Ativar Cor do Time no ESP",
+    CurrentValue = false,
+    Flag = "ESPTeamColor", 
+    Callback = function(Value)
+        espTeamColor = Value
+    end,
+})
+
+-- Tab 3: Descrições
+local Paragraph = tab3:CreateParagraph({
+    Title = "Aimbot",
+    Content = "Um aimbot é uma ferramenta usada em jogos para ajudar os jogadores a mirar automaticamente em seus oponentes. Ele funciona detectando inimigos na tela e ajustando a mira do jogador para atingi-los com precisão."
+})
+
+local Paragraph = tab3:CreateParagraph({
+    Title = "Check de Time",
+    Content = "O Check de Time verifica se o jogador inimigo está no mesmo time que você, evitando que o aimbot mire em aliados. Isso é aplicável a todos os outros itens que você configurar para garantir que apenas inimigos sejam afetados."
+})
+
+local Paragraph = tab3:CreateParagraph({
+    Title = "Check de Visibilidade",
+    Content = "Check de Visibilidade é uma funcionalidade em jogos que verifica se um oponente está dentro da linha de visão direta do jogador. Isso ajuda a determinar se os adversários estão visíveis ou ocultos por obstáculos, permitindo estratégias mais precisas e eficazes durante o jogo."
+})
+
+local Paragraph = tab3:CreateParagraph({
+    Title = "FOV do Aimbot",
+    Content = "FOV (Field of View) do aimbot é a área em que o aimbot procura por alvos. É como um cone de visão onde o aimbot detecta e trava nos oponentes. Configurar a FOV permite ajustar a precisão e a área de atuação do aimbot."
+})
+
+local Paragraph = tab3:CreateParagraph({
+    Title = "ESP",
+    Content = "O ESP (Extra Sensory Perception) é uma funcionalidade que permite aos jogadores verem seus oponentes através de obstáculos, desenhando caixas ao redor dos personagens inimigos para melhor percepção no jogo."
+})
