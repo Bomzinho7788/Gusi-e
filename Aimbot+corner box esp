@@ -1,0 +1,314 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "ESP Configuration",
+    Icon = 0, -- Sem ícone no topo
+    LoadingTitle = "BOM_MODS_V2",
+    LoadingSubtitle = "Carregando script...",
+    Theme = "Default",
+
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "ESP_Config",
+        FileName = "Config"
+    },
+
+    Discord = {
+        Enabled = false,
+        Invite = "noinvitelink",
+        RememberJoins = true
+    },
+
+    KeySystem = true, -- Sistema de chave ativado
+    KeySettings = {
+        Title = "BOM_MODS_V2",
+        Subtitle = "Insira a chave para continuar",
+        Note = "Use as chaves 1234 ou 4321.",
+        FileName = "Key",
+        SaveKey = true, -- Salva a chave no executor
+        GrabKeyFromSite = false, -- Não buscar chave online
+        Key = {"1234", "4321"} -- Lista de chaves válidas
+    }
+})
+
+-- Script ESP
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/esp%20script"))()
+
+ESP.NameColor = Color3.new(1, 1, 1)
+ESP.HealthHighColor = Color3.new(0, 1, 0)
+ESP.HealthLowColor = Color3.new(1, 0, 0)
+ESP.Teamcheck = false
+ESP.Enabled = false
+ESP.ShowBox = false
+ESP.ShowName = false
+ESP.ShowHealth = false
+ESP.ShowDistance = false
+ESP.ShowTracer = false
+
+-- Interface principal
+local Tab = Window:CreateTab("ESP Settings", 4483362458)
+
+-- Toggles
+Tab:CreateToggle({
+    Name = "Ativar ESP",
+    CurrentValue = false,
+    Flag = "ESPEnabled",
+    Callback = function(Value)
+        ESP.Enabled = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Mostrar Box",
+    CurrentValue = false,
+    Flag = "ShowBox",
+    Callback = function(Value)
+        ESP.ShowBox = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Team Check",
+    CurrentValue = false,
+    Flag = "TeamCheck",
+    Callback = function(Value)
+        ESP.Teamcheck = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Mostrar Nome",
+    CurrentValue = false,
+    Flag = "ShowName",
+    Callback = function(Value)
+        ESP.ShowName = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Mostrar Saúde",
+    CurrentValue = false,
+    Flag = "ShowHealth",
+    Callback = function(Value)
+        ESP.ShowHealth = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Mostrar Distância",
+    CurrentValue = false,
+    Flag = "ShowDistance",
+    Callback = function(Value)
+        ESP.ShowDistance = Value
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Mostrar Tracer",
+    CurrentValue = false,
+    Flag = "ShowTracer",
+    Callback = function(Value)
+        ESP.ShowTracer = Value
+    end
+})
+
+
+local player = game.Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+local aimPart = "Head"
+local silentAimEnabled = false
+local wallCheckEnabled = false
+local teamCheckEnabled = false
+local fovEnabled = false
+local fovRadius = 200
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = 1
+fovCircle.Filled = false
+fovCircle.Color = Color3.new(1, 0, 0) -- Cor do círculo da FOV
+fovCircle.Transparency = 0.5
+fovCircle.Visible = false -- Começa invisível
+
+-- Função para desenhar o círculo da FOV
+local function updateFovCircle()
+    if silentAimEnabled and fovEnabled then
+        fovCircle.Visible = true
+        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        fovCircle.Position = mousePos
+        fovCircle.Radius = fovRadius
+    else
+        fovCircle.Visible = false
+    end
+end
+
+-- Função para verificar se há paredes entre o jogador e o alvo
+local function isVisible(targetPart)
+    if not wallCheckEnabled then
+        return true -- Se WallCheck estiver desativado, sempre retorna visível
+    end
+
+    local ray = Ray.new(camera.CFrame.Position, (targetPart.Position - camera.CFrame.Position).Unit * 500)
+    local hit, _ = game.Workspace:FindPartOnRay(ray, player.Character, false, true)
+
+    if hit and hit:IsDescendantOf(targetPart.Parent) then
+        return true -- Sem obstruções
+    else
+        return false -- Obstruído
+    end
+end
+
+-- Função para verificar se o alvo está no mesmo time
+local function isOnSameTeam(targetPlayer)
+    if not teamCheckEnabled then
+        return false -- Ignora verificação de time
+    end
+
+    if targetPlayer.Team == player.Team then
+        return true -- Mesmo time
+    else
+        return false -- Time diferente
+    end
+end
+
+-- Função para encontrar o jogador mais próximo na FOV
+local function getClosestPlayerInFOV()
+    local closestPlayer = nil
+    local shortestDistance = fovRadius
+
+    for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+        if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
+            if isOnSameTeam(targetPlayer) then
+                continue -- Ignora jogadores do mesmo time
+            end
+
+            local head = targetPlayer.Character[aimPart]
+            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            if onScreen and isVisible(head) then -- Verifica se o alvo está visível
+                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
+
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = head
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+-- Ajusta a mira automaticamente
+local function silentAimAtClosestPlayer()
+    if silentAimEnabled then
+        local targetHead = getClosestPlayerInFOV()
+
+        if targetHead then
+            local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+        end
+    end
+end
+
+-- Criando a aba e toggles
+local MainTab = Window:CreateTab("Aimbot & FOV", 4483345998)
+
+MainTab:CreateToggle({
+    Name = "Aimbot",
+    CurrentValue = false,
+    Flag = "SilentAimToggle", -- Identificador único para o slider de Silent Aim
+    Callback = function(State)
+        silentAimEnabled = State
+        updateFovCircle()
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "WallCheck",
+    CurrentValue = false,
+    Flag = "WallCheckToggle", -- Identificador único para o toggle de WallCheck
+    Callback = function(State)
+        wallCheckEnabled = State
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "TeamCheck",
+    CurrentValue = false,
+    Flag = "TeamCheckToggle", -- Identificador único para o toggle de TeamCheck
+    Callback = function(State)
+        teamCheckEnabled = State
+    end
+})
+
+-- Slider para ajustar o tamanho da FOV
+MainTab:CreateSlider({
+    Name = "Tamanho da FOV",
+    Range = {50, 500},
+    Increment = 10,
+    Suffix = "Units",
+    CurrentValue = 200,
+    Flag = "FOVSlider", -- Identificador único para o slider de FOV
+    Callback = function(Value)
+        fovRadius = Value
+        updateFovCircle()
+    end
+})
+
+-- Slider para ajustar a espessura da FOV
+MainTab:CreateSlider({
+    Name = "Espessura da FOV",
+    Range = {1, 5},
+    Increment = 1,
+    Suffix = "Thickness",
+    CurrentValue = 1,
+    Flag = "FOVThicknessSlider", -- Identificador único para o slider de espessura
+    Callback = function(Value)
+        fovCircle.Thickness = Value
+    end
+})
+
+-- Slider para ajustar a transparência da FOV
+MainTab:CreateSlider({
+    Name = "Transparência da FOV",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "Transparency",
+    CurrentValue = 0.5,
+    Flag = "FOVTransparencySlider", -- Identificador único para o slider de transparência
+    Callback = function(Value)
+        fovCircle.Transparency = Value
+    end
+})
+
+-- Colorpicker para mudar a cor da FOV
+MainTab:CreateColorPicker({
+    Name = "Cor da FOV",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "FOVColorPicker", -- Identificador único para o colorpicker de FOV
+    Callback = function(Color)
+        fovCircle.Color = Color
+    end
+})
+
+-- Toggle para ativar/desativar a FOV
+MainTab:CreateToggle({
+    Name = "Ativar FOV",
+    CurrentValue = false,
+    Flag = "FOVToggle", -- Identificador único para o toggle de FOV
+    Callback = function(State)
+        fovEnabled = State
+        updateFovCircle()
+    end
+})
+
+-- Loop principal para o Silent Aim
+game:GetService("RunService").RenderStepped:Connect(function()
+    if silentAimEnabled then
+        silentAimAtClosestPlayer()
+    end
+    updateFovCircle() -- Atualiza a FOV continuamente
+end)
+
+
+-- Salvar configurações no encerramento
+Rayfield:LoadConfiguration()
