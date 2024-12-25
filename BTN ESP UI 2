@@ -1,0 +1,215 @@
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20Library"))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "ESP Configuration",
+   LoadingTitle = "Loading ESP Configurator",
+   LoadingSubtitle = "by Rayfield",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "ESP_Config"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "", -- The Discord invite code, do not include discord.gg/
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Key System",
+      Subtitle = "Enter your key",
+      Note = "Join the discord",
+      FileName = "ESP_Key",
+      SaveKey = true,
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = "YourKey"
+   }
+})
+
+local Tab = Window:CreateTab("ESP Settings", 4483362458) -- Title, Image
+
+local Section = Tab:CreateSection("General Settings")
+
+local Toggle = Tab:CreateToggle({
+   Name = "Enable ESP",
+   CurrentValue = ESP.Enabled,
+   Flag = "Toggle_ESP", -- Identifier for the configuration file
+   Callback = function(Value)
+       ESP.Enabled = Value
+   end,
+})
+
+local ColorPicker_BoxOutline = Tab:CreateColorPicker({
+    Name = "Box Outline Color",
+    Color = ESP.BoxOutlineColor,
+    Flag = "ColorPicker_BoxOutline",
+    Callback = function(Value)
+        ESP.BoxOutlineColor = Value
+    end,
+})
+
+local ColorPicker_Box = Tab:CreateColorPicker({
+    Name = "Box Color",
+    Color = ESP.BoxColor,
+    Flag = "ColorPicker_Box",
+    Callback = function(Value)
+        ESP.BoxColor = Value
+    end,
+})
+
+local ColorPicker_Name = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = ESP.NameColor,
+    Flag = "ColorPicker_Name",
+    Callback = function(Value)
+        ESP.NameColor = Value
+    end,
+})
+
+local ColorPicker_HealthOutline = Tab:CreateColorPicker({
+    Name = "Health Outline Color",
+    Color = ESP.HealthOutlineColor,
+    Flag = "ColorPicker_HealthOutline",
+    Callback = function(Value)
+        ESP.HealthOutlineColor = Value
+    end,
+})
+
+local ColorPicker_HealthHigh = Tab:CreateColorPicker({
+    Name = "Health High Color",
+    Color = ESP.HealthHighColor,
+    Flag = "ColorPicker_HealthHigh",
+    Callback = function(Value)
+        ESP.HealthHighColor = Value
+    end,
+})
+
+local ColorPicker_HealthLow = Tab:CreateColorPicker({
+    Name = "Health Low Color",
+    Color = ESP.HealthLowColor,
+    Flag = "ColorPicker_HealthLow",
+    Callback = function(Value)
+        ESP.HealthLowColor = Value
+    end,
+})
+
+local ColorPicker_Tracer = Tab:CreateColorPicker({
+    Name = "Tracer Color",
+    Color = ESP.TracerColor,
+    Flag = "ColorPicker_Tracer",
+    Callback = function(Value)
+        ESP.TracerColor = Value
+    end,
+})
+
+local ColorPicker_Skeletons = Tab:CreateColorPicker({
+    Name = "Skeletons Color",
+    Color = ESP.SkeletonsColor,
+    Flag = "ColorPicker_Skeletons",
+    Callback = function(Value)
+        ESP.SkeletonsColor = Value
+    end,
+})
+
+local Slider_TracerThickness = Tab:CreateSlider({
+    Name = "Tracer Thickness",
+    Range = {1, 10},
+    Increment = 1,
+    Suffix = "px",
+    CurrentValue = ESP.TracerThickness,
+    Flag = "Slider_TracerThickness",
+    Callback = function(Value)
+        ESP.TracerThickness = Value
+    end,
+})
+
+local Dropdown_BoxType = Tab:CreateDropdown({
+   Name = "Box Type",
+   Options = {"2D", "Corner Box Esp"},
+   CurrentOption = ESP.BoxType,
+   Flag = "Dropdown_BoxType",
+   Callback = function(Option)
+       ESP.BoxType = Option
+   end,
+})
+
+local Dropdown_TracerPosition = Tab:CreateDropdown({
+   Name = "Tracer Position",
+   Options = {"Top", "Middle", "Bottom"},
+   CurrentOption = ESP.TracerPosition,
+   Flag = "Dropdown_TracerPosition",
+   Callback = function(Option)
+       ESP.TracerPosition = Option
+   end,
+})
+
+local Toggle_ShowBox = Tab:CreateToggle({
+   Name = "Show Box",
+   CurrentValue = ESP.ShowBox,
+   Flag = "Toggle_ShowBox",
+   Callback = function(Value)
+       ESP.ShowBox = Value
+   end,
+})
+
+local Toggle_ShowName = Tab:CreateToggle({
+   Name = "Show Name",
+   CurrentValue = ESP.ShowName,
+   Flag = "Toggle_ShowName",
+   Callback = function(Value)
+       ESP.ShowName = Value
+   end,
+})
+
+local Toggle_ShowHealth = Tab:CreateToggle({
+   Name = "Show Health",
+   CurrentValue = ESP.ShowHealth,
+   Flag = "Toggle_ShowHealth",
+   Callback = function(Value)
+       ESP.ShowHealth = Value
+   end,
+})
+
+local Toggle_ShowDistance = Tab:CreateToggle({
+   Name = "Show Distance",
+   CurrentValue = ESP.ShowDistance,
+   Flag = "Toggle_ShowDistance",
+   Callback = function(Value)
+       ESP.ShowDistance = Value
+   end,
+})
+
+local Toggle_ShowSkeletons = Tab:CreateToggle({
+   Name = "Show Skeletons",
+   CurrentValue = ESP.ShowSkeletons,
+   Flag = "Toggle_ShowSkeletons",
+   Callback = function(Value)
+       ESP.ShowSkeletons = Value
+   end,
+})
+
+local Toggle_ShowTracer = Tab:CreateToggle({
+   Name = "Show Tracer",
+   CurrentValue = ESP.ShowTracer,
+   Flag = "Toggle_ShowTracer",
+   Callback = function(Value)
+       ESP.ShowTracer = Value
+   end,
+})
+
+-- Notificação de exemplo
+Rayfield:Notify({
+    Title = "ESP Configurator",
+    Content = "Configuration loaded successfully!",
+    Duration = 6.5,
+    Image = 4483362458,
+    Actions = { -- Notification Buttons
+        Ignore = {
+            Name = "Okay!",
+            Callback = function()
+                print("Configuration acknowledged!")
+            end
+        },
+    },
+})
