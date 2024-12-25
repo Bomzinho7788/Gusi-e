@@ -1,40 +1,48 @@
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20Library"))()
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "ESP Configuration",
-   LoadingTitle = "Loading ESP Configurator",
-   LoadingSubtitle = "by Rayfield",
+   Name = "Rayfield Example Window",
+   Icon = 0,
+   LoadingTitle = "Loading BTN ESP",
+   LoadingSubtitle = "by Bomzinho",
+   Theme = "Amethyst",
+
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "ESP_Config"
+      FolderName = BTN ESP,
+      FileName = "BTN ESP",
    },
+
    Discord = {
-      Enabled = false,
-      Invite = "", -- The Discord invite code, do not include discord.gg/
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+      Enabled = false
+      Invite = "noinvitelink",
+      RememberJoins = true
    },
-   KeySystem = false, -- Set this to true to use our key system
+
+   KeySystem = true,
    KeySettings = {
       Title = "Key System",
-      Subtitle = "Enter your key",
-      Note = "Join the discord",
-      FileName = "ESP_Key",
+      Subtitle = "Buy The Key on SX Store Discord",
+      Note = "No method of obtaining the key is provided",
+      FileName = "BTNKEY",
       SaveKey = true,
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = "YourKey"
+      GrabKeyFromSite = false,
+      Key = {"1234", 4321}
    }
 })
 
-local Tab = Window:CreateTab("ESP Settings", 4483362458) -- Title, Image
+local Tab = Window:CreateTab("ESP Settings", 4483362458)
 
 local Section = Tab:CreateSection("General Settings")
 
 local Toggle = Tab:CreateToggle({
    Name = "Enable ESP",
    CurrentValue = ESP.Enabled,
-   Flag = "Toggle_ESP", -- Identifier for the configuration file
+   Flag = "Toggle_ESP",
    Callback = function(Value)
        ESP.Enabled = Value
    end,
@@ -196,20 +204,4 @@ local Toggle_ShowTracer = Tab:CreateToggle({
    Callback = function(Value)
        ESP.ShowTracer = Value
    end,
-})
-
--- Notificação de exemplo
-Rayfield:Notify({
-    Title = "ESP Configurator",
-    Content = "Configuration loaded successfully!",
-    Duration = 6.5,
-    Image = 4483362458,
-    Actions = { -- Notification Buttons
-        Ignore = {
-            Name = "Okay!",
-            Callback = function()
-                print("Configuration acknowledged!")
-            end
-        },
-    },
 })
