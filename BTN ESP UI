@@ -1,6 +1,3 @@
---[[
-    WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-]]
 local ESP = loadstring(game:HttpGet("COLOQUE_O_LINK_DO_RAW_AQUI"))()
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
 
