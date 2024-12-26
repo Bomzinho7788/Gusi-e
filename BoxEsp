@@ -1,0 +1,168 @@
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0,3,0)
+
+-- Configurações
+local temcheck = true
+local temcheckmode = "colors" -- opções: "colors", "invisible"
+local teamcolor = Color3.new(0, 1, 0) --a Cor para o time
+local enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
+
+-- Configurações BoxOutline e Box
+local boxOutlineColor = Color3.new(0, 0, 0)
+local boxOutlineThickness = 3
+local boxOutlineTransparency = 1
+local boxOutlineVisible = true
+
+local boxColor = Color3.new(0, 0, 0)
+local boxThickness = 1
+local boxTransparency = 1
+local boxVisible = true
+
+-- Configurações BoxFilled
+local boxFilledColor = Color3.new(0, 0, 0)
+local boxFilledTransparency = 0.5
+local boxFilledVisible = true
+
+-- Definir Box, BoxOutline e BoxFilled no início
+local BoxOutline = Drawing.new("Square")
+BoxOutline.Visible = boxOutlineVisible
+BoxOutline.Color = boxOutlineColor
+BoxOutline.Thickness = boxOutlineThickness
+BoxOutline.Transparency = boxOutlineTransparency
+BoxOutline.Filled = false
+
+local Box = Drawing.new("Square")
+Box.Visible = boxVisible
+Box.Color = boxColor
+Box.Thickness = boxThickness
+Box.Transparency = boxTransparency
+Box.Filled = false
+
+local BoxFilled = Drawing.new("Square")
+BoxFilled.Visible = boxFilledVisible
+BoxFilled.Color = boxFilledColor
+BoxFilled.Transparency = boxFilledTransparency
+BoxFilled.Filled = true
+
+for i, v in pairs(game.Players:GetChildren()) do
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+                
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+                    
+                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+
+                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    BoxFilled.Visible = true
+
+                    if temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = teamcolor
+                            BoxFilled.Color = teamcolor
+                        else
+                            Box.Color = enemycolor
+                            BoxFilled.Color = enemycolor
+                        end
+                    elseif temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxOutline.Visible = false
+                            BoxFilled.Visible = false
+                        else
+                            Box.Color = enemycolor
+                            BoxFilled.Color = enemycolor
+                        end
+                    end
+                    
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    BoxFilled.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end
+
+game.Players.PlayerAdded:Connect(function(v)
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+
+                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+
+                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    BoxFilled.Visible = true
+
+                    if temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = teamcolor
+                            BoxFilled.Color = teamcolor
+                        else
+                            Box.Color = enemycolor
+                            BoxFilled.Color = enemycolor
+                        end
+                    elseif temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxOutline.Visible = false
+                            BoxFilled.Visible = false
+                        else
+                            Box.Color = enemycolor
+                            BoxFilled.Color = enemycolor
+                        end
+                    end
+                    
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    BoxFilled.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end)
