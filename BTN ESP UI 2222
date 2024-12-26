@@ -137,6 +137,13 @@ for i, v in pairs(game.Players:GetChildren()) do
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = _G.boxFilledVisible
                     
+                    local function GetHealthColor(CurrentHealth, MaxHealth)
+                        local HealthPercentage = CurrentHealth / MaxHealth
+                        local Red = math.clamp(1 - HealthPercentage, 0, 1) -- Mais vermelho com menos vida
+                        local Green = math.clamp(HealthPercentage, 0, 1)   -- Mais verde com mais vida
+                        return Color3.new(Red, Green, 0) -- Cor resultante
+                    end
+                    
                     local MaxHealth = v:FindFirstChild("NRPBS") and v.NRPBS:FindFirstChild("MaxHealth") and v.NRPBS.MaxHealth.Value or v.Humanoid.MaxHealth
                     local CurrentHealth = v:FindFirstChild("NRPBS") and v.NRPBS:FindFirstChild("Health") and v.NRPBS.Health.Value or v.Humanoid.Health
 
@@ -148,7 +155,7 @@ for i, v in pairs(game.Players:GetChildren()) do
                     -- Barra de vida
                     local HealthBar = Drawing.new("Square")
                     HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (MaxHealth / math.clamp(CurrentHealth, 0, MaxHealth)))
-                    HealthBar.Color = Color3.fromRGB(0, 255, 0)
+                    HealthBar.Color = GetHealthColor(CurrentHealth, MaxHealth) -- Cor dinâmica com base na vida
                     HealthBar.Visible = _G.HealthBarVisible
 
                     -- Lógica de posição com base no Dropdown
@@ -236,14 +243,43 @@ game.Players.PlayerAdded:Connect(function(v)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = _G.boxFilledVisible
 
+                    local function GetHealthColor(CurrentHealth, MaxHealth)
+                        local HealthPercentage = CurrentHealth / MaxHealth
+                        local Red = math.clamp(1 - HealthPercentage, 0, 1) -- Mais vermelho com menos vida
+                        local Green = math.clamp(HealthPercentage, 0, 1)   -- Mais verde com mais vida
+                        return Color3.new(Red, Green, 0) -- Cor resultante
+                    end
+                    
+                    local MaxHealth = v:FindFirstChild("NRPBS") and v.NRPBS:FindFirstChild("MaxHealth") and v.NRPBS.MaxHealth.Value or v.Humanoid.MaxHealth
+                    local CurrentHealth = v:FindFirstChild("NRPBS") and v.NRPBS:FindFirstChild("Health") and v.NRPBS.Health.Value or v.Humanoid.Health
+
+                    -- Barra de contorno (Outline)
+                    local HealthBarOutline = Drawing.new("Square")
                     HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    HealthBarOutline.Position = BoxOutline.Position - Vector2.new(6,0)
                     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
-                    
-                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value)))
-                    HealthBar.Position = Vector2.new(Box.Position.x - 6, Box.Position.Y + (1 / HealthBar.Size.Y))
+
+                    -- Barra de vida
+                    local HealthBar = Drawing.new("Square")
+                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (MaxHealth / math.clamp(CurrentHealth, 0, MaxHealth)))
+                    HealthBar.Color = GetHealthColor(CurrentHealth, MaxHealth) -- Cor dinâmica com base na vida
                     HealthBar.Visible = _G.HealthBarVisible
-                    
+
+                    -- Lógica de posição com base no Dropdown
+                    if _G.HealthBarEveryonePosition == "Right" then
+                        HealthBarOutline.Position = BoxOutline.Position + Vector2.new(6, 0)
+                        HealthBar.Position = Box.Position + Vector2.new(6, 0)
+                    elseif _G.HealthBarEveryonePosition == "Left" then
+                        HealthBarOutline.Position = BoxOutline.Position - Vector2.new(6, 0)
+                        HealthBar.Position = Box.Position - Vector2.new(6, 0)
+                    elseif _G.HealthBarEveryonePosition == "Top" then
+                        HealthBarOutline.Position = BoxOutline.Position - Vector2.new(0, HealthBarOutline.Size.Y + 6)
+                        HealthBar.Position = Box.Position - Vector2.new(0, HealthBar.Size.Y + 6)
+                    elseif _G.HealthBarEveryonePosition == "Bottom" then
+                        HealthBarOutline.Position = BoxOutline.Position + Vector2.new(0, BoxOutline.Size.Y + 6)
+                        HealthBar.Position = Box.Position + Vector2.new(0, Box.Size.Y + 6)
+                    end
+                end
+                                        
                     if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
