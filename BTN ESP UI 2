@@ -1,207 +1,251 @@
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20Library"))()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Rayfield Example Window",
-   Icon = 0,
-   LoadingTitle = "Loading BTN ESP",
+   Name = "BNT ESP Library UI",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Loading...",
    LoadingSubtitle = "by Bomzinho",
-   Theme = "Amethyst",
+   Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
    DisableRayfieldPrompts = true,
-   DisableBuildWarnings = true,
+   DisableBuildWarnings = true, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
 
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = BTN ESP,
-      FileName = "BTN ESP",
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
    },
 
    Discord = {
-      Enabled = false
-      Invite = "noinvitelink",
-      RememberJoins = true
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
 
-   KeySystem = true,
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
       Title = "Key System",
-      Subtitle = "Buy The Key on SX Store Discord",
-      Note = "No method of obtaining the key is provided",
-      FileName = "BTNKEY",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"1234", 4321}
+      Subtitle = "BTN ESP",
+      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, --
+      GrabKeyFromSite = false, -- If 
+      Key = {"1", "12", "123", "1234"} -- 
    }
 })
 
-local Tab = Window:CreateTab("ESP Settings", 4483362458)
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
-local Section = Tab:CreateSection("General Settings")
+local Tab = Window:CreateTab("ESP", 4483362458) -- Title, Image
+
+local Label = Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(255, 255, 255), false) -- Title, Icon, Color, IgnoreTheme
+
+local function createNotification(content)
+    Rayfield:Notify({
+        Title = "Click on Reset Button on The Bottom of The Tab for Better Affect",
+        Content = content,
+        Duration = 10,
+        Image = 4483362458,
+    })
+end
 
 local Toggle = Tab:CreateToggle({
    Name = "Enable ESP",
-   CurrentValue = ESP.Enabled,
-   Flag = "Toggle_ESP",
+   CurrentValue = false,
+   Flag = "ENABLEESP", -- A
    Callback = function(Value)
-       ESP.Enabled = Value
+   ESP.Enabled = Value
    end,
 })
 
-local ColorPicker_BoxOutline = Tab:CreateColorPicker({
-    Name = "Box Outline Color",
-    Color = ESP.BoxOutlineColor,
-    Flag = "ColorPicker_BoxOutline",
-    Callback = function(Value)
-        ESP.BoxOutlineColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Box",
+   CurrentValue = false,
+   Flag = "ShowBox", -- A
+   Callback = function(Value)
+   ESP.ShowBox = Value
+   end,
 })
 
-local ColorPicker_Box = Tab:CreateColorPicker({
-    Name = "Box Color",
-    Color = ESP.BoxColor,
-    Flag = "ColorPicker_Box",
-    Callback = function(Value)
-        ESP.BoxColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Tracer",
+   CurrentValue = false,
+   Flag = "ShowTracer", -- A
+   Callback = function(Value)
+   ESP.ShowTracer = Value
+   end,
 })
 
-local ColorPicker_Name = Tab:CreateColorPicker({
-    Name = "Name Color",
-    Color = ESP.NameColor,
-    Flag = "ColorPicker_Name",
-    Callback = function(Value)
-        ESP.NameColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Health Bar",
+   CurrentValue = false,
+   Flag = "ShowHealthBar", -- A
+   Callback = function(Value)
+   ESP.ShowHealth = Value
+   end,
 })
 
-local ColorPicker_HealthOutline = Tab:CreateColorPicker({
-    Name = "Health Outline Color",
-    Color = ESP.HealthOutlineColor,
-    Flag = "ColorPicker_HealthOutline",
-    Callback = function(Value)
-        ESP.HealthOutlineColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Name",
+   CurrentValue = false,
+   Flag = "ShowName", -- A
+   Callback = function(Value)
+   ESP.ShowName = Value
+   end,
 })
 
-local ColorPicker_HealthHigh = Tab:CreateColorPicker({
-    Name = "Health High Color",
-    Color = ESP.HealthHighColor,
-    Flag = "ColorPicker_HealthHigh",
-    Callback = function(Value)
-        ESP.HealthHighColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Distance",
+   CurrentValue = false,
+   Flag = "ShowDistance", -- A
+   Callback = function(Value)
+   ESP.ShowDistance = Value
+   end,
 })
 
-local ColorPicker_HealthLow = Tab:CreateColorPicker({
-    Name = "Health Low Color",
-    Color = ESP.HealthLowColor,
-    Flag = "ColorPicker_HealthLow",
-    Callback = function(Value)
-        ESP.HealthLowColor = Value
-    end,
+local Toggle = Tab:CreateToggle({
+   Name = "Show Skeletons",
+   CurrentValue = false,
+   Flag = "ShowSkeletons", -- A
+   Callback = function(Value)
+   ESP.ShowSkeletons = Value
+   end,
 })
 
-local ColorPicker_Tracer = Tab:CreateColorPicker({
-    Name = "Tracer Color",
-    Color = ESP.TracerColor,
-    Flag = "ColorPicker_Tracer",
-    Callback = function(Value)
-        ESP.TracerColor = Value
-    end,
-})
+local Label = Tab:CreateLabel("Slider Settings", 4483362458, Color3.fromRGB(255, 255, 255), false) -- Title, Icon, Color, IgnoreTheme
 
-local ColorPicker_Skeletons = Tab:CreateColorPicker({
-    Name = "Skeletons Color",
-    Color = ESP.SkeletonsColor,
-    Flag = "ColorPicker_Skeletons",
-    Callback = function(Value)
-        ESP.SkeletonsColor = Value
-    end,
-})
-
-local Slider_TracerThickness = Tab:CreateSlider({
+local Slider = Tab:CreateSlider({
     Name = "Tracer Thickness",
-    Range = {1, 10},
-    Increment = 1,
-    Suffix = "px",
-    CurrentValue = ESP.TracerThickness,
-    Flag = "Slider_TracerThickness",
+    Range = {1, 7.5},
+    Increment = 10,
+    Suffix = "Thickness",
+    CurrentValue = 0.5,
+    Flag = "TracerThickness",
     Callback = function(Value)
         ESP.TracerThickness = Value
+        createNotification("Tracer Thickness changed to " .. tostring(Value))
     end,
 })
 
-local Dropdown_BoxType = Tab:CreateDropdown({
-   Name = "Box Type",
-   Options = {"2D", "Corner Box Esp"},
-   CurrentOption = ESP.BoxType,
-   Flag = "Dropdown_BoxType",
-   Callback = function(Option)
-       ESP.BoxType = Option
-   end,
+local Label = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false) -- Title, Icon, Color, IgnoreTheme
+
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Tracer Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "TracerColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.TracerColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Dropdown_TracerPosition = Tab:CreateDropdown({
-   Name = "Tracer Position",
-   Options = {"Top", "Middle", "Bottom"},
-   CurrentOption = ESP.TracerPosition,
-   Flag = "Dropdown_TracerPosition",
-   Callback = function(Option)
-       ESP.TracerPosition = Option
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Box Outline Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "BoxOutlineColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.BoxOutlineColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowBox = Tab:CreateToggle({
-   Name = "Show Box",
-   CurrentValue = ESP.ShowBox,
-   Flag = "Toggle_ShowBox",
-   Callback = function(Value)
-       ESP.ShowBox = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Box Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "BoxColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.BoxColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowName = Tab:CreateToggle({
-   Name = "Show Name",
-   CurrentValue = ESP.ShowName,
-   Flag = "Toggle_ShowName",
-   Callback = function(Value)
-       ESP.ShowName = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "NameColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.NameColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowHealth = Tab:CreateToggle({
-   Name = "Show Health",
-   CurrentValue = ESP.ShowHealth,
-   Flag = "Toggle_ShowHealth",
-   Callback = function(Value)
-       ESP.ShowHealth = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "SkeletonsColor",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "SkeletonsColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.SkeletonsColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowDistance = Tab:CreateToggle({
-   Name = "Show Distance",
-   CurrentValue = ESP.ShowDistance,
-   Flag = "Toggle_ShowDistance",
-   Callback = function(Value)
-       ESP.ShowDistance = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Health Outline Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "HealthOutlineColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.HealthOutlineColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowSkeletons = Tab:CreateToggle({
-   Name = "Show Skeletons",
-   CurrentValue = ESP.ShowSkeletons,
-   Flag = "Toggle_ShowSkeletons",
-   Callback = function(Value)
-       ESP.ShowSkeletons = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Health High Life Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "HealthOutlineColor", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.HealthHighColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
 
-local Toggle_ShowTracer = Tab:CreateToggle({
-   Name = "Show Tracer",
-   CurrentValue = ESP.ShowTracer,
-   Flag = "Toggle_ShowTracer",
-   Callback = function(Value)
-       ESP.ShowTracer = Value
-   end,
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Health Low Life Color",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "HealthLowColor", -- A flag is the identifier qfor the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        ESP.HealthLowColor = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end
 })
+
+local Label = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(255, 255, 255), false) -- Title, Icon, Color, IgnoreTheme
+
+local Dropdown = Tab:CreateDropdown({
+    Name = "Box Type",
+    Options = {"Corner Box Esp", "2D"},
+    CurrentOption = "Corner Box Esp",
+    MultipleOptions = false,
+    Flag = "BoxType",
+    Callback = function(Value)
+        ESP.BoxType = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end,
+})
+
+local Dropdown = Tab:CreateDropdown({
+    Name = "Tracer Position",
+    Options = {"Top", "Center", "Middle", "Bottom"},
+    CurrentOption = "Corner Box Esp",
+    MultipleOptions = false,
+    Flag = "TracerPosition",
+    Callback = function(Value)
+        ESP.TracerPosition = Value
+        createNotification("Box Type changed to " .. tostring(Value))
+    end,
+})
+
+-- Add a button to reset the UI
+local ResetButton = Tab:CreateButton({
+    Name = "Reset UI",
+    Callback = function()
+        Rayfield:Destroy()
+        wait(0.01)
+        loadstring(game:HttpGet("")))() -- Reload the script
+    end,
+})
+
+Rayfield:LoadConfiguration()
