@@ -7,52 +7,58 @@ local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0,3,0)
 
 -- Configurações
-local temcheck = true
-local temcheckmode = "colors" -- opções: "colors", "invisible"
-local teamcolor = Color3.new(0, 1, 0) --a Cor para o time
-local enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
+_G.temcheck = true
+_G.temcheckmode = "colors" -- opções: "colors", "invisible"
+_G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
+_G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
 
 -- Configurações BoxOutline e Box
-local boxOutlineColor = Color3.new(0, 0, 0)
-local boxOutlineThickness = 3
-local boxOutlineTransparency = 1
-local boxOutlineVisible = true
+_G.boxOutlineColor = Color3.new(0, 0, 0)
+_G.boxOutlineThickness = 3
+_G.boxOutlineTransparency = 1
+_G.boxOutlineVisible = true
 
-local boxColor = Color3.new(0, 0, 0)
-local boxThickness = 1
-local boxTransparency = 1
-local boxVisible = true
+_G.boxColor = Color3.new(0, 0, 0)
+_G.boxThickness = 1
+_G.boxTransparency = 1
+_G.boxVisible = true
 
 -- Configurações BoxFilled
-local boxFilledColor = Color3.new(0, 0, 0)
-local boxFilledTransparency = 0.5
-local boxFilledVisible = true
+_G.boxFilledColor = Color3.new(0, 0, 0)
+_G.boxFilledTransparency = 0.5
+_G.boxFilledVisible = true
 
 -- Definir Box, BoxOutline e BoxFilled no início
-local BoxOutline = Drawing.new("Square")
-BoxOutline.Visible = boxOutlineVisible
-BoxOutline.Color = boxOutlineColor
-BoxOutline.Thickness = boxOutlineThickness
-BoxOutline.Transparency = boxOutlineTransparency
-BoxOutline.Filled = false
+local function createDrawingObjects()
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = _G.boxOutlineVisible
+    BoxOutline.Color = _G.boxOutlineColor
+    BoxOutline.Thickness = _G.boxOutlineThickness
+    BoxOutline.Transparency = _G.boxOutlineTransparency
+    BoxOutline.Filled = false
 
-local Box = Drawing.new("Square")
-Box.Visible = boxVisible
-Box.Color = boxColor
-Box.Thickness = boxThickness
-Box.Transparency = boxTransparency
-Box.Filled = false
+    local Box = Drawing.new("Square")
+    Box.Visible = _G.boxVisible
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Filled = false
 
-local BoxFilled = Drawing.new("Square")
-BoxFilled.Visible = boxFilledVisible
-BoxFilled.Color = boxFilledColor
-BoxFilled.Transparency = boxFilledTransparency
-BoxFilled.Filled = true
+    local BoxFilled = Drawing.new("Square")
+    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Filled = true
+    
+    return BoxOutline, Box, BoxFilled
+end
 
 for i, v in pairs(game.Players:GetChildren()) do
-    function boxesp()
+    local BoxOutline, Box, BoxFilled = createDrawingObjects()
+    
+    local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            if temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
                 
                 local RootPart = v.Character.HumanoidRootPart
@@ -74,22 +80,22 @@ for i, v in pairs(game.Players:GetChildren()) do
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = true
 
-                    if temcheckmode == "colors" then
+                    if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
-                            Box.Color = teamcolor
-                            BoxFilled.Color = teamcolor
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
                         else
-                            Box.Color = enemycolor
-                            BoxFilled.Color = enemycolor
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
                         end
-                    elseif temcheckmode == "invisible" then
+                    elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxOutline.Visible = false
                             BoxFilled.Visible = false
                         else
-                            Box.Color = enemycolor
-                            BoxFilled.Color = enemycolor
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
                         end
                     end
                     
@@ -109,9 +115,11 @@ for i, v in pairs(game.Players:GetChildren()) do
 end
 
 game.Players.PlayerAdded:Connect(function(v)
-    function boxesp()
+    local BoxOutline, Box, BoxFilled = createDrawingObjects()
+
+    local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            if temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
                 local RootPart = v.Character.HumanoidRootPart
@@ -133,22 +141,22 @@ game.Players.PlayerAdded:Connect(function(v)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = true
 
-                    if temcheckmode == "colors" then
+                    if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
-                            Box.Color = teamcolor
-                            BoxFilled.Color = teamcolor
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
                         else
-                            Box.Color = enemycolor
-                            BoxFilled.Color = enemycolor
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
                         end
-                    elseif temcheckmode == "invisible" then
+                    elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxOutline.Visible = false
                             BoxFilled.Visible = false
                         else
-                            Box.Color = enemycolor
-                            BoxFilled.Color = enemycolor
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
                         end
                     end
                     
