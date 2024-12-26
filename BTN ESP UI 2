@@ -47,7 +47,7 @@ local Window = Rayfield:CreateWindow({
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
-    BoxEsp.boxVisible = Value
+    Box.boxVisible = Value
     end,
  })
 
@@ -56,7 +56,7 @@ local Window = Rayfield:CreateWindow({
     CurrentValue = false,
     Flag = "Show BoxOutline",
     Callback = function(Value)
-    BoxEsp.boxOutlineVisible = Value
+    Box.boxOutlineVisible = Value
     end,
  })
 
@@ -65,7 +65,7 @@ local Window = Rayfield:CreateWindow({
     CurrentValue = false,
     Flag = "BoxFilled",
     Callback = function(Value)
-    BoxEsp.boxFilledVisible = Value
+    Box.boxFilledVisible = Value
     end,
  })
 
@@ -74,7 +74,7 @@ local Window = Rayfield:CreateWindow({
     CurrentValue = false,
     Flag = "temcheck",
     Callback = function(Value)
-    BoxEsp.temcheck = Value
+    Box.temcheck = Value
     end,
  })
 
@@ -85,7 +85,7 @@ local Window = Rayfield:CreateWindow({
     Color = Color3.fromRGB(255,255,255),
     Flag = "teamcolor",
     Callback = function(Value)
-        BoxEsp.teamcolor = Value
+        Box.teamcolor = Value
     end
 })
 
@@ -94,7 +94,7 @@ local ColorPicker1 = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255,255,255),
     Flag = "enemycolor",
     Callback = function(Value)
-        BoxEsp.enemycolor = Value
+        Box.enemycolor = Value
     end
 })
 
@@ -103,7 +103,7 @@ local ColorPicker2 = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255,255,255),
     Flag = "boxColor",
     Callback = function(Value)
-        BoxEsp.boxColor = Value
+        Box.boxColor = Value
     end
 })
 
@@ -112,7 +112,7 @@ local ColorPicker3 = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255,255,255),
     Flag = "boxOutlineColor",
     Callback = function(Value)
-        BoxEsp.boxOutlineColor = Value
+        Box.boxOutlineColor = Value
     end
 })
 
@@ -121,7 +121,7 @@ local ColorPicker4 = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255,255,255),
     Flag = "boxFilledColor",
     Callback = function(Value)
-        BoxEsp.boxFilledColor = Value
+        Box.boxFilledColor = Value
     end
 })
 
@@ -135,7 +135,7 @@ local Slider = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "boxTransparency",
     Callback = function(Value)
-    boxesp.boxTransparency = Value
+    Box.boxTransparency = Value
     end,
  })
 
@@ -147,7 +147,7 @@ local Slider = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "boxOutlineTransparency",
     Callback = function(Value)
-    boxesp.boxOutlineTransparency = Value
+    Box.boxOutlineTransparency = Value
     end,
  })
 
@@ -159,7 +159,7 @@ local Slider = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "boxOutlineTransparency",
     Callback = function(Value)
-    boxesp.boxOutlineTransparency = Value
+    Box.boxOutlineTransparency = Value
     end,
  })
 
@@ -173,7 +173,7 @@ local Slider = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "box Thickness",
     Callback = function(Value)
-    boxesp.boxThickness = Value
+    Box.boxThickness = Value
     end,
  })
 
@@ -185,7 +185,7 @@ local Slider = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "boxOutlineTransparency",
     Callback = function(Value)
-    boxesp.boxOutlineTransparency = Value
+    Box.boxOutlineTransparency = Value
     end,
  })
 
