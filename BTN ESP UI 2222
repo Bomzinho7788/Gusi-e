@@ -1,3 +1,8 @@
+HealthBarEveryonePosition = Value
+    end,
+})
+
+Rayfield:LoadConfiguration()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local lplr = game.Players.LocalPlayer
@@ -402,7 +407,7 @@ local Slider5 = Tab:CreateSlider({
     end,
 })
 
-local Slider5 = Tab:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Health Bar Transparency",
     Range = {0, 1},
     Increment = .05,
