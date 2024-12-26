@@ -79,7 +79,7 @@ local function createDrawingObjects()
     return BoxOutline, Box, BoxFilled, HealthBarOutline, HealthBar
 end
 
-local function updateDrawingObjects(BoxOutline, Box, BoxFilled)
+local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline, HealthBar)
     BoxOutline.Color = _G.boxOutlineColor
     BoxOutline.Thickness = _G.boxOutlineThickness
     BoxOutline.Transparency = _G.boxOutlineTransparency
@@ -93,15 +93,13 @@ local function updateDrawingObjects(BoxOutline, Box, BoxFilled)
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
     BoxFilled.Visible = _G.boxFilledVisible
-    
-    HealthBar.HealthBarEveryonePosition = _G.HealthBarEveryonePosition
-    
+
     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
     HealthBarOutline.Color = _G.HealthBarOutlineColor
     HealthBarOutline.Thickness = _G.HealthBarOutlineThickness
     HealthBarOutline.Transparency = _G.HealthBarOutlineTransparency
     HealthBarOutline.Filled = _G.HealthBarOutlineVisible
-    
+
     HealthBar.Visible = _G.HealthBarVisible
     HealthBar.Thickness = _G.HealthBarThickness
     HealthBar.Transparency = _G.HealthBarTransparency
@@ -113,7 +111,7 @@ for i, v in pairs(game.Players:GetChildren()) do
     
     local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            updateDrawingObjects(BoxOutline, Box, BoxFilled)
+            updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline)
 
             if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -219,7 +217,7 @@ game.Players.PlayerAdded:Connect(function(v)
 
     local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            updateDrawingObjects(BoxOutline, Box, BoxFilled)
+            updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline)
 
             if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
