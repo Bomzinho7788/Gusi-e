@@ -1,7 +1,5 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Box = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BoxEsp"))()
-
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
     Icon = 0,
@@ -19,12 +17,12 @@ local Window = Rayfield:CreateWindow({
     },
  
     Discord = {
-       Enabled = true,
+       Enabled = false,
        Invite = "",
        RememberJoins = true
     },
  
-    KeySystem = false,
+    KeySystem = true,
     KeySettings = {
        Title = "BNT ESP",
        Subtitle = "Key System",
@@ -34,94 +32,94 @@ local Window = Rayfield:CreateWindow({
        GrabKeyFromSite = false,
        Key = {"4321", "1234"}
     }
- })
+})
 
- local Tab1 = Window:CreateTab("Aimbot", 4483362458)
+local Tab1 = Window:CreateTab("Aimbot", 4483362458)
 
- local Tab = Window:CreateTab("ESP", 4483362458)
+local Tab = Window:CreateTab("ESP", 4483362458)
 
- local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
 
- local Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Show Box",
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
-    Box.boxVisible = Value
+        _G.boxVisible = Value
     end,
- })
+})
 
- local Toggle1 = Tab:CreateToggle({
+local Toggle1 = Tab:CreateToggle({
     Name = "Show Box Outline",
     CurrentValue = false,
     Flag = "Show BoxOutline",
     Callback = function(Value)
-    Box.boxOutlineVisible = Value
+        _G.boxOutlineVisible = Value
     end,
- })
+})
 
- local Toggle2 = Tab:CreateToggle({
+local Toggle2 = Tab:CreateToggle({
     Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
     Callback = function(Value)
-    Box.boxFilledVisible = Value
+        _G.boxFilledVisible = Value
     end,
- })
+})
 
- local Toggle3 = Tab:CreateToggle({
+local Toggle3 = Tab:CreateToggle({
     Name = "temcheck",
     CurrentValue = false,
     Flag = "temcheck",
     Callback = function(Value)
-    Box.temcheck = Value
+        _G.temcheck = Value
     end,
- })
+})
 
- local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
 
- local ColorPicker = Tab:CreateColorPicker({
+local ColorPicker = Tab:CreateColorPicker({
     Name = "Team Color",
-    Color = Color3.fromRGB(255,255,255),
+    Color = Color3.fromRGB(0, 255, 0),
     Flag = "teamcolor",
     Callback = function(Value)
-        Box.teamcolor = Value
+        _G.teamcolor = Value
     end
 })
 
 local ColorPicker1 = Tab:CreateColorPicker({
     Name = "Enemy Color",
-    Color = Color3.fromRGB(255,255,255),
+    Color = Color3.fromRGB(255, 0, 0),
     Flag = "enemycolor",
     Callback = function(Value)
-        Box.enemycolor = Value
+        _G.enemycolor = Value
     end
 })
 
 local ColorPicker2 = Tab:CreateColorPicker({
     Name = "Box Color",
-    Color = Color3.fromRGB(255,255,255),
+    Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxColor",
     Callback = function(Value)
-        Box.boxColor = Value
+        _G.boxColor = Value
     end
 })
 
 local ColorPicker3 = Tab:CreateColorPicker({
-    Name = "box Outline Color",
-    Color = Color3.fromRGB(255,255,255),
+    Name = "Box Outline Color",
+    Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxOutlineColor",
     Callback = function(Value)
-        Box.boxOutlineColor = Value
+        _G.boxOutlineColor = Value
     end
 })
 
 local ColorPicker4 = Tab:CreateColorPicker({
     Name = "Box Filled Color",
-    Color = Color3.fromRGB(255,255,255),
+    Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxFilledColor",
     Callback = function(Value)
-        Box.boxFilledColor = Value
+        _G.boxFilledColor = Value
     end
 })
 
@@ -131,62 +129,60 @@ local Slider = Tab:CreateSlider({
     Name = "Box Transparency",
     Range = {0, 1},
     Increment = .05,
-    Suffix = "TRSP",
+    Suffix = "",
     CurrentValue = 1,
     Flag = "boxTransparency",
     Callback = function(Value)
-    Box.boxTransparency = Value
+        _G.boxTransparency = Value
     end,
- })
+})
 
- local Slider1 = Tab:CreateSlider({
-    Name = "box Outline Transparency",
+local Slider1 = Tab:CreateSlider({
+    Name = "Box Outline Transparency",
     Range = {0, 1},
     Increment = .05,
-    Suffix = "TRSP",
+    Suffix = "",
     CurrentValue = 1,
     Flag = "boxOutlineTransparency",
     Callback = function(Value)
-    Box.boxOutlineTransparency = Value
+        _G.boxOutlineTransparency = Value
     end,
- })
+})
 
- local Slider2 = Tab:CreateSlider({
-    Name = "box Filled Transparency",
+local Slider2 = Tab:CreateSlider({
+    Name = "Box Filled Transparency",
     Range = {0, 1},
     Increment = .05,
-    Suffix = "TRSP",
+    Suffix = "",
     CurrentValue = 1,
-    Flag = "boxOutlineTransparency",
+    Flag = "boxFilledTransparency",
     Callback = function(Value)
-    Box.boxOutlineTransparency = Value
+        _G.boxFilledTransparency = Value
     end,
- })
+})
 
- local Label2 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
 
- local Slider3 = Tab:CreateSlider({
-    Name = "box Thickness",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "TCK",
+local Slider3 = Tab:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 10},
+    Increment = .5,
+    Suffix = "",
     CurrentValue = 1,
-    Flag = "box Thickness",
+    Flag = "boxThickness",
     Callback = function(Value)
-    Box.boxThickness = Value
+        _G.boxThickness = Value
     end,
- })
+})
 
- local Slider4 = Tab:CreateSlider({
-    Name = "box Filled Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "TCK",
-    CurrentValue = 1,
-    Flag = "boxOutlineTransparency",
+local Slider4 = Tab:CreateSlider({
+    Name = "Box Outline Thickness",
+    Range = {0, 10},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 3,
+    Flag = "boxOutlineThickness",
     Callback = function(Value)
-    Box.boxOutlineTransparency = Value
+        _G.boxOutlineThickness = Value
     end,
- })
-
-Rayfield:LoadConfiguration()
+})
