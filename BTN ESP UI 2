@@ -244,7 +244,7 @@ local ResetButton = Tab:CreateButton({
     Callback = function()
         Rayfield:Destroy()
         wait(0.01)
-        loadstring(game:HttpGet("")))() -- Reload the script
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20UI%202"))() -- Reload the script
     end,
 })
 
