@@ -1,0 +1,400 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0,3,0)
+
+-- Configurações
+_G.temcheck = false
+_G.temcheckmode = "colors" -- opções: "colors", "invisible"
+_G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
+_G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
+
+-- Configurações BoxOutline e Box
+_G.boxOutlineColor = Color3.new(0, 0, 0)
+_G.boxOutlineThickness = 3
+_G.boxOutlineTransparency = 1
+_G.boxOutlineVisible = false
+
+_G.boxColor = Color3.new(0, 0, 0)
+_G.boxThickness = 1
+_G.boxTransparency = 1
+_G.boxVisible = false
+
+-- Configurações BoxFilled
+_G.boxFilledColor = Color3.new(0, 0, 0)
+_G.boxFilledTransparency = 0.5
+_G.boxFilledVisible = false
+
+-- Definir Box, BoxOutline e BoxFilled no início
+local function createDrawingObjects()
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = _G.boxOutlineVisible
+    BoxOutline.Color = _G.boxOutlineColor
+    BoxOutline.Thickness = _G.boxOutlineThickness
+    BoxOutline.Transparency = _G.boxOutlineTransparency
+    BoxOutline.Filled = false
+
+    local Box = Drawing.new("Square")
+    Box.Visible = _G.boxVisible
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Filled = false
+
+    local BoxFilled = Drawing.new("Square")
+    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Filled = true
+    
+    return BoxOutline, Box, BoxFilled
+end
+
+local function updateDrawingObjects(BoxOutline, Box, BoxFilled)
+    BoxOutline.Color = _G.boxOutlineColor
+    BoxOutline.Thickness = _G.boxOutlineThickness
+    BoxOutline.Transparency = _G.boxOutlineTransparency
+    BoxOutline.Visible = _G.boxOutlineVisible
+
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Visible = _G.boxVisible
+
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Visible = _G.boxFilledVisible
+end
+
+for i, v in pairs(game.Players:GetChildren()) do
+    local BoxOutline, Box, BoxFilled = createDrawingObjects()
+    
+    local function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            updateDrawingObjects(BoxOutline, Box, BoxFilled)
+
+            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+                
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = _G.boxOutlineVisible
+                    
+                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = _G.boxVisible
+
+                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    BoxFilled.Visible = _G.boxFilledVisible
+
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxOutline.Visible = false
+                            BoxFilled.Visible = false
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                        end
+                    end
+                    
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    BoxFilled.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end
+
+game.Players.PlayerAdded:Connect(function(v)
+    local BoxOutline, Box, BoxFilled = createDrawingObjects()
+
+    local function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            updateDrawingObjects(BoxOutline, Box, BoxFilled)
+
+            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = _G.boxOutlineVisible
+
+                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = _G.boxVisible
+
+                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    BoxFilled.Visible = _G.boxFilledVisible
+
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxOutline.Visible = false
+                            BoxFilled.Visible = false
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                        end
+                    end
+                    
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    BoxFilled.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end)
+
+local Window = Rayfield:CreateWindow({
+    Name = "BNT ESP",
+    Icon = 0,
+    LoadingTitle = "By Bomzinho",
+    LoadingSubtitle = "Loading....",
+    Theme = "Amethyst",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+ 
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = nil,
+       FileName = "ESPP"
+    },
+ 
+    Discord = {
+       Enabled = false,
+       Invite = "",
+       RememberJoins = true
+    },
+ 
+    KeySystem = true,
+    KeySettings = {
+       Title = "BNT ESP",
+       Subtitle = "Key System",
+       Note = "No method of obtaining the key is provided",
+       FileName = "Key",
+       SaveKey = true,
+       GrabKeyFromSite = false,
+       Key = {"4321", "1234"}
+    }
+})
+
+local Tab1 = Window:CreateTab("Aimbot", 4483362458)
+
+local Tab = Window:CreateTab("ESP", 4483362458)
+
+local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+local Toggle = Tab:CreateToggle({
+    Name = "Show Box",
+    CurrentValue = false,
+    Flag = "Show Box",
+    Callback = function(Value)
+        _G.boxVisible = Value
+    end,
+})
+
+local Toggle1 = Tab:CreateToggle({
+    Name = "Show Box Outline",
+    CurrentValue = false,
+    Flag = "Show BoxOutline",
+    Callback = function(Value)
+        _G.boxOutlineVisible = Value
+    end,
+})
+
+local Toggle2 = Tab:CreateToggle({
+    Name = "Box Filled",
+    CurrentValue = false,
+    Flag = "BoxFilled",
+    Callback = function(Value)
+        _G.boxFilledVisible = Value
+    end,
+})
+
+local Toggle3 = Tab:CreateToggle({
+    Name = "temcheck",
+    CurrentValue = false,
+    Flag = "temcheck",
+    Callback = function(Value)
+        _G.temcheck = Value
+    end,
+})
+
+local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Team Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "teamcolor",
+    Callback = function(Value)
+        _G.teamcolor = Value
+    end
+})
+
+local ColorPicker1 = Tab:CreateColorPicker({
+    Name = "Enemy Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "enemycolor",
+    Callback = function(Value)
+        _G.enemycolor = Value
+    end
+})
+
+local ColorPicker2 = Tab:CreateColorPicker({
+    Name = "Box Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxColor",
+    Callback = function(Value)
+        _G.boxColor = Value
+    end
+})
+
+local ColorPicker3 = Tab:CreateColorPicker({
+    Name = "Box Outline Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxOutlineColor",
+    Callback = function(Value)
+        _G.boxOutlineColor = Value
+    end
+})
+
+local ColorPicker4 = Tab:CreateColorPicker({
+    Name = "Box Filled Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilledColor",
+    Callback = function(Value)
+        _G.boxFilledColor = Value
+    end
+})
+
+local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+local Slider = Tab:CreateSlider({
+    Name = "Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxTransparency",
+    Callback = function(Value)
+        _G.boxTransparency = Value
+    end,
+})
+
+local Slider1 = Tab:CreateSlider({
+    Name = "Box Outline Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxOutlineTransparency",
+    Callback = function(Value)
+        _G.boxOutlineTransparency = Value
+    end,
+})
+
+local Slider2 = Tab:CreateSlider({
+    Name = "Box Filled Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        _G.boxFilledTransparency = Value
+    end,
+})
+
+local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+local Slider3 = Tab:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 10},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxThickness",
+    Callback = function(Value)
+        _G.boxThickness = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Box Outline Thickness",
+    Range = {0, 10},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 3,
+    Flag = "boxOutlineThickness",
+    Callback = function(Value)
+        _G.boxOutlineThickness = Value
+    end,
+})
+
+local Label4 = Tab:CreateLabel("others Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+
+local Dropdown = Tab:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"colors","invisible"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "TeamcheckMode",
+    Callback = function(Options)
+    _G.temcheckmode = Value
+    end,
+ })
+
+Rayfield:LoadConfiguration()
