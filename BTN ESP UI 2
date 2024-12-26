@@ -7,7 +7,7 @@ local Window = Rayfield:CreateWindow({
     Icon = 0,
     LoadingTitle = "By Bomzinho",
     LoadingSubtitle = "Loading....",
-    Theme = "AmberGlow",
+    Theme = "Ocean",
 
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
@@ -15,7 +15,7 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {
        Enabled = true,
        FolderName = nil,
-       FileName = "Big Hub"
+       FileName = "ESPP"
     },
  
     Discord = {
@@ -169,7 +169,7 @@ local Slider = Tab:CreateSlider({
     Name = "box Thickness",
     Range = {0, 1},
     Increment = .05,
-    Suffix = "TRSP",
+    Suffix = "TCK",
     CurrentValue = 1,
     Flag = "box Thickness",
     Callback = function(Value)
@@ -181,7 +181,7 @@ local Slider = Tab:CreateSlider({
     Name = "box Filled Transparency",
     Range = {0, 1},
     Increment = .05,
-    Suffix = "TRSP",
+    Suffix = "TCK",
     CurrentValue = 1,
     Flag = "boxOutlineTransparency",
     Callback = function(Value)
