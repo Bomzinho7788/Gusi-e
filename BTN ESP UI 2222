@@ -219,7 +219,7 @@ local Window = Rayfield:CreateWindow({
        RememberJoins = true
     },
  
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
        Title = "BNT ESP",
        Subtitle = "Key System",
@@ -235,7 +235,7 @@ local Tab1 = Window:CreateTab("Aimbot", 4483362458)
 
 local Tab = Window:CreateTab("ESP", 4483362458)
 
-local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Toggle = Tab:CreateToggle({
     Name = "Show Box",
@@ -273,7 +273,7 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local ColorPicker = Tab:CreateColorPicker({
     Name = "Team Color",
@@ -320,7 +320,7 @@ local ColorPicker4 = Tab:CreateColorPicker({
     end
 })
 
-local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider = Tab:CreateSlider({
     Name = "Box Transparency",
@@ -358,7 +358,7 @@ local Slider2 = Tab:CreateSlider({
     end,
 })
 
-local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider3 = Tab:CreateSlider({
     Name = "Box Thickness",
@@ -384,7 +384,7 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local Label4 = Tab:CreateLabel("others Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label4 = Tab:CreateLabel("others Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Dropdown = Tab:CreateDropdown({
     Name = "Teamcheck Mode",
