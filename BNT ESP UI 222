@@ -39,7 +39,10 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
-
+_G.nameEspColor = Color3.new(0, 0, 0)
+_G.nameEspSize = 13
+_G.nameEspTransparency = 1
+_G.nameEspVisible = false
 
 -- Função para definir a posição do tracer com base na seleção do dropdown
 local function getTracerFromPosition()
@@ -80,6 +83,8 @@ local function createDrawingObjects()
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
 
+
+
     return Box, BoxFilled, HealthBar, Tracer
 end
 
@@ -118,99 +123,32 @@ local function getHealthValues(player)
 end
 
 local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
-                     local offset = isOutline and 6 or 4
-                     local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
+    local offset = isOutline and 6 or 4
+    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
 
-                    if _G.HealthBarPosition == "Left" then
-                        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
-                    elseif _G.HealthBarPosition == "Right" then
-                        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
-                    end
-
-                    HealthBar.Size = Vector2.new(2, healthBarSize)
-end
-
--- Função para criar o ESP de nome
-local function esp(p, cr)
-    local HumanoidRootPart = cr:WaitForChild("HumanoidRootPart")
-    local text = Drawing.new("Text")
-    text.Visible = false
-    text.Center = true
-    text.Outline = true
-    text.Font = 2  -- Fonte (2 é geralmente uma boa escolha)
-    text.Color = _G.nameEspColor
-    text.Size = _G.nameEspSize
-    text.Transparency = _G.nameEspTransparency
-
-    -- Atualizar as propriedades do texto
-    local function updateTextProperties()
-        text.Visible = _G.nameEspVisible
-        text.Color = _G.nameEspColor
-        text.Transparency = _G.nameEspTransparency
-        text.Size = _G.nameEspSize
+    if _G.HealthBarPosition == "Left" then
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
+    elseif _G.HealthBarPosition == "Right" then
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
     end
 
-    -- Desconectar eventos quando o personagem morrer ou for removido
-    local c1, c2, c3
-    local function dc()
-        text.Visible = false
-        text:Remove()
-        if c1 then
-            c1:Disconnect()
-            c1 = nil
-        end
-        if c2 then
-            c2:Disconnect()
-            c2 = nil
-        end
-        if c3 then
-            c3:Disconnect()
-            c3 = nil
-        end
-    end
-
-    -- Conectar eventos para remoção de personagens e morte
-    c2 = cr.AncestryChanged:Connect(function(_, parent)
-        if not parent then
-            dc()
-        end
-    end)
-
-    c3 = cr.Humanoid.HealthChanged:Connect(function(v)
-        if (v <= 0) or (cr.Humanoid:GetState() == Enum.HumanoidStateType.Dead) then
-            dc()
-        end
-    end)
-
-    -- Conectar a renderização do nome na tela
-    c1 = game:GetService("RunService").RenderStepped:Connect(function()
-        updateTextProperties()
-        local HumanoidRootPartPos, hrp_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(HumanoidRootPart.Position)
-        if hrp_onscreen then
-            text.Position = Vector2.new(HumanoidRootPartPos.X, HumanoidRootPartPos.Y - 30) -- Ajuste para posicionar acima do ESP box
-            text.Text = p.Name
-            text.Visible = true
-        else
-            text.Visible = false
-        end
-    end)
+    HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
--- Função para configurar o ESP do jogador
 local function setupPlayerBox(v)
     local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
     game:GetService("RunService").RenderStepped:Connect(function()
         updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
 
-        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= game.Players.LocalPlayer and v.Character.Humanoid.Health > 0 then
-            local Vector, onScreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
             local RootPart = v.Character.HumanoidRootPart
             local Head = v.Character.Head
-            local RootPosition, RootVis = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(RootPart.Position)
-            local HeadPosition = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(Head.Position + Vector3.new(0, 1, 0))
-            local LegPosition = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 2, 0))
+            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
 
             if onScreen then
                 local maxHealth, health = getHealthValues(v)
@@ -232,14 +170,38 @@ local function setupPlayerBox(v)
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
-                -- Atualizando o ESP de nome
-                esp(v, v.Character)
-
+                if _G.teamcheck == true then
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                            Tracer.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                            Tracer.Visible = false
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    end
+                end
             else
                 Box.Visible = false
                 BoxFilled.Visible = false
                 HealthBar.Visible = false
                 Tracer.Visible = false
+                Box.Color = _G.boxColor
+                BoxFilled.Color = _G.boxFilledColor
+                Tracer.Color = _G.TracerColor
             end
         else
             Box.Visible = false
@@ -250,27 +212,6 @@ local function setupPlayerBox(v)
     end)
 end
 
--- Conectar com os jogadores
-local players = game:GetService("Players")
-
-local function playeradded(player)
-    if player.Character then
-        setupPlayerBox(player)
-    end
-    player.CharacterAdded:Connect(function(cr)
-        setupPlayerBox(player)
-    end)
-end
-
-for i, player in next, players:GetPlayers() do 
-    if player ~= game.Players.LocalPlayer then
-        playeradded(player)
-    end
-end
-
-players.PlayerAdded:Connect(playeradded)
-
-
 for _, player in pairs(game.Players:GetChildren()) do
     setupPlayerBox(player)
 end
@@ -278,6 +219,91 @@ end
 game.Players.PlayerAdded:Connect(function(player)
     setupPlayerBox(player)
 end)
+
+local function createNameESP(player, character)
+    -- Criar o objeto de texto para o ESP de nome
+    local text = Drawing.new("Text")
+    text.Visible = false
+    text.Center = true
+    text.Outline = true
+    text.Font = 2  -- Fonte (2 é uma boa escolha para texto legível)
+    text.Color = _G.nameEspColor or Color3.fromRGB(255, 255, 255)  -- Cor do nome
+    text.Size = _G.nameEspSize or 20  -- Tamanho do texto
+    text.Transparency = _G.nameEspTransparency or 0  -- Transparência do texto
+
+    -- Função para atualizar as propriedades do texto
+    local function updateTextProperties()
+        text.Visible = _G.nameEspVisible or false  -- Visibilidade
+        text.Color = _G.nameEspColor or Color3.fromRGB(255, 255, 255)  -- Cor
+        text.Transparency = _G.nameEspTransparency or 0  -- Transparência
+        text.Size = _G.nameEspSize or 20  -- Tamanho
+    end
+
+    -- Desconectar quando o personagem for removido ou morrer
+    local function dc()
+        text.Visible = false
+        text:Remove()
+    end
+
+    -- Conectar ao evento de mudança de ancestralidade (remover quando o personagem for removido)
+    local c1, c2
+    c2 = character.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            dc()
+        end
+    end)
+
+    -- Conectar ao evento de mudança de saúde do humanoide
+    c1 = character:WaitForChild("Humanoid").HealthChanged:Connect(function(health)
+        if health <= 0 then
+            dc()
+        end
+    end)
+
+    -- Função que atualiza a posição do nome
+    local function updateNamePosition()
+        local camera = game:GetService("Workspace").CurrentCamera
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+        local head = character:WaitForChild("Head")
+
+        -- Verificar se o personagem está na tela
+        local headPos, onScreen = camera:WorldToViewportPoint(head.Position)
+        if onScreen then
+            -- Atualiza a posição do nome 1 stud acima da cabeça
+            text.Position = Vector2.new(headPos.X, headPos.Y - 30)  -- Ajuste a distância (1 stud acima da cabeça)
+            text.Text = player.Name  -- Nome do jogador
+            text.Visible = true
+        else
+            text.Visible = false
+        end
+    end
+
+    -- Conectar a atualização da posição do nome a cada frame
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateTextProperties()
+        updateNamePosition()
+    end)
+end
+
+-- Função para quando um novo jogador for adicionado
+local function playerAdded(player)
+    if player.Character then
+        createNameESP(player, player.Character)
+    end
+    player.CharacterAdded:Connect(function(character)
+        createNameESP(player, character)
+    end)
+end
+
+-- Para cada jogador já presente no jogo
+for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        playerAdded(player)
+    end
+end
+
+-- Conectar ao evento de novo jogador adicionado
+game:GetService("Players").PlayerAdded:Connect(playerAdded)
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -364,6 +390,15 @@ local Toggle7 = Tab:CreateToggle({
     end,
 })
 
+local Toggle3 = Tab:CreateToggle({
+    Name = "Show Name",
+    CurrentValue = false,
+    Flag = "healthbarouf",
+    Callback = function(Value)
+        _G.nameEspVisible = Value
+    end,
+})
+
 local Toggle5 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
@@ -420,6 +455,15 @@ local ColorPicker5 = Tab:CreateColorPicker({
     end
 })
 
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "nameEspColor",
+    Callback = function(Value)
+        _G.nameEspColor = Value
+    end
+})
+
 local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider1 = Tab:CreateSlider({
@@ -470,6 +514,18 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
+local Slider4 = Tab:CreateSlider({
+    Name = "Name Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "nameEspTransparency",
+    Callback = function(Value)
+        _G.nameEspTransparency = Value
+    end,
+})
+
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider5 = Tab:CreateSlider({
@@ -503,6 +559,18 @@ local Slider7 = Tab:CreateSlider({
     Suffix = "",
     CurrentValue = 1,
     Flag = "TracerThickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+local Slider7 = Tab:CreateSlider({
+    Name = "name Size",
+    Range = {5, 25},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = nameEspSize,
+    Flag = "nameEspSize",
     Callback = function(Value)
         _G.TracerThickness = Value
     end,
