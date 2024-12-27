@@ -46,8 +46,6 @@ local runService = game:GetService("RunService")
 
 if _G.teamcheck then
     skel_settings.skelvi = false
-else
-    skel_settings.skelvi = true
 end
 
 local skel_settings = {
