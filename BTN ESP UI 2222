@@ -245,6 +245,16 @@ local Toggle4 = Tab:CreateToggle({
     end,
 })
 
+local Toggle5 = Tab:CreateToggle({
+    Name = "Teamcheck",
+    CurrentValue = false,
+    Flag = "gfdfghgfdsdfghfff",
+    Callback = function(Value)
+        _G.teamcheck = Value
+    end,
+})
+
+
 local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local ColorPicker1 = Tab:CreateColorPicker({
