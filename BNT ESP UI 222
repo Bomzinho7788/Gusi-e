@@ -296,7 +296,7 @@ local function draw(player, character)
                     local character_rootpart_3d = character.HumanoidRootPart.Position
                     local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
     
-                    if rootpart_onscreen and character.HumanoidRigType == Enum.HumanoidRigType.R15 and skel_settings.skelvi == true then
+                    if rootpart_onscreen and skel_settings.skelvi == true then
                         local Head_2d = camera:WorldToViewportPoint(character.Head.Position)
                         local UpperTorso_2d = camera:WorldToViewportPoint(character.UpperTorso.Position)
                         local LowerTorso_2d = camera:WorldToViewportPoint(character.skel_LowerTorso.Position)
