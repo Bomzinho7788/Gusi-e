@@ -406,18 +406,6 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local SliderTransparency = Tab:CreateSlider({
-    Name = "Name ESP Transparency",
-    Range = {0, 1},
-    Increment = 0.05,
-    Suffix = "",
-    CurrentValue = _G.nameEspTransparency,
-    Flag = "nameEspTransparency",
-    Callback = function(Value)
-        _G.nameEspTransparency = Value
-    end,
-})
-
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider5 = Tab:CreateSlider({
