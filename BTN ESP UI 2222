@@ -554,7 +554,7 @@ local Dropdown = Tab:CreateDropdown({
     MultipleOptions = false,
     Flag = "hhhhggdf",
     Callback = function(Options)
-        _G.HealthBarPosition = Value
+        _G.HealthBarPosition = Options[1
     end,
 })
 
