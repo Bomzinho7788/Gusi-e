@@ -39,236 +39,179 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
-_G.SKVI = false
-_G.SKCOLOR = Color3.new(255, 255, 255)
-_G.SKTHICK = 2
-_G.SKTRANSPA = 1
-
 --Skeleton
-do
-    local Player = game:GetService("Players").LocalPlayer
-local Camera = game:GetService("Workspace").CurrentCamera
+_G.SKVI = false
+_G.SKCOLOR = Color3.new(1, 1, 1)
+_G.SKTRANSPA = 1
+_G.SKTHICK = 1.5
 
-local function DrawLine()
-    local l = Drawing.new("Line")
-    l.Visible = _G.SKVI
-    l.From = Vector2.new(0, 0)
-    l.To = Vector2.new(1, 1)
-    l.Color = _G.SKCOLOR
-    l.Thickness = _G.SKTHICK
-    l.Transparency = _G.SKTRANSPA
+local camera = workspace.CurrentCamera
+local entities = game:GetService("Players")
+local localPlayer = entities.LocalPlayer
+local runService = game:GetService("RunService")
 
-    -- Atualização automática das propriedades
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if l then
-            l.Visible = _G.SKVI
-            l.Color = _G.SKCOLOR
-            l.Thickness = _G.SKTHICK
-            l.Transparency = _G.SKTRANSPA
-        end
-    end)
+local skel_settings = {
+    skelvi = _G.SKVI,
+    color = _G.SKCOLOR,
+    thickness = _G.SKTHICK,
+    transparency = _G.SKTRANSPA
+}
 
-    return l
-end
+local function draw(player, character)
 
-local function DrawESP(plr)
-    repeat wait() until plr.Character and plr.Character:FindFirstChild("Humanoid")
-    local limbs = {}
-    local R15 = (plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15)
-    if R15 then 
-        limbs = {
-            Head_UpperTorso = DrawLine(),
-            UpperTorso_LowerTorso = DrawLine(),
-            UpperTorso_LeftUpperArm = DrawLine(),
-            LeftUpperArm_LeftLowerArm = DrawLine(),
-            LeftLowerArm_LeftHand = DrawLine(),
-            UpperTorso_RightUpperArm = DrawLine(),
-            RightUpperArm_RightLowerArm = DrawLine(),
-            RightLowerArm_RightHand = DrawLine(),
-            LowerTorso_LeftUpperLeg = DrawLine(),
-            LeftUpperLeg_LeftLowerLeg = DrawLine(),
-            LeftLowerLeg_LeftFoot = DrawLine(),
-            LowerTorso_RightUpperLeg = DrawLine(),
-            RightUpperLeg_RightLowerLeg = DrawLine(),
-            RightLowerLeg_RightFoot = DrawLine(),
-        }
-    else 
-        limbs = {
-            Head_Spine = DrawLine(),
-            Spine = DrawLine(),
-            LeftArm = DrawLine(),
-            LeftArm_UpperTorso = DrawLine(),
-            RightArm = DrawLine(),
-            RightArm_UpperTorso = DrawLine(),
-            LeftLeg = DrawLine(),
-            LeftLeg_LowerTorso = DrawLine(),
-            RightLeg = DrawLine(),
-            RightLeg_LowerTorso = DrawLine()
-        }
-    end
+    local skel_head = Drawing.new("Line")
+    skel_head.Visible = false
+    skel_head.Thickness = 1.5
+    skel_head.Color = Color3.new(1, 1, 1)
+    skel_head.Transparency = 1
 
-    local function Visibility(state)
-        for _, v in pairs(limbs) do
-            if v then
-                v.Visible = state
-            end
-        end
-    end
+    local skel_torso = Drawing.new("Line")
+    skel_torso.Visible = false
+    skel_torso.Thickness = 1.5
+    skel_torso.Color = Color3.new(1, 1, 1)
+    skel_torso.Transparency = 1
 
-    local function Updater()
+    local skel_leftarm = Drawing.new("Line")
+    skel_leftarm.Visible = false
+    skel_leftarm.Thickness = 1.5
+    skel_leftarm.Color = Color3.new(1, 1, 1)
+    skel_leftarm.Transparency = 1
+
+    local skel_rightarm = Drawing.new("Line")
+    skel_rightarm.Visible = false
+    skel_rightarm.Thickness = 1.5
+    skel_rightarm.Color = Color3.new(1, 1, 1)
+    skel_rightarm.Transparency = 1
+
+    local skel_leftleg = Drawing.new("Line")
+    skel_leftleg.Visible = false
+    skel_leftleg.Thickness = 1.5
+    skel_leftleg.Color = Color3.new(1, 1, 1)
+    skel_leftleg.Transparency = 1
+
+    local skel_rightleg = Drawing.new("Line")
+    skel_rightleg.Visible = false
+    skel_rightleg.Thickness = 1.5
+    skel_rightleg.Color = Color3.new(1, 1, 1)
+    skel_rightleg.Transparency = 1
+
+    local function update()
         local connection
-        connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character.Humanoid.Health > 0 then
-                local _, vis = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
-                if vis then
-                    if R15 then
-                        -- Atualizações para R15
-                        local H = Camera:WorldToViewportPoint(plr.Character.Head.Position)
-                        local UT = Camera:WorldToViewportPoint(plr.Character.UpperTorso.Position)
-                        local LT = Camera:WorldToViewportPoint(plr.Character.LowerTorso.Position)
-                        local LUA = Camera:WorldToViewportPoint(plr.Character.LeftUpperArm.Position)
-                        local LLA = Camera:WorldToViewportPoint(plr.Character.LeftLowerArm.Position)
-                        local LH = Camera:WorldToViewportPoint(plr.Character.LeftHand.Position)
-                        local RUA = Camera:WorldToViewportPoint(plr.Character.RightUpperArm.Position)
-                        local RLA = Camera:WorldToViewportPoint(plr.Character.RightLowerArm.Position)
-                        local RH = Camera:WorldToViewportPoint(plr.Character.RightHand.Position)
-                        local LUL = Camera:WorldToViewportPoint(plr.Character.LeftUpperLeg.Position)
-                        local LLL = Camera:WorldToViewportPoint(plr.Character.LeftLowerLeg.Position)
-                        local LF = Camera:WorldToViewportPoint(plr.Character.LeftFoot.Position)
-                        local RUL = Camera:WorldToViewportPoint(plr.Character.RightUpperLeg.Position)
-                        local RLL = Camera:WorldToViewportPoint(plr.Character.RightLowerLeg.Position)
-                        local RF = Camera:WorldToViewportPoint(plr.Character.RightFoot.Position)
+        connection = runService.RenderStepped:Connect(function()
+            
+            if workspace:FindFirstChild(character.Name) and
+            character and
+            character:FindFirstChild("HumanoidRootPart") and
+            character:FindFirstChild("Humanoid") and
+            character:FindFirstChild("Humanoid").Health ~= 0 then
+                
+                local character_rootpart_3d = character.HumanoidRootPart.Position
+                local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
 
-                        if limbs.Head_UpperTorso and limbs.UpperTorso_LowerTorso then
-                            -- Cabeça ao Torso Superior
-                            limbs.Head_UpperTorso.From = Vector2.new(H.X, H.Y)
-                            limbs.Head_UpperTorso.To = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_LowerTorso.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_LowerTorso.To = Vector2.new(LT.X, LT.Y)
+                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.skelvi == true then
+                  
+                    local head_2d = camera:WorldToViewportPoint(character.Head.Position)
+                    local torso_upper_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, 1, 0))
+                    local torso_lower_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, -1, 0))
 
-                            -- Braço Esquerdo
-                            limbs.UpperTorso_LeftUpperArm.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_LeftUpperArm.To = Vector2.new(LUA.X, LUA.Y)
-                            limbs.LeftUpperArm_LeftLowerArm.From = Vector2.new(LUA.X, LUA.Y)
-                            limbs.LeftUpperArm_LeftLowerArm.To = Vector2.new(LLA.X, LLA.Y)
-                            limbs.LeftLowerArm_LeftHand.From = Vector2.new(LLA.X, LLA.Y)
-                            limbs.LeftLowerArm_LeftHand.To = Vector2.new(LH.X, LH.Y)
+                    local leftArm_2d = camera:WorldToViewportPoint(character["Left Arm"].Position)
+                    local rightArm_2d = camera:WorldToViewportPoint(character["Right Arm"].Position)
+                    local leftLeg_2d = camera:WorldToViewportPoint(character["Left Leg"].Position + Vector3.new(0, -1, 0))
+                    local rightLeg_2d = camera:WorldToViewportPoint(character["Right Leg"].Position + Vector3.new(0, -1, 0))
 
-                            -- Braço Direito
-                            limbs.UpperTorso_RightUpperArm.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_RightUpperArm.To = Vector2.new(RUA.X, RUA.Y)
-                            limbs.RightUpperArm_RightLowerArm.From = Vector2.new(RUA.X, RUA.Y)
-                            limbs.RightUpperArm_RightLowerArm.To = Vector2.new(RLA.X, RLA.Y)
-                            limbs.RightLowerArm_RightHand.From = Vector2.new(RLA.X, RLA.Y)
-                            limbs.RightLowerArm_RightHand.To = Vector2.new(RH.X, RH.Y)
+                    skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
+                    skel_head.To = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
 
-                            -- Perna Esquerda
-                            limbs.LowerTorso_LeftUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                            limbs.LowerTorso_LeftUpperLeg.To = Vector2.new(LUL.X, LUL.Y)
-                            limbs.LeftUpperLeg_LeftLowerLeg.From = Vector2.new(LUL.X, LUL.Y)
-                            limbs.LeftUpperLeg_LeftLowerLeg.To = Vector2.new(LLL.X, LLL.Y)
-                            limbs.LeftLowerLeg_LeftFoot.From = Vector2.new(LLL.X, LLL.Y)
-                            limbs.LeftLowerLeg_LeftFoot.To = Vector2.new(LF.X, LF.Y)
+                    skel_torso.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_torso.To = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
 
-                            -- Perna Direita
-                            limbs.LowerTorso_RightUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                            limbs.LowerTorso_RightUpperLeg.To = Vector2.new(RUL.X, RUL.Y)
-                            limbs.RightUpperLeg_RightLowerLeg.From = Vector2.new(RUL.X, RUL.Y)
-                            limbs.RightUpperLeg_RightLowerLeg.To = Vector2.new(RLL.X, RLL.Y)
-                            limbs.RightLowerLeg_RightFoot.From = Vector2.new(RLL.X, RLL.Y)
-                            limbs.RightLowerLeg_RightFoot.To = Vector2.new(RF.X, RF.Y)
-                        end
-                    else
-                        -- Atualizações para R6
-                        local H = Camera:WorldToViewportPoint(plr.Character.Head.Position)
-                        local T_Height = plr.Character.Torso.Size.Y / 2 - 0.2
-                        local UT = Camera:WorldToViewportPoint((plr.Character.Torso.CFrame * CFrame.new(0, T_Height, 0)).p)
-                        local LT = Camera:WorldToViewportPoint((plr.Character.Torso.CFrame * CFrame.new(0, -T_Height, 0)).p)
-                        local LA_Height = plr.Character["Left Arm"].Size.Y / 2 - 0.2
-                        local LUA = Camera:WorldToViewportPoint((plr.Character["Left Arm"].CFrame * CFrame.new(0, LA_Height, 0)).p)
-                        local LLA = Camera:WorldToViewportPoint((plr.Character["Left Arm"].CFrame * CFrame.new(0, -LA_Height, 0)).p)
-                        local RA_Height = plr.Character["Right Arm"].Size.Y / 2 - 0.2
-                        local RUA = Camera:WorldToViewportPoint((plr.Character["Right Arm"].CFrame * CFrame.new(0, RA_Height, 0)).p)
-                        local RLA = Camera:WorldToViewportPoint((plr.Character["Right Arm"].CFrame * CFrame.new(0, -RA_Height, 0)).p)
-                        local LL_Height = plr.Character["Left Leg"].Size.Y / 2 - 0.2
-                        local LUL = Camera:WorldToViewportPoint((plr.Character["Left Leg"].CFrame * CFrame.new(0, LL_Height, 0)).p)
-                        local LLL = Camera:WorldToViewportPoint((plr.Character["Left Leg"].CFrame * CFrame.new(0, -LL_Height, 0)).p)
-                        local RL_Height = plr.Character["Right Leg"].Size.Y / 2 - 0.2
-                        local RUL = Camera:WorldToViewportPoint((plr.Character["Right Leg"].CFrame * CFrame.new(0, RL_Height, 0)).p)
-                        local RLL = Camera:WorldToViewportPoint((plr.Character["Right Leg"].CFrame * CFrame.new(0, -RL_Height, 0)).p)
+                    skel_leftarm.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_leftarm.To = Vector2.new(leftArm_2d.X, leftArm_2d.Y)
 
-                        -- Cabeça ao Torso
-                        limbs.Head_Spine.From = Vector2.new(H.X, H.Y)
-                        limbs.Head_Spine.To = Vector2.new(UT.X, UT.Y)
-                        limbs.Spine.From = Vector2.new(UT.X, UT.Y)
-                        limbs.Spine.To = Vector2.new(LT.X, LT.Y)
+                    skel_rightarm.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_rightarm.To = Vector2.new(rightArm_2d.X, rightArm_2d.Y)
 
-                        -- Braço Esquerdo
-                        limbs.LeftArm.From = Vector2.new(LUA.X, LUA.Y)
-                        limbs.LeftArm.To = Vector2.new(LLA.X, LLA.Y)
-                        limbs.LeftArm_UpperTorso.From = Vector2.new(UT.X, UT.Y)
-                        limbs.LeftArm_UpperTorso.To = Vector2.new(LUA.X, LUA.Y)
+                    skel_leftleg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
+                    skel_leftleg.To = Vector2.new(leftLeg_2d.X, leftLeg_2d.Y)
 
-                        -- Braço Direito
-                        limbs.RightArm.From = Vector2.new(RUA.X, RUA.Y)
-                        limbs.RightArm.To = Vector2.new(RLA.X, RLA.Y)
-                        limbs.RightArm_UpperTorso.From = Vector2.new(UT.X, UT.Y)
-                        limbs.RightArm_UpperTorso.To = Vector2.new(RUA.X, RUA.Y)
+                    skel_rightleg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
+                    skel_rightleg.To = Vector2.new(rightLeg_2d.X, rightLeg_2d.Y)
 
-                        -- Perna Esquerda
-                        limbs.LeftLeg.From = Vector2.new(LUL.X, LUL.Y)
-                        limbs.LeftLeg.To = Vector2.new(LLL.X, LLL.Y)
-                        limbs.LeftLeg_LowerTorso.From = Vector2.new(LT.X, LT.Y)
-                        limbs.LeftLeg_LowerTorso.To = Vector2.new(LUL.X, LUL.Y)
+                    skel_head.Visible = skel_settings.skelvi
+                    skel_torso.Visible = skel_settings.skelvi
+                    skel_leftarm.Visible = skel_settings.skelvi
+                    skel_rightarm.Visible = skel_settings.skelvi
+                    skel_leftleg.Visible = skel_settings.skelvi
+                    skel_rightleg.Visible = skel_settings.skelvi
 
-                        -- Perna Direita
-                        limbs.RightLeg.From = Vector2.new(RUL.X, RUL.Y)
-                        limbs.RightLeg.To = Vector2.new(RLL.X, RLL.Y)
-                        limbs.RightLeg_LowerTorso.From = Vector2.new(LT.X, LT.Y)
-                        limbs.RightLeg_LowerTorso.To = Vector2.new(RUL.X, RUL.Y)
-                    end
+                    skel_head.Color = skel_settings.color
+                    skel_torso.Color = skel_settings.color
+                    skel_leftarm.Color = skel_settings.color
+                    skel_rightarm.Color = skel_settings.color
+                    skel_leftleg.Color = skel_settings.color
+                    skel_rightleg.Color = skel_settings.color
 
-                    if limbs.Head_Spine and limbs.Head_Spine.Visible ~= true then
-                        Visibility(true)
-                    end
-                else 
-                    if limbs.Head_Spine and limbs.Head_Spine.Visible ~= false then
-                        Visibility(false)
-                    end
+                    skel_head.Transparency = skel_settings.transparency
+                    skel_torso.Transparency = skel_settings.transparency
+                    skel_leftarm.Transparency = skel_settings.transparency
+                    skel_rightarm.Transparency = skel_settings.transparency
+                    skel_leftleg.Transparency = skel_settings.transparency
+                    skel_rightleg.Transparency = skel_settings.transparency
+
+                    skel_head.Thickness = skel_settings.thickness
+                    skel_torso.Thickness = skel_settings.thickness
+                    skel_leftarm.Thickness = skel_settings.thickness
+                    skel_rightarm.Thickness = skel_settings.thickness
+                    skel_leftleg.Thickness = skel_settings.thickness
+                    skel_rightleg.Thickness = skel_settings.thickness
+
+                else
+
+                    skel_head.Visible = false
+                    skel_torso.Visible = false
+                    skel_leftarm.Visible = false
+                    skel_rightarm.Visible = false
+                    skel_leftleg.Visible = false
+                    skel_rightleg.Visible = false
+
                 end
-            else 
-                if limbs.Head_Spine and limbs.Head_Spine.Visible ~= false then
-                    Visibility(false)
+    
+            else
+
+                if player == nil then
+                    connection:Disconnect()
+                    connection = nil
                 end
-                if not game.Players:FindFirstChild(plr.Name) then 
-                    for _, v in pairs(limbs) do
-                        if v then
-                            v:Remove()
-                        end
-                    end
-                    if connection then
-                        connection:Disconnect()
-                    end
-                end
+
+                skel_head.Visible = false
+                skel_torso.Visible = false
+                skel_leftarm.Visible = false
+                skel_rightarm.Visible = false
+                skel_leftleg.Visible = false
+                skel_rightleg.Visible = false
+
             end
         end)
     end
-
-    coroutine.wrap(Updater)()
+    coroutine.wrap(update)()
 end
 
-for _, v in pairs(game:GetService("Players"):GetPlayers()) do
-    if v.Name ~= Player.Name then
-        DrawESP(v)
+local function playeradded(player)
+    if player.Character then
+        coroutine.wrap(draw)(player, player.Character)
+    end
+    player.CharacterAdded:Connect(function(character)
+        coroutine.wrap(draw)(player, character)
+    end)
+end
+
+for _, player in next, entities:GetPlayers() do
+    if player ~= localPlayer then
+        playeradded(player)
     end
 end
 
-game.Players.PlayerAdded:Connect(function(newplr)
-    if newplr.Name ~= Player.Name then
-        DrawESP(newplr)
-    end
-end)
-end
+entities.PlayerAdded:Connect(playeradded)
 
 -- Função para definir a posição do tracer com base na seleção do dropdown
 local function getTracerFromPosition()
