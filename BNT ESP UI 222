@@ -158,7 +158,7 @@ local function draw(player, character)
                     skel_leftarm.Thickness = skel_settings.thickness
                     skel_rightarm.Thickness = skel_settings.thickness
                     skel_leftleg.Thickness = skel_settings.thickness
-                    skel_rightleg.Thickness = skel_settings.thicknes
+                    skel_rightleg.Thickness = skel_settings.thickness
 
                 else
 
