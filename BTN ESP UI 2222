@@ -9,7 +9,7 @@ local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
 -- Configurações
-_G.temcheck = true
+_G.temcheck = false
 _G.temcheckmode = "colors" -- opções: "colors", "invisible"
 _G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
 _G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
@@ -31,6 +31,24 @@ _G.HealthBarColor = Color3.new(0, 1, 0)
 _G.HealthBarFilled = true
 
 _G.HealthBarPosition = "Left"
+
+_G.TracerVisible = false
+_G.TracerThickness = 1.5
+_G.TracerTransparency = 1
+_G.TracerColor = Color3.new(0, 0, 0)
+
+_G.TracerFrom = "Bottom"
+
+-- Função para definir a posição do tracer com base na seleção do dropdown
+local function getTracerFromPosition()
+    if _G.TracerFrom == "Bottom" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+    elseif _G.TracerFrom == "Middle" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif _G.TracerFrom == "Top" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 4)
+    end
+end
 
 -- Definir Box, BoxOutline e BoxFilled no início
 local function createDrawingObjects()
@@ -54,10 +72,16 @@ local function createDrawingObjects()
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
 
-    return Box, BoxFilled, HealthBar
+    local Tracer = Drawing.new("Line")
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
+    return Box, BoxFilled, HealthBar, Tracer
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -72,6 +96,11 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar)
     HealthBar.Transparency = _G.HealthBarTransparency
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
+
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
 end
 
 local function getHealthValues(player)
@@ -100,12 +129,12 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
 end
 
 local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar = createDrawingObjects()
+    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
     game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar)
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
 
-        if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
             local RootPart = v.Character.HumanoidRootPart
@@ -130,33 +159,48 @@ local function setupPlayerBox(v)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
 
-                if _G.temcheckmode == "colors" then
-                    if v.TeamColor == lplr.TeamColor then
-                        Box.Color = _G.teamcolor
-                        BoxFilled.Color = _G.teamcolor
-                    else
-                        Box.Color = _G.enemycolor
-                        BoxFilled.Color = _G.enemycolor
-                    end
-                elseif _G.temcheckmode == "invisible" then
-                    if v.TeamColor == lplr.TeamColor then
-                        Box.Visible = false
-                        BoxFilled.Visible = false
-                        HealthBar.Visible = false
-                    else
-                        Box.Color = _G.enemycolor
-                        BoxFilled.Color = _G.enemycolor
+                -- Atualizando a posição do Tracer
+                Tracer.From = getTracerFromPosition()
+                Tracer.To = Vector2.new(Vector.X, Vector.Y)
+
+                if _G.teamcheck == true then
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                            Tracer.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                            Tracer.Visible = false
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
                     end
                 end
             else
-                Box.Visible = false
-                BoxFilled.Visible = false
-                HealthBar.Visible = false
+                Box.Visible = true
+                BoxFilled.Visible = true
+                HealthBar.Visible = true
+                Tracer.Visible = true
+                Box.Color = _G.boxColor
+                BoxFilled.Color = _G.boxFilledColor
+                Tracer.Color = _G.TracerColor
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
+            Tracer.Visible = false
         end
     end)
 end
@@ -245,15 +289,23 @@ local Toggle4 = Tab:CreateToggle({
     end,
 })
 
+local Toggle7 = Tab:CreateToggle({
+    Name = "Show Tracer",
+    CurrentValue = false,
+    Flag = "TracerVisible",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
 local Toggle5 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
-    Flag = "gfdfghgfdsdfghfff",
+    Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
     end,
 })
-
 
 local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
@@ -290,6 +342,15 @@ local ColorPicker4 = Tab:CreateColorPicker({
     Flag = "boxFilledColor",
     Callback = function(Value)
         _G.boxFilledColor = Value
+    end
+})
+
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Tracer Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TracerColor",
+    Callback = function(Value)
+        _G.TracerColor = Value
     end
 })
 
@@ -331,12 +392,24 @@ local Slider3 = Tab:CreateSlider({
     end,
 })
 
+local Slider4 = Tab:CreateSlider({
+    Name = "Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTransparency",
+    Callback = function(Value)
+        _G.TracerTransparency = Value
+    end,
+})
+
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Slider4 = Tab:CreateSlider({
+local Slider5 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
-    Increment = .5,
+    Increment = .05,
     Suffix = "",
     CurrentValue = 1,
     Flag = "boxThickness",
@@ -345,10 +418,10 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local Slider5 = Tab:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
     Range = {0, 10},
-    Increment = .5,
+    Increment = .05,
     Suffix = "",
     CurrentValue = 1,
     Flag = "HealthBarThickness",
@@ -357,11 +430,23 @@ local Slider5 = Tab:CreateSlider({
     end,
 })
 
+local Slider7 = Tab:CreateSlider({
+    Name = "Tracer Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerThickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
 local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Dropdown1 = Tab:CreateDropdown({
     Name = "Teamcheck Mode",
-    Options = {"colors","invisible"},
+    Options = {"colors", "invisible"},
     CurrentOption = {"colors"},
     MultipleOptions = false,
     Flag = "TeamcheckMode",
@@ -378,6 +463,17 @@ local Dropdown2 = Tab:CreateDropdown({
     Flag = "HealthBarPosition",
     Callback = function(Options)
         _G.HealthBarPosition = Options[1]
+    end,
+})
+
+local Dropdown3 = Tab:CreateDropdown({
+    Name = "Tracer From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "TracerFrom",
+    Callback = function(Options)
+        _G.TracerFrom = Options[1]
     end,
 })
 
