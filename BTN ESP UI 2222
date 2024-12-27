@@ -128,10 +128,10 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
 end
 
 local function clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
-    Box:Remove()
-    BoxFilled:Remove()
-    HealthBar:Remove()
-    Tracer:Remove()
+    Box.Visible = false
+    BoxFilled.Visible = false
+    HealthBar.Visible = false
+    Tracer.Visible = false
 end
 
 local function setupPlayerBox(v)
@@ -167,6 +167,7 @@ local function setupPlayerBox(v)
 
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
+                Tracer.Visible = _G.TracerVisible
 
                 if _G.teamcheck == true then
                     if _G.temcheckmode == "colors" then
