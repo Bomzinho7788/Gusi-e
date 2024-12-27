@@ -1,14 +1,17 @@
+-- Carregamento da biblioteca Rayfield
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
+local rs = game:GetService("RunService")
+local ps = game:GetService("Players")
 local currentCamera = workspace.CurrentCamera
 local worldToViewportPoint = currentCamera.worldToViewportPoint
 
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
--- Configurações
+-- Configurações iniciais
 _G.temcheck = false
 _G.temcheckmode = "colors" -- opções: "colors", "invisible"
 _G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
@@ -39,7 +42,11 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
--- Função para definir a posição do tracer com base na seleção do dropdown
+_G.nameEspVisible = true
+_G.nameEspColor = Color3.fromRGB(255, 255, 255)
+_G.nameEspTransparency = 1
+_G.nameEspSize = 13
+
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -50,10 +57,9 @@ local function getTracerFromPosition()
     end
 end
 
--- Definir Box, BoxOutline e BoxFilled no início
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
-    Box.Visible = _G.boxVisible
+    Box.Visible = false
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -159,7 +165,6 @@ local function setupPlayerBox(v)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
 
-                -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
@@ -199,42 +204,137 @@ local function setupPlayerBox(v)
         else
             Box.Visible = false
             BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                Tracer.Visible = false
+            end
+        else
+            Box.Visible = false
+            BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
         end
     end)
 end
 
-for _, player in pairs(game.Players:GetChildren()) do
-    setupPlayerBox(player)
+local function esp(p, cr)
+    local h = cr:WaitForChild("Humanoid")
+    local hrp = cr:WaitForChild("HumanoidRootPart")
+
+    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
+
+    local text = Drawing.new("Text")
+    text.Visible = false
+    text.Center = true
+    text.Outline = true 
+    text.Font = 2
+    text.Color = _G.nameEspColor
+    text.Size = _G.nameEspSize
+    text.Transparency = _G.nameEspTransparency
+
+    local function updateTextProperties()
+        text.Visible = _G.nameEspVisible
+        text.Color = _G.nameEspColor
+        text.Transparency = _G.nameEspTransparency
+        text.Size = _G.nameEspSize
+    end
+
+    local c1, c2, c3
+
+    local function dc()
+        text.Visible = false
+        text:Remove()
+        Box:Remove()
+        BoxFilled:Remove()
+        HealthBar:Remove()
+        Tracer:Remove()
+        if c1 then
+            c1:Disconnect()
+            c1 = nil 
+        end
+        if c2 then
+            c2:Disconnect()
+            c2 = nil 
+        end
+        if c3 then
+            c3:Disconnect()
+            c3 = nil 
+        end
+    end
+
+    c2 = cr.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            dc()
+        end
+    end)
+
+    c3 = h.HealthChanged:Connect(function(v)
+        if (v <= 0) or (h:GetState() == Enum.HumanoidStateType.Dead) then
+            dc()
+        end
+    end)
+
+    c1 = rs.RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+        updateTextProperties()
+        local hrp_pos, hrp_onscreen = camera:WorldToViewportPoint(hrp.Position)
+        if hrp_onscreen then
+            Box.Position = Vector2.new(hrp_pos.X - Box.Size.X / 2, hrp_pos.Y - Box.Size.Y / 2)
+            Box.Size = Vector2.new(1000 / hrp_pos.Z, 1000 / hrp_pos.Z)
+            text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - Box.Size.Y / 2 - 15) -- Ajuste para posicionar acima do ESP box
+            text.Text = p.Name
+            text.Visible = true
+            Box.Visible = _G.boxVisible
+            BoxFilled.Position = Box.Position
+            BoxFilled.Size = Box.Size
+            BoxFilled.Visible = _G.boxFilledVisible
+            Tracer.From = getTracerFromPosition()
+            Tracer.To = Vector2.new(hrp_pos.X, hrp_pos.Y)
+            Tracer.Visible = _G.TracerVisible
+        else
+            text.Visible = false
+            Box.Visible = false
+            BoxFilled.Visible = false
+            Tracer.Visible = false
+        end
+    end)
 end
 
-game.Players.PlayerAdded:Connect(function(player)
-    setupPlayerBox(player)
-end)
+local function p_added(p)
+    if p.Character then
+        esp(p, p.Character)
+    end
+    p.CharacterAdded:Connect(function(cr)
+        esp(p, cr)
+    end)
+end
 
+for i, p in next, ps:GetPlayers() do 
+    if p ~= lplr then
+        p_added(p)
+    end
+end
+
+ps.PlayerAdded:Connect(p_added)
+
+-- Configurações da interface Rayfield
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
     Icon = 0,
     LoadingTitle = "By Bomzinho",
     LoadingSubtitle = "Loading....",
     Theme = "Amethyst",
-
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
-
     ConfigurationSaving = {
         Enabled = true,
         FolderName = nil,
         FileName = "ESPP"
     },
-
     Discord = {
         Enabled = false,
         Invite = "",
         RememberJoins = true
     },
-
     KeySystem = true,
     KeySettings = {
         Title = "BNT ESP",
@@ -248,14 +348,13 @@ local Window = Rayfield:CreateWindow({
 })
 
 local Tab1 = Window:CreateTab("Aimbot", 4483362458)
-
 local Tab = Window:CreateTab("ESP", 4483362458)
 
 local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Toggle = Tab:CreateToggle({
     Name = "Show Box",
-    CurrentValue = false,
+    CurrentValue = _G.boxVisible,
     Flag = "Show Box",
     Callback = function(Value)
         _G.boxVisible = Value
@@ -264,7 +363,7 @@ local Toggle = Tab:CreateToggle({
 
 local Toggle2 = Tab:CreateToggle({
     Name = "Box Filled",
-    CurrentValue = false,
+    CurrentValue = _G.boxFilledVisible,
     Flag = "BoxFilled",
     Callback = function(Value)
         _G.boxFilledVisible = Value
@@ -273,7 +372,7 @@ local Toggle2 = Tab:CreateToggle({
 
 local Toggle3 = Tab:CreateToggle({
     Name = "Show Health Bar",
-    CurrentValue = false,
+    CurrentValue = _G.HealthBarVisible,
     Flag = "healthbarouf",
     Callback = function(Value)
         _G.HealthBarVisible = Value
@@ -282,7 +381,7 @@ local Toggle3 = Tab:CreateToggle({
 
 local Toggle4 = Tab:CreateToggle({
     Name = "Health Bar Filled",
-    CurrentValue = false,
+    CurrentValue = _G.HealthBarFilled,
     Flag = "healthbarouff",
     Callback = function(Value)
         _G.HealthBarFilled = Value
@@ -291,7 +390,7 @@ local Toggle4 = Tab:CreateToggle({
 
 local Toggle7 = Tab:CreateToggle({
     Name = "Show Tracer",
-    CurrentValue = false,
+    CurrentValue = _G.TracerVisible,
     Flag = "TracerVisible",
     Callback = function(Value)
         _G.TracerVisible = Value
@@ -300,7 +399,7 @@ local Toggle7 = Tab:CreateToggle({
 
 local Toggle5 = Tab:CreateToggle({
     Name = "Teamcheck",
-    CurrentValue = false,
+    CurrentValue = _G.teamcheck,
     Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
@@ -311,7 +410,7 @@ local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0
 
 local ColorPicker1 = Tab:CreateColorPicker({
     Name = "Team Color",
-    Color = Color3.fromRGB(0, 255, 0),
+    Color = _G.teamcolor,
     Flag = "teamcolor",
     Callback = function(Value)
         _G.teamcolor = Value
@@ -320,7 +419,7 @@ local ColorPicker1 = Tab:CreateColorPicker({
 
 local ColorPicker2 = Tab:CreateColorPicker({
     Name = "Enemy Color",
-    Color = Color3.fromRGB(255, 0, 0),
+    Color = _G.enemycolor,
     Flag = "enemycolor",
     Callback = function(Value)
         _G.enemycolor = Value
@@ -329,7 +428,7 @@ local ColorPicker2 = Tab:CreateColorPicker({
 
 local ColorPicker3 = Tab:CreateColorPicker({
     Name = "Box Color",
-    Color = Color3.fromRGB(255, 255, 255),
+    Color = _G.boxColor,
     Flag = "boxColor",
     Callback = function(Value)
         _G.boxColor = Value
@@ -338,7 +437,7 @@ local ColorPicker3 = Tab:CreateColorPicker({
 
 local ColorPicker4 = Tab:CreateColorPicker({
     Name = "Box Filled Color",
-    Color = Color3.fromRGB(255, 255, 255),
+    Color = _G.boxFilledColor,
     Flag = "boxFilledColor",
     Callback = function(Value)
         _G.boxFilledColor = Value
@@ -347,10 +446,19 @@ local ColorPicker4 = Tab:CreateColorPicker({
 
 local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Tracer Color",
-    Color = Color3.fromRGB(255, 255, 255),
+    Color = _G.TracerColor,
     Flag = "TracerColor",
     Callback = function(Value)
         _G.TracerColor = Value
+    end
+})
+
+local ColorPicker6 = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = _G.nameEspColor,
+    Flag = "nameEspColor",
+    Callback = function(Value)
+        _G.nameEspColor = Value
     end
 })
 
@@ -361,7 +469,7 @@ local Slider1 = Tab:CreateSlider({
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.boxTransparency,
     Flag = "boxTransparency",
     Callback = function(Value)
         _G.boxTransparency = Value
@@ -373,7 +481,7 @@ local Slider2 = Tab:CreateSlider({
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.boxFilledTransparency,
     Flag = "boxFilledTransparency",
     Callback = function(Value)
         _G.boxFilledTransparency = Value
@@ -385,7 +493,7 @@ local Slider3 = Tab:CreateSlider({
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.HealthBarTransparency,
     Flag = "HealthBarTransparency",
     Callback = function(Value)
         _G.HealthBarTransparency = Value
@@ -397,48 +505,70 @@ local Slider4 = Tab:CreateSlider({
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.TracerTransparency,
     Flag = "TracerTransparency",
     Callback = function(Value)
         _G.TracerTransparency = Value
     end,
 })
 
-local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
 local Slider5 = Tab:CreateSlider({
+    Name = "Name ESP Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = _G.nameEspTransparency,
+    Flag = "nameEspTransparency",
+    Callback = function(Value)
+        _G.nameEspTransparency = Value
+    end,
+})
+
+local Slider6 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.boxThickness,
     Flag = "boxThickness",
     Callback = function(Value)
         _G.boxThickness = Value
     end,
 })
 
-local Slider6 = Tab:CreateSlider({
+local Slider7 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
     Range = {0, 10},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.HealthBarThickness,
     Flag = "HealthBarThickness",
     Callback = function(Value)
         _G.HealthBarThickness = Value
     end,
 })
 
-local Slider7 = Tab:CreateSlider({
+local Slider8 = Tab:CreateSlider({
     Name = "Tracer Thickness",
     Range = {0, 10},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = _G.TracerThickness,
     Flag = "TracerThickness",
     Callback = function(Value)
         _G.TracerThickness = Value
+    end,
+})
+
+local SliderSize = Tab:CreateSlider({
+    Name = "Name Size",
+    Range = {10, 20},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = _G.nameEspSize,
+    Flag = "nameEspSize",
+    Callback = function(Value)
+        _G.nameEspSize = Value
     end,
 })
 
