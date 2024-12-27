@@ -104,7 +104,7 @@ if lplr then
                     local character_rootpart_3d = character.HumanoidRootPart.Position
                     local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
     
-                    if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.skelvi == true then
+                    if rootpart_onscreen and character.Humanoid.RigType == R6 and skel_settings.skelvi == true then
                       
                         local head_2d = camera:WorldToViewportPoint(character.Head.Position)
                         local torso_upper_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, 1, 0))
@@ -317,7 +317,7 @@ if lplr then
                     local character_rootpart_3d = character.HumanoidRootPart.Position
                     local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
     
-                    if rootpart_onscreen and character.HumanoidRigType == Enum.HumanoidRigType.R15 and skel_settings.skelvi == true then
+                    if rootpart_onscreen and character.HumanoidRigType == R15 and skel_settings.skelvi == true then
                         local Head_2d = camera:WorldToViewportPoint(character.Head.Position)
                         local UpperTorso_2d = camera:WorldToViewportPoint(character.UpperTorso.Position)
                         local LowerTorso_2d = camera:WorldToViewportPoint(character.skel_LowerTorso.Position)
