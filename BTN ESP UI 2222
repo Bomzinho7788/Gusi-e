@@ -39,7 +39,6 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
--- Função para definir a posição do tracer com base na seleção do dropdown
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -128,6 +127,13 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
+local function clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+    Box:Remove()
+    BoxFilled:Remove()
+    HealthBar:Remove()
+    Tracer:Remove()
+end
+
 local function setupPlayerBox(v)
     local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
@@ -159,7 +165,6 @@ local function setupPlayerBox(v)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
 
-                -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
@@ -188,19 +193,10 @@ local function setupPlayerBox(v)
                     end
                 end
             else
-                Box.Visible = true
-                BoxFilled.Visible = true
-                HealthBar.Visible = true
-                Tracer.Visible = true
-                Box.Color = _G.boxColor
-                BoxFilled.Color = _G.boxFilledColor
-                Tracer.Color = _G.TracerColor
+                clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
             end
         else
-            Box.Visible = false
-            BoxFilled.Visible = false
-            HealthBar.Visible = false
-            Tracer.Visible = false
+            clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
         end
     end)
 end
