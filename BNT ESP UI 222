@@ -705,7 +705,7 @@ local Toggle = Tab:CreateToggle({
     end,
 })
 
-local Toggle2 = Tab:CreateToggle({
+local Toggle1 = Tab:CreateToggle({
     Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
@@ -714,7 +714,7 @@ local Toggle2 = Tab:CreateToggle({
     end,
 })
 
-local Toggle3 = Tab:CreateToggle({
+local Toggle2 = Tab:CreateToggle({
     Name = "Show Health Bar",
     CurrentValue = false,
     Flag = "healthbarouf",
@@ -723,7 +723,7 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Toggle4 = Tab:CreateToggle({
+local Toggle3 = Tab:CreateToggle({
     Name = "Health Bar Filled",
     CurrentValue = false,
     Flag = "healthbarouff",
@@ -732,7 +732,7 @@ local Toggle4 = Tab:CreateToggle({
     end,
 })
 
-local Toggle7 = Tab:CreateToggle({
+local Toggle4 = Tab:CreateToggle({
     Name = "Show Tracer",
     CurrentValue = false,
     Flag = "TracerVisible",
@@ -741,7 +741,7 @@ local Toggle7 = Tab:CreateToggle({
     end,
 })
 
-local Toggle7 = Tab:CreateToggle({
+local Toggle5 = Tab:CreateToggle({
     Name = "Show Skeleton",
     CurrentValue = false,
     Flag = "TracerVisible",
@@ -750,7 +750,7 @@ local Toggle7 = Tab:CreateToggle({
     end,
 })
 
-local Toggle5 = Tab:CreateToggle({
+local Toggle6 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
@@ -806,7 +806,7 @@ local ColorPicker5 = Tab:CreateColorPicker({
     end
 })
 
-local ColorPicker5 = Tab:CreateColorPicker({
+local ColorPicker6 = Tab:CreateColorPicker({
     Name = "Skeleton Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TracerColor",
@@ -865,7 +865,7 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local Slider9 = Tab:CreateSlider({
+local Slider5 = Tab:CreateSlider({
     Name = "Skeleton Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -879,7 +879,7 @@ local Slider9 = Tab:CreateSlider({
 
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Slider5 = Tab:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -891,7 +891,7 @@ local Slider5 = Tab:CreateSlider({
     end,
 })
 
-local Slider6 = Tab:CreateSlider({
+local Slider7 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -903,7 +903,7 @@ local Slider6 = Tab:CreateSlider({
     end,
 })
 
-local Slider7 = Tab:CreateSlider({
+local Slider8 = Tab:CreateSlider({
     Name = "Tracer Thickness",
     Range = {0, 10},
     Increment = .05,
