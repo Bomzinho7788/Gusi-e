@@ -1,4 +1,4 @@
-
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
@@ -45,10 +45,12 @@ local entities = game:GetService("Players")
 local localPlayer = entities.LocalPlayer
 local runService = game:GetService("RunService")
 
-skelvi = false,
-colr = Color3.new(1, 1, 1),
-thicness = 1.5,
-transarency = 1
+local skel_settings = {
+    skelvi = false,
+    color = Color3.new(1, 1, 1),
+    thickness = 1.5,
+    transparency = 1
+}
 
 local function draw(player, character)
 
@@ -101,7 +103,7 @@ local function draw(player, character)
                 local character_rootpart_3d = character.HumanoidRootPart.Position
                 local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
 
-                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and  then
+                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.skelvi == true then
                   
                     local head_2d = camera:WorldToViewportPoint(character.Head.Position)
                     local torso_upper_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, 1, 0))
@@ -130,33 +132,33 @@ local function draw(player, character)
                     skel_rightleg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
                     skel_rightleg.To = Vector2.new(rightLeg_2d.X, rightLeg_2d.Y)
 
-                    skel_head.Visible = skelvi
-                    skel_torso.Visible = skelvi
-                    skel_leftarm.Visible = skelvi
-                    skel_rightarm.Visible = skelvi
-                    skel_leftleg.Visible = skelvi
-                    skel_rightleg.Visible = skelvi
+                    skel_head.Visible = skel_settings.skelvi
+                    skel_torso.Visible = skel_settings.skelvi
+                    skel_leftarm.Visible = skel_settings.skelvi
+                    skel_rightarm.Visible = skel_settings.skelvi
+                    skel_leftleg.Visible = skel_settings.skelvi
+                    skel_rightleg.Visible = skel_settings.skelvi
 
-                    skel_head.Color = colr
-                    skel_torso.Color = colr
-                    skel_leftarm.Color = colr
-                    skel_rightarm.Color = colr
-                    skel_leftleg.Color = colr
-                    skel_rightleg.Color = colr
+                    skel_head.Color = skel_settings.color
+                    skel_torso.Color = skel_settings.color
+                    skel_leftarm.Color = skel_settings.color
+                    skel_rightarm.Color = skel_settings.color
+                    skel_leftleg.Color = skel_settings.color
+                    skel_rightleg.Color = skel_settings.color
 
-                    skel_head.Transparency = transarency
-                    skel_torso.Transparency = transarency
-                    skel_leftarm.Transparency = transarency
-                    skel_rightarm.Transparency = transarency
-                    skel_leftleg.Transparency = transarency
-                    skel_rightleg.Transparency = transarency
+                    skel_head.Transparency = skel_settings.transparency
+                    skel_torso.Transparency = skel_settings.transparency
+                    skel_leftarm.Transparency = skel_settings.transparency
+                    skel_rightarm.Transparency = skel_settings.transparency
+                    skel_leftleg.Transparency = skel_settings.transparency
+                    skel_rightleg.Transparency = skel_settings.transparency
 
-                    skel_head.Thickness = thickness
-                    skel_torso.Thickness = thicness
-                    skel_leftarm.Thickness = thicness
-                    skel_rightarm.Thickness = thicness
-                    skel_leftleg.Thickness = thicness
-                    skel_rightleg.Thickness = thicness
+                    skel_head.Thickness = skel_settings.thickness
+                    skel_torso.Thickness = skel_settings.thickness
+                    skel_leftarm.Thickness = skel_settings.thickness
+                    skel_rightarm.Thickness = skel_settings.thickness
+                    skel_leftleg.Thickness = skel_settings.thickness
+                    skel_rightleg.Thickness = skel_settings.thickness
 
                 else
 
@@ -347,7 +349,7 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            skelvi = false
+                            skel_settings.skelvi = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -363,14 +365,14 @@ local function setupPlayerBox(v)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                skelvi = false
+                skel_settings.skelvi = false
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            skelvi = false
+            skel_settings.skelvi = false
         end
     end)
 end
@@ -473,7 +475,7 @@ local ToggleSKVI = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "SKVI",
     Callback = function(Value)
-        skelvi = Value
+        skel_settings.skelvi = Value
     end,
 })
 
@@ -538,7 +540,7 @@ local ColorPickerSKCOLOR = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "SKCOLOR",
     Callback = function(Value)
-        colr = Value
+        skel_settings.color = Value
     end
 })
 
@@ -600,7 +602,7 @@ local SliderSKTRANSPA = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "SKTRANSPA",
     Callback = function(Value)
-        transarency = Value
+        skel_settings.transparency = Value
     end,
 })
 
@@ -650,7 +652,7 @@ local SliderSKTHICK = Tab:CreateSlider({
     CurrentValue = 1.5,
     Flag = "SKTHICK",
     Callback = function(Value)
-        thicness = Value
+        skel_settings.thickness = Value
     end,
 })
 
