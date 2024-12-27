@@ -52,7 +52,7 @@ local skel_settings = {
     transparency = 1
 }
 
-if game.Players.Character.HumanoidRigType == Enum.HumanoidRigType.R6 then
+if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
     local function draw(player, character)
 
         local skel_head = Drawing.new("Line")
@@ -210,7 +210,7 @@ if game.Players.Character.HumanoidRigType == Enum.HumanoidRigType.R6 then
     entities.PlayerAdded:Connect(playeradded)
 end
 
-if game.Players.Character.HumanoidRigType == Enum.HumanoidRigType.R15 then
+if character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     local function drawR15(player, character)
 
         local skel_Head = Drawing.new("Line")
