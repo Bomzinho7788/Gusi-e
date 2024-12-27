@@ -52,8 +52,6 @@ local skel_settings = {
     transparency = 1
 }
 
-local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
-
 if character:FindFirstChild("Humanoid") then
     local humanoid = character.Humanoid
     if humanoid.RigType == Enum.HumanoidRigType.R6 then
