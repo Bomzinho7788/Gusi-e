@@ -337,12 +337,12 @@ local function setupPlayerBox(v)
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
-                            _G.SKCOLOR = _G.teamcolor
+                            skel_settings.color = _G.teamcolor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
-                            _G.SKCOLOR = _G.enemycolor
+                            skel_settings.color = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
@@ -350,13 +350,12 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            _G.SKVI = false
+                            skel_settings.skelvi = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
-                            _G.vtcolor = _G.enemycolor
-                            _G.SKCOLOR = _G.enemycolor
+                            skel_settings.color = _G.enemycolor
                         end
                     end
                 end
@@ -368,15 +367,15 @@ local function setupPlayerBox(v)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                _G.SKVI = false
-                _G.SKCOLOR = _G.SKCOLOR
+                skel_settings.skelvi = false
+                skel_settings.color = skel_settings.color
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            _G.SKVI = false
+            skel_settings.skelvi = false
         end
     end)
 end
@@ -476,7 +475,7 @@ local Toggle7 = Tab:CreateToggle({
 
 local ToggleSKVI = Tab:CreateToggle({
     Name = "Show Skeletons",
-    CurrentValue = _G.SKVI,
+    CurrentValue = false,
     Flag = "SKVI",
     Callback = function(Value)
         skel_settings.skelvi = Value
@@ -541,7 +540,7 @@ local ColorPicker5 = Tab:CreateColorPicker({
 
 local ColorPickerSKCOLOR = Tab:CreateColorPicker({
     Name = "Skeleton Color",
-    Color = _G.SKCOLOR,
+    Color = Color3.fromRGB(255, 255, 255),
     Flag = "SKCOLOR",
     Callback = function(Value)
         skel_settings.color = Value
@@ -603,7 +602,7 @@ local SliderSKTRANSPA = Tab:CreateSlider({
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = _G.SKTRANSPA,
+    CurrentValue = 1,
     Flag = "SKTRANSPA",
     Callback = function(Value)
         skel_settings.transparency = Value
@@ -653,7 +652,7 @@ local SliderSKTHICK = Tab:CreateSlider({
     Range = {0, 10},
     Increment = .05,
     Suffix = "",
-    CurrentValue = _G.SKTHICK,
+    CurrentValue = 1.5,
     Flag = "SKTHICK",
     Callback = function(Value)
         skel_settings.thickness = Value
