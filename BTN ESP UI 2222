@@ -94,7 +94,7 @@ local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline
 
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Visible = _G.boxFilledvisible
+    BoxFilled.Visible = _G.boxFilled_visible
 
     HealthBarOutline.Thickness = _G.HealthBarOutlineThickness
     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
@@ -108,9 +108,21 @@ local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline
     HealthBar.Color = _G.HealthBarColor
 end
 
-local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline)
+local function getHealthValues(player)
+    local maxHealth, health
+    if player:FindFirstChild("NRPBS") then
+        maxHealth = player.NRPBS["MaxHealth"].Value
+        health = player.NRPBS["Health"].Value
+    else
+        maxHealth = player.Character.Humanoid.MaxHealth
+        health = player.Character.Humanoid.Health
+    end
+    return maxHealth, health
+end
+
+local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
     local offset = isOutline and 6 or 4
-    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value))
+    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
 
     if _G.HealthBarPosition == "Left" then
         HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
@@ -142,6 +154,8 @@ for i, v in pairs(game.Players:GetChildren()) do
                 local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
 
                 if onScreen then
+                    local maxHealth, health = getHealthValues(v)
+
                     BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = _G.boxOutlineVisible
@@ -152,15 +166,15 @@ for i, v in pairs(game.Players:GetChildren()) do
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilledvisible
+                    BoxFilled.Visible = _G.boxFilled_visible
 
                     HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true)
+                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true, maxHealth, health)
                     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
 
-                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value)))
-                    updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false)
-                    HealthBar.Color = Color3.fromRGB(255 - 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 0)
+                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+                    updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                    HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                     HealthBar.Visible = _G.HealthBarVisible
 
                     if _G.temcheckmode == "colors" then
@@ -220,6 +234,8 @@ game.Players.PlayerAdded:Connect(function(v)
                 local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
 
                 if onScreen then
+                    local maxHealth, health = getHealthValues(v)
+
                     BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = _G.boxOutlineVisible
@@ -230,15 +246,15 @@ game.Players.PlayerAdded:Connect(function(v)
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilledvisible
+                    BoxFilled.Visible = _G.boxFilled_visible
 
                     HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true)
+                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true, maxHealth, health)
                     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
 
-                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value)))
-                    updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false)
-                    HealthBar.Color = Color3.fromRGB(255 - 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 0)
+                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+                    updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                    HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                     HealthBar.Visible = _G.HealthBarVisible
 
                     if _G.temcheckmode == "colors" then
