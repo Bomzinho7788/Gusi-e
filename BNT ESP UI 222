@@ -40,21 +40,15 @@ _G.TracerColor = Color3.new(0, 0, 0)
 _G.TracerFrom = "Bottom"
 
 --Skeleton
-_G.SKVI = false
-_G.SKCOLOR = Color3.new(1, 1, 1)
-_G.SKTRANSPA = 1
-_G.SKTHICK = 1.5
-
-local camera = workspace.CurrentCamera
 local entities = game:GetService("Players")
 local localPlayer = entities.LocalPlayer
 local runService = game:GetService("RunService")
 
 local skel_settings = {
-    skelvi = _G.SKVI,
-    color = _G.SKCOLOR,
-    thickness = _G.SKTHICK,
-    transparency = _G.SKTRANSPA
+    skelvi = false,
+    color = Color3.new(1, 1, 1),
+    thickness = 1.5,
+    transparency = 1
 }
 
 local function draw(player, character)
@@ -485,7 +479,7 @@ local ToggleSKVI = Tab:CreateToggle({
     CurrentValue = _G.SKVI,
     Flag = "SKVI",
     Callback = function(Value)
-        _G.SKVI = Value
+        skel_settings.skelvi = Value
     end,
 })
 
@@ -550,7 +544,7 @@ local ColorPickerSKCOLOR = Tab:CreateColorPicker({
     Color = _G.SKCOLOR,
     Flag = "SKCOLOR",
     Callback = function(Value)
-        _G.SKCOLOR = Value
+        skel_settings.color = Value
     end
 })
 
@@ -612,7 +606,7 @@ local SliderSKTRANSPA = Tab:CreateSlider({
     CurrentValue = _G.SKTRANSPA,
     Flag = "SKTRANSPA",
     Callback = function(Value)
-        _G.SKTRANSPA = Value
+        skel_settings.transparency = Value
     end,
 })
 
@@ -662,7 +656,7 @@ local SliderSKTHICK = Tab:CreateSlider({
     CurrentValue = _G.SKTHICK,
     Flag = "SKTHICK",
     Callback = function(Value)
-        _G.SKTHICK = Value
+        skel_settings.thickness = Value
     end,
 })
 
