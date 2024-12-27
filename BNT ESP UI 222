@@ -43,7 +43,7 @@ local entities = game:GetService("Players")
 local localplayer = entities.localplayer
 local runservice = game:GetService("RunService")
 
-local skel_settings{
+local skel_settings = {
     Visible = false,
     Transparency = 1,
     thickness = 1.5,
@@ -194,13 +194,13 @@ local function draw(player, Character)
 
                 if RootPart_onscreen and Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
 
-                    local head_2d = camera:worldToViewportPoint(Character.Head.Position)
-                    local uppertorso_2d = camera:worldToViewportPoint(Character.Torso.Position + Vector2.new(0,1,0))
-                    local lowertorso_2d = camera:worldToViewportPoint(Character.Torso.Position - Vector2.new(0,1,0))
-                    local leftarm_2d = camera:worldToViewportPoint(Character["LeftArm"].Position)
-                    local rightarm_2d = camera:worldToViewportPoint(Character["RightArm"].Position)
-                    local leftleg_2d = camera:worldToViewportPoint(Character["LeftLeg"].Position - Vector2.new(0,1,0))
-                    local rightleg_2d = camera:worldToViewportPoint(Character["RightLeg"].Position - Vector2.new(0,1,0))
+                    local head_2d = camera:WorldToViewportPoint(Character.Head.Position)
+                    local uppertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position + Vector2.new(0,1,0))
+                    local lowertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position - Vector2.new(0,1,0))
+                    local leftarm_2d = camera:WorldToViewportPoint(Character["LeftArm"].Position)
+                    local rightarm_2d = camera:WorldToViewportPoint(Character["RightArm"].Position)
+                    local leftleg_2d = camera:WorldToViewportPoint(Character["LeftLeg"].Position - Vector2.new(0,1,0))
+                    local rightleg_2d = camera:WorldToViewportPoint(Character["RightLeg"].Position - Vector2.new(0,1,0))
 
                     skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
                     skel_head.To = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
@@ -286,27 +286,27 @@ local function draw(player, Character)
 
                 if RootPart_onscreen and Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
 
-                    local head15_2d = camera:worldToViewportPoint(Character.Head.Position)
-                    local uppertorso15_2d = camera:worldToViewportPoint(Character.UpperTorso.Position)
-                    local lowertorso15_2d = camera:worldToViewportPoint(Character.LowerTorso.Position)
+                    local head15_2d = camera:WorldToViewportPoint(Character.Head.Position)
+                    local uppertorso15_2d = camera:WorldToViewportPoint(Character.UpperTorso.Position)
+                    local lowertorso15_2d = camera:WorldToViewportPoint(Character.LowerTorso.Position)
 
-                    local rightupperarm_2d = camera:worldToViewportPoint(Character["RightUpperArm"].Position)
-                    local leftupperarm_2d = camera:worldToViewportPoint(Character["LeftUpperArm"].Position)
+                    local rightupperarm_2d = camera:WorldToViewportPoint(Character["RightUpperArm"].Position)
+                    local leftupperarm_2d = camera:WorldToViewportPoint(Character["LeftUpperArm"].Position)
 
-                    local rightlowerarm_2d = camera:worldToViewportPoint(Character["RightLowerArm"].Position)
+                    local rightlowerarm_2d = camera:WorldToViewportPoint(Character["RightLowerArm"].Position)
                     local leftlowerarm_2d = camera:worldToViewportPoint(Character["LeftLowerArm"].Position)
 
-                    local righthand_2d = camera:worldToViewportPoint(Character["RightHand"].Position)
+                    local righthand_2d = camera:WorldToViewportPoint(Character["RightHand"].Position)
                     local lefthand_2d = camera:worldToViewportPoint(Character["LeftHand"].Position)
 
-                    local rightupperleg_2d = camera:worldToViewportPoint(Character["RightUpperLeg"].Position)
-                    local leftupperleg_2d = camera:worldToViewportPoint(Character["LeftUpperLeg"].Position)
+                    local rightupperleg_2d = camera:WorldToViewportPoint(Character["RightUpperLeg"].Position)
+                    local leftupperleg_2d = camera:WorldToViewportPoint(Character["LeftUpperLeg"].Position)
 
-                    local rightlowerleg_2d = camera:worldToViewportPoint(Character["RightLowerLeg"].Position)
-                    local leftlowerleg_2d = camera:worldToViewportPoint(Character["LeftLowerLeg"].Position)
+                    local rightlowerleg_2d = camera:WorldToViewportPoint(Character["RightLowerLeg"].Position)
+                    local leftlowerleg_2d = camera:WorldToViewportPoint(Character["LeftLowerLeg"].Position)
 
-                    local rightfoot_2d = camera:worldToViewportPoint(Character["RightFoot"].Position)
-                    local leftfoor_2d = camera:worldToViewportPoint(Character["LeftFoot"].Position)
+                    local rightfoot_2d = camera:WorldToViewportPoint(Character["RightFoot"].Position)
+                    local leftfoor_2d = camera:WorldToViewportPoint(Character["LeftFoot"].Position)
 
                     skel_head15.From = Vector2.new(head15_2d.X, head15_2d.Y)
                     skel_head15.To = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
