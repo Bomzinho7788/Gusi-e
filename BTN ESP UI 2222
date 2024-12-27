@@ -39,6 +39,7 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
+-- Função para definir a posição do tracer com base na seleção do dropdown
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -127,13 +128,6 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
-local function clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
-    Box.Visible = false
-    BoxFilled.Visible = false
-    HealthBar.Visible = false
-    Tracer.Visible = false
-end
-
 local function setupPlayerBox(v)
     local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
@@ -165,9 +159,9 @@ local function setupPlayerBox(v)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
 
+                -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
-                Tracer.Visible = _G.TracerVisible
 
                 if _G.teamcheck == true then
                     if _G.temcheckmode == "colors" then
@@ -194,10 +188,19 @@ local function setupPlayerBox(v)
                     end
                 end
             else
-                clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+                Box.Visible = false
+                BoxFilled.Visible = false
+                HealthBar.Visible = false
+                Tracer.Visible = false
+                Box.Color = _G.boxColor
+                BoxFilled.Color = _G.boxFilledColor
+                Tracer.Color = _G.TracerColor
             end
         else
-            clearDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+            Box.Visible = false
+            BoxFilled.Visible = false
+            HealthBar.Visible = false
+            Tracer.Visible = false
         end
     end)
 end
