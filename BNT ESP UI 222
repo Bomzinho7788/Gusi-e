@@ -40,6 +40,7 @@ _G.TracerColor = Color3.new(0, 0, 0)
 _G.TracerFrom = "Bottom"
 
 --Skeleton
+local camera = workspace.CurrentCamera
 local entities = game:GetService("Players")
 local localPlayer = entities.LocalPlayer
 local runService = game:GetService("RunService")
