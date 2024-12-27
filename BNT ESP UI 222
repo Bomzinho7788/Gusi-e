@@ -4,6 +4,7 @@ local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
 local currentCamera = workspace.CurrentCamera
 local worldToViewportPoint = currentCamera.worldToViewportPoint
+local ps = game.Players
 
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
@@ -52,7 +53,7 @@ local skel_settings = {
     transparency = 1
 }
 
-if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
+if ps.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
     local function draw(player, character)
 
         local skel_head = Drawing.new("Line")
@@ -210,7 +211,7 @@ if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
     entities.PlayerAdded:Connect(playeradded)
 end
 
-if character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+if ps.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     local function drawR15(player, character)
 
         local skel_Head = Drawing.new("Line")
