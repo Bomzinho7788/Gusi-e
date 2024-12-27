@@ -45,12 +45,10 @@ local entities = game:GetService("Players")
 local localPlayer = entities.LocalPlayer
 local runService = game:GetService("RunService")
 
-local skel_settings = {
-    skelvi = false,
-    color = Color3.new(1, 1, 1),
-    thickness = 1.5,
-    transparency = 1
-}
+skelvi = false,
+color = Color3.new(1, 1, 1),
+thickness = 1.5,
+transparency = 1
 
 local function draw(player, character)
 
@@ -103,7 +101,7 @@ local function draw(player, character)
                 local character_rootpart_3d = character.HumanoidRootPart.Position
                 local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
 
-                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.skelvi == true then
+                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 and  then
                   
                     local head_2d = camera:WorldToViewportPoint(character.Head.Position)
                     local torso_upper_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, 1, 0))
@@ -349,7 +347,7 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            skel_settings.skelvi = false
+                            skelvi = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -365,14 +363,14 @@ local function setupPlayerBox(v)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                skel_settings.skelvi = false
+                skelvi = false
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            skel_settings.skelvi = false
+            skelvi = false
         end
     end)
 end
@@ -475,7 +473,7 @@ local ToggleSKVI = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "SKVI",
     Callback = function(Value)
-        skel_settings.skelvi = Value
+        skelvi = Value
     end,
 })
 
@@ -540,7 +538,7 @@ local ColorPickerSKCOLOR = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "SKCOLOR",
     Callback = function(Value)
-        skel_settings.color = Value
+        color = Value
     end
 })
 
@@ -602,7 +600,7 @@ local SliderSKTRANSPA = Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "SKTRANSPA",
     Callback = function(Value)
-        skel_settings.transparency = Value
+        transparency = Value
     end,
 })
 
@@ -652,7 +650,7 @@ local SliderSKTHICK = Tab:CreateSlider({
     CurrentValue = 1.5,
     Flag = "SKTHICK",
     Callback = function(Value)
-        skel_settings.thickness = Value
+        thickness = Value
     end,
 })
 
