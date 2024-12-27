@@ -14,12 +14,6 @@ _G.temcheckmode = "colors" -- opções: "colors", "invisible"
 _G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
 _G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
 
--- Configurações BoxOutline e Box
-_G.boxOutlineColor = Color3.new(0, 0, 0)
-_G.boxOutlineThickness = 3
-_G.boxOutlineTransparency = 1
-_G.boxOutlineVisible = false
-
 _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
 _G.boxTransparency = 1
@@ -30,26 +24,16 @@ _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
 _G.boxFilledVisible = false
 
-_G.HealthBarOutlineVisible = false
-_G.HealthBarOutlineThickness = 3
-_G.HealthBarOutlineTransparency = 1
-_G.HealthBarOutlineColor = Color3.new(0,0,0)
-
 _G.HealthBarThickness = 1
 _G.HealthBarVisible = false
 _G.HealthBarTransparency = 1
 _G.HealthBarColor = Color3.new(0,1,0)
+_G.HealthBarFilled = true
 
 _G.HealthBarPosition = "Left"
 
 -- Definir Box, BoxOutline e BoxFilled no início
 local function createDrawingObjects()
-    local BoxOutline = Drawing.new("Square")
-    BoxOutline.Visible = _G.boxOutlineVisible
-    BoxOutline.Color = _G.boxOutlineColor
-    BoxOutline.Thickness = _G.boxOutlineThickness
-    BoxOutline.Transparency = _G.boxOutlineTransparency
-    BoxOutline.Filled = false
 
     local Box = Drawing.new("Square")
     Box.Visible = _G.boxVisible
@@ -64,28 +48,17 @@ local function createDrawingObjects()
     BoxFilled.Transparency = _G.boxFilledTransparency
     BoxFilled.Filled = true
 
-    local HealthBarOutline = Drawing.new("Square")
-    HealthBarOutline.Thickness = _G.HealthBarOutlineThickness
-    HealthBarOutline.Visible = _G.HealthBarOutlineVisible
-    HealthBarOutline.Transparency =  _G.HealthBarOutlineTransparency
-    HealthBarOutline.Color = _G.HealthBarOutlineColor
-    HealthBarOutline.Filled = false
-
     local HealthBar = Drawing.new("Square")
     HealthBar.Thickness = _G.HealthBarThickness
     HealthBar.Visible = _G.HealthBarVisible
     HealthBar.Transparency =  _G.HealthBarTransparency
     HealthBar.Color = _G.HealthBarColor
-    HealthBar.Filled = false
+    HealthBar.Filled = _G.HealthBarFilled
 
-    return BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline
+    return Box, BoxFilled, HealthBar
 end
 
-local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline, HealthBar)
-    BoxOutline.Color = _G.boxOutlineColor
-    BoxOutline.Thickness = _G.boxOutlineThickness
-    BoxOutline.Transparency = _G.boxOutlineTransparency
-    BoxOutline.Visible = _G.boxOutlineVisible
+local function updateDrawingObjects(Box, BoxFilled, HealthBar)
 
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
@@ -94,18 +67,13 @@ local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline
 
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Visible = _G.boxFilled_visible
-
-    HealthBarOutline.Thickness = _G.HealthBarOutlineThickness
-    HealthBarOutline.Visible = _G.HealthBarOutlineVisible
-    HealthBarOutline.Transparency =  _G.HealthBarOutlineTransparency
-    HealthBarOutline.Color = _G.HealthBarOutlineColor
-    HealthBarOutline.Filled = false
+    BoxFilled.Visible = _G.boxFilledVisible
 
     HealthBar.Thickness = _G.HealthBarThickness
     HealthBar.Visible = _G.HealthBarVisible
     HealthBar.Transparency =  _G.HealthBarTransparency
     HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
 end
 
 local function getHealthValues(player)
@@ -128,21 +96,17 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
         HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
     elseif _G.HealthBarPosition == "Right" then
         HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
-    elseif _G.HealthBarPosition == "Top" then
-        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y - offset - healthBarSize)
-    elseif _G.HealthBarPosition == "Bottom" then
-        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y + offset)
     end
 
     HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
 for i, v in pairs(game.Players:GetChildren()) do
-    local BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline = createDrawingObjects()
+    local BoxOutline, Box, BoxFilled, HealthBar = createDrawingObjects()
 
     local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline)
+            updateDrawingObjects(Box, BoxFilled, HealthBar)
 
             if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -156,21 +120,13 @@ for i, v in pairs(game.Players:GetChildren()) do
                 if onScreen then
                     local maxHealth, health = getHealthValues(v)
 
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
-                    BoxOutline.Visible = _G.boxOutlineVisible
-
                     Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = _G.boxVisible
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilled_visible
-
-                    HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true, maxHealth, health)
-                    HealthBarOutline.Visible = _G.HealthBarOutlineVisible
+                    BoxFilled.Visible = _G.boxFilledVisible
 
                     HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
                     updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
@@ -188,10 +144,8 @@ for i, v in pairs(game.Players:GetChildren()) do
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
-                            BoxOutline.Visible = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
-                            HealthBarOutline.Visible = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -199,18 +153,14 @@ for i, v in pairs(game.Players:GetChildren()) do
                     end
 
                 else
-                    BoxOutline.Visible = false
                     Box.Visible = false
                     BoxFilled.Visible = false
                     HealthBar.Visible = false
-                    HealthBarOutline.Visible = false
                 end
             else
-                BoxOutline.Visible = false
                 Box.Visible = false
                 BoxFilled.Visible = false
                 HealthBar.Visible = false
-                HealthBarOutline.Visible = false
             end
         end)
     end
@@ -218,11 +168,11 @@ for i, v in pairs(game.Players:GetChildren()) do
 end
 
 game.Players.PlayerAdded:Connect(function(v)
-    local BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline = createDrawingObjects()
+    local Box, BoxFilled, HealthBar = createDrawingObjects()
 
     local function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBar, HealthBarOutline)
+            updateDrawingObjects(Box, BoxFilled, HealthBar)
 
             if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
                 local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -236,21 +186,13 @@ game.Players.PlayerAdded:Connect(function(v)
                 if onScreen then
                     local maxHealth, health = getHealthValues(v)
 
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
-                    BoxOutline.Visible = _G.boxOutlineVisible
-
                     Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = _G.boxVisible
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilled_visible
-
-                    HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true, maxHealth, health)
-                    HealthBarOutline.Visible = _G.HealthBarOutlineVisible
+                    BoxFilled.Visible = _G.boxFilledVisible
 
                     HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
                     updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
@@ -268,10 +210,8 @@ game.Players.PlayerAdded:Connect(function(v)
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
-                            BoxOutline.Visible = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
-                            HealthBarOutline.Visible = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -279,18 +219,14 @@ game.Players.PlayerAdded:Connect(function(v)
                     end
 
                 else
-                    BoxOutline.Visible = false
                     Box.Visible = false
                     BoxFilled.Visible = false
                     HealthBar.Visible = false
-                    HealthBarOutline.Visible = false
                 end
             else
-                BoxOutline.Visible = false
                 Box.Visible = false
                 BoxFilled.Visible = false
                 HealthBar.Visible = false
-                HealthBarOutline.Visible = false
             end
         end)
     end
@@ -335,7 +271,7 @@ local Tab1 = Window:CreateTab("Aimbot", 4483362458)
 
 local Tab = Window:CreateTab("ESP", 4483362458)
 
-local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Toggle = Tab:CreateToggle({
     Name = "Show Box",
@@ -343,15 +279,6 @@ local Toggle = Tab:CreateToggle({
     Flag = "Show Box",
     Callback = function(Value)
         _G.boxVisible = Value
-    end,
-})
-
-local Toggle1 = Tab:CreateToggle({
-    Name = "Show Box Outline",
-    CurrentValue = false,
-    Flag = "Show BoxOutline",
-    Callback = function(Value)
-        _G.boxOutlineVisible = Value
     end,
 })
 
@@ -374,16 +301,7 @@ local Toggle3 = Tab:CreateToggle({
 })
 
 local Toggle3 = Tab:CreateToggle({
-    Name = "Show Health Bar Outline",
-    CurrentValue = false,
-    Flag = "healthbarouf",
-    Callback = function(Value)
-        _G.HealthBarOutlineVisible = Value
-    end,
-})
-
-local Toggle3 = Tab:CreateToggle({
-    Name = "Show Health Outline",
+    Name = "Show Health Bar",
     CurrentValue = false,
     Flag = "healthbarouf",
     Callback = function(Value)
@@ -391,7 +309,16 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Toggle3 = Tab:CreateToggle({
+    Name = "Health Bar Filled",
+    CurrentValue = false,
+    Flag = "healthbarouff",
+    Callback = function(Value)
+        _G.HealthBarFilled = Value
+    end,
+})
+
+local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local ColorPicker = Tab:CreateColorPicker({
     Name = "Team Color",
@@ -420,15 +347,6 @@ local ColorPicker2 = Tab:CreateColorPicker({
     end
 })
 
-local ColorPicker3 = Tab:CreateColorPicker({
-    Name = "Box Outline Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxOutlineColor",
-    Callback = function(Value)
-        _G.boxOutlineColor = Value
-    end
-})
-
 local ColorPicker4 = Tab:CreateColorPicker({
     Name = "Box Filled Color",
     Color = Color3.fromRGB(255, 255, 255),
@@ -438,7 +356,7 @@ local ColorPicker4 = Tab:CreateColorPicker({
     end
 })
 
-local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider = Tab:CreateSlider({
     Name = "Box Transparency",
@@ -449,18 +367,6 @@ local Slider = Tab:CreateSlider({
     Flag = "boxTransparency",
     Callback = function(Value)
         _G.boxTransparency = Value
-    end,
-})
-
-local Slider1 = Tab:CreateSlider({
-    Name = "Box Outline Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxOutlineTransparency",
-    Callback = function(Value)
-        _G.boxOutlineTransparency = Value
     end,
 })
 
@@ -476,18 +382,6 @@ local Slider2 = Tab:CreateSlider({
     end,
 })
 
-local Slider3 = Tab:CreateSlider({
-    Name = "Health Bar Outline Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarOutlineTransparency",
-    Callback = function(Value)
-        _G.HealthBarOutlineTransparency = Value
-    end,
-})
-
 local Slider4 = Tab:CreateSlider({
     Name = "Health Bar Transparency",
     Range = {0, 1},
@@ -500,7 +394,7 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider5 = Tab:CreateSlider({
     Name = "Box Thickness",
@@ -511,30 +405,6 @@ local Slider5 = Tab:CreateSlider({
     Flag = "boxThickness",
     Callback = function(Value)
         _G.boxThickness = Value
-    end,
-})
-
-local Slider6 = Tab:CreateSlider({
-    Name = "Box Outline Thickness",
-    Range = {0, 10},
-    Increment = .5,
-    Suffix = "",
-    CurrentValue = 3,
-    Flag = "boxOutlineThickness",
-    Callback = function(Value)
-        _G.boxOutlineThickness = Value
-    end,
-})
-
-local Slider7 = Tab:CreateSlider({
-    Name = "Health Bar Outline Thickness",
-    Range = {0, 10},
-    Increment = .5,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarOutlineThickness",
-    Callback = function(Value)
-        _G.HealthBarOutlineThickness = Value
     end,
 })
 
@@ -550,7 +420,7 @@ local Slider8 = Tab:CreateSlider({
     end,
 })
 
-local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Dropdown1 = Tab:CreateDropdown({
     Name = "Teamcheck Mode",
@@ -565,7 +435,7 @@ local Dropdown1 = Tab:CreateDropdown({
 
 local Dropdown2 = Tab:CreateDropdown({
     Name = "Health Bar Position",
-    Options = {"Left", "Right", "Top", "Bottom"},
+    Options = {"Left", "Right"},
     CurrentOption = {"Left"},
     MultipleOptions = false,
     Flag = "HealthBarPosition",
