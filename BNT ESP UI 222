@@ -130,33 +130,33 @@ local function draw(player, character)
                     skel_rightleg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
                     skel_rightleg.To = Vector2.new(rightLeg_2d.X, rightLeg_2d.Y)
 
-                    skel_head.Visible = skel_settings.skelvi
-                    skel_torso.Visible = skel_settings.skelvi
-                    skel_leftarm.Visible = skel_settings.skelvi
-                    skel_rightarm.Visible = skel_settings.skelvi
-                    skel_leftleg.Visible = skel_settings.skelvi
-                    skel_rightleg.Visible = skel_settings.skelvi
+                    skel_head.Visible = skelvi
+                    skel_torso.Visible = skelvi
+                    skel_leftarm.Visible = skelvi
+                    skel_rightarm.Visible = skelvi
+                    skel_leftleg.Visible = skelvi
+                    skel_rightleg.Visible = skelvi
 
-                    skel_head.Color = skel_settings.color
-                    skel_torso.Color = skel_settings.color
-                    skel_leftarm.Color = skel_settings.color
-                    skel_rightarm.Color = skel_settings.color
-                    skel_leftleg.Color = skel_settings.color
-                    skel_rightleg.Color = skel_settings.color
+                    skel_head.Color = color
+                    skel_torso.Color = color
+                    skel_leftarm.Color = color
+                    skel_rightarm.Color = color
+                    skel_leftleg.Color = color
+                    skel_rightleg.Color = color
 
-                    skel_head.Transparency = skel_settings.transparency
-                    skel_torso.Transparency = skel_settings.transparency
-                    skel_leftarm.Transparency = skel_settings.transparency
-                    skel_rightarm.Transparency = skel_settings.transparency
-                    skel_leftleg.Transparency = skel_settings.transparency
-                    skel_rightleg.Transparency = skel_settings.transparency
+                    skel_head.Transparency = transparency
+                    skel_torso.Transparency = transparency
+                    skel_leftarm.Transparency = transparency
+                    skel_rightarm.Transparency = transparency
+                    skel_leftleg.Transparency = transparency
+                    skel_rightleg.Transparency = transparency
 
-                    skel_head.Thickness = skel_settings.thickness
-                    skel_torso.Thickness = skel_settings.thickness
-                    skel_leftarm.Thickness = skel_settings.thickness
-                    skel_rightarm.Thickness = skel_settings.thickness
-                    skel_leftleg.Thickness = skel_settings.thickness
-                    skel_rightleg.Thickness = skel_settings.thickness
+                    skel_head.Thickness = thickness
+                    skel_torso.Thickness = thickness
+                    skel_leftarm.Thickness = thickness
+                    skel_rightarm.Thickness = thickness
+                    skel_leftleg.Thickness = thickness
+                    skel_rightleg.Thickness = thickness
 
                 else
 
