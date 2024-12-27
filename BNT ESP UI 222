@@ -44,10 +44,6 @@ local entities = game:GetService("Players")
 local localPlayer = entities.LocalPlayer
 local runService = game:GetService("RunService")
 
-if _G.teamcheck then
-    skel_settings.skelvi = false
-end
-
 local skel_settings = {
     skelvi = false,
     color = Color3.new(1, 1, 1),
