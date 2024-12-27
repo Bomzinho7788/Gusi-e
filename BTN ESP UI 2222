@@ -94,7 +94,7 @@ local function updateDrawingObjects(BoxOutline, Box, BoxFilled, HealthBarOutline
 
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Visible = _G.boxFilledvisible
 
     HealthBarOutline.Thickness = _G.HealthBarOutlineThickness
     HealthBarOutline.Visible = _G.HealthBarOutlineVisible
@@ -152,7 +152,7 @@ for i, v in pairs(game.Players:GetChildren()) do
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilledVisible
+                    BoxFilled.Visible = _G.boxFilledvisible
 
                     HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
                     updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true)
@@ -230,7 +230,7 @@ game.Players.PlayerAdded:Connect(function(v)
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = _G.boxFilledVisible
+                    BoxFilled.Visible = _G.boxFilledvisible
 
                     HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
                     updateHealthBarPosition(HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true)
@@ -460,25 +460,25 @@ local Slider2 = Tab:CreateSlider({
     end,
 })
 
-local Slider2 = Tab:CreateSlider({
+local Slider3 = Tab:CreateSlider({
     Name = "Health Bar Outline Transparency",
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
     CurrentValue = 1,
-    Flag = "healgrfgf",
+    Flag = "HealthBarOutlineTransparency",
     Callback = function(Value)
         _G.HealthBarOutlineTransparency = Value
     end,
 })
 
-local Slider2 = Tab:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Health Bar Transparency",
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
     CurrentValue = 1,
-    Flag = "tertyuyttyui",
+    Flag = "HealthBarTransparency",
     Callback = function(Value)
         _G.HealthBarTransparency = Value
     end,
@@ -486,7 +486,7 @@ local Slider2 = Tab:CreateSlider({
 
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
 
-local Slider3 = Tab:CreateSlider({
+local Slider5 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
     Increment = .5,
@@ -498,7 +498,7 @@ local Slider3 = Tab:CreateSlider({
     end,
 })
 
-local Slider4 = Tab:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Box Outline Thickness",
     Range = {0, 10},
     Increment = .5,
@@ -510,51 +510,51 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
-local Slider2 = Tab:CreateSlider({
+local Slider7 = Tab:CreateSlider({
     Name = "Health Bar Outline Thickness",
-    Range = {0, 1},
-    Increment = .05,
+    Range = {0, 10},
+    Increment = .5,
     Suffix = "",
     CurrentValue = 1,
-    Flag = "hgggealgrfgf",
+    Flag = "HealthBarOutlineThickness",
     Callback = function(Value)
         _G.HealthBarOutlineThickness = Value
     end,
 })
 
-local Slider2 = Tab:CreateSlider({
+local Slider8 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
-    Range = {0, 1},
-    Increment = .05,
+    Range = {0, 10},
+    Increment = .5,
     Suffix = "",
     CurrentValue = 1,
-    Flag = "tertyuyttttyui",
+    Flag = "HealthBarThickness",
     Callback = function(Value)
         _G.HealthBarThickness = Value
     end,
 })
 
-local Label4 = Tab:CreateLabel("others Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
+local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
 
-local Dropdown = Tab:CreateDropdown({
+local Dropdown1 = Tab:CreateDropdown({
     Name = "Teamcheck Mode",
     Options = {"colors","invisible"},
     CurrentOption = {"colors"},
     MultipleOptions = false,
     Flag = "TeamcheckMode",
     Callback = function(Options)
-        _G.temcheckmode = Value
+        _G.temcheckmode = Options[1]
     end,
 })
 
-local Dropdown = Tab:CreateDropdown({
-    Name = "Health Bar Positions",
-    Options = {"Top","Right","Bottom","Left"},
+local Dropdown2 = Tab:CreateDropdown({
+    Name = "Health Bar Position",
+    Options = {"Left", "Right", "Top", "Bottom"},
     CurrentOption = {"Left"},
     MultipleOptions = false,
-    Flag = "hhhhggdf",
+    Flag = "HealthBarPosition",
     Callback = function(Options)
-        _G.HealthBarPosition = Options[1
+        _G.HealthBarPosition = Options[1]
     end,
 })
 
