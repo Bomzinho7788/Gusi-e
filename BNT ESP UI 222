@@ -199,11 +199,11 @@ local function setupPlayerBox(v)
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
-                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position + Box.Size.Y + 1)
+                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 1 + Box.Size.Y)
                 NameTag.Text = v.Name
                 NameTag.Visible = _G.Name
 
-                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position + Box.Size.Y + 2)
+                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 2 + Box.Size.Y)
                 DistanceTag.Text = tostring(math.floor((lplr.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)) .. "m"
                 DistanceTag.Visible = _G.Distance
 
