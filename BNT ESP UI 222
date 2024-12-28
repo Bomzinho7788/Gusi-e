@@ -11,68 +11,87 @@ local LegOff = Vector3.new(0, 3, 0)
 _G.NameESP = {
     TextSize = 13,
     TextColor = Color3.fromRGB(255, 255, 255),
-    OutlineColor = Color3.fromRGB(0, 0, 0),
-    OutlineThickness = 2,
     Visible = false
 }
-local function createNameESP(player)
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    local head = character:WaitForChild("Head")
-    
-    local nameLabel = Drawing.new("Text")
-    nameLabel.Text = player.Name
-    nameLabel.Size = _G.NameESP.TextSize
-    nameLabel.Color = _G.NameESP.TextColor
-    nameLabel.Outline = true
-    nameLabel.OutlineColor = _G.NameESP.OutlineColor
-    nameLabel.OutlineThickness = _G.NameESP.OutlineThickness
-    nameLabel.Center = true
-    
-    local function updateNameLabel()
-        local screenPosition, onScreen = workspace.CurrentCamera:WorldToScreenPoint(head.Position)
-        
-        if onScreen then
-            local positionAboveHead = head.Position + Vector3.new(0, 5, 0)
-            local screenPositionAboveHead, onScreenAboveHead = workspace.CurrentCamera:WorldToScreenPoint(positionAboveHead)
-            
-            if onScreenAboveHead then
-                nameLabel.Position = Vector2.new(screenPositionAboveHead.X, screenPositionAboveHead.Y)
-            end
-            
-            nameLabel.Visible = _G.NameESP.Visible
-        else
-            nameLabel.Visible = false
+
+local c = workspace.CurrentCamera
+local ps = game:GetService("Players")
+local lp = ps.LocalPlayer
+local rs = game:GetService("RunService")
+
+local function esp(p,cr)
+    local h = cr:WaitForChild("Humanoid")
+    local hrp = cr:WaitForChild("Head")
+
+    local text = Drawing.new("Text")
+    text.Visible = _G.NameESP.Visible
+    text.Center = true
+    text.Outline = true 
+    text.Font = 2
+    text.Color = _G.NameESP.TextColor
+    text.Size = _G.NameESP.TextSize
+
+    local c1
+    local c2
+    local c3
+
+    local function dc()
+        text.Visible = false
+        text:Remove()
+        if c1 then
+            c1:Disconnect()
+            c1 = nil 
+        end
+        if c2 then
+            c2:Disconnect()
+            c2 = nil 
+        end
+        if c3 then
+            c3:Disconnect()
+            c3 = nil 
         end
     end
 
-    game:GetService("RunService").RenderStepped:Connect(function()
-        updateNameLabel()
+    c2 = cr.AncestryChanged:Connect(function(_,parent)
+        if not parent then
+            dc()
+        end
     end)
 
-    return function()
-        nameLabel:Remove()
+    c3 = h.HealthChanged:Connect(function(v)
+        if (v<=0) or (h:GetState() == Enum.HumanoidStateType.Dead) then
+            dc()
+        end
+    end)
+
+    c1 = rs.RenderStepped:Connect(function()
+        local hrp_pos,hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
+        if hrp_onscreen then
+            text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y + Vector2.new(0,2,0))
+            text.Text = p.Name
+            text.Visible = true
+        else
+            text.Visible = false
+        end
+    end)
+end
+
+local function p_added(p)
+    if p.Character then
+        esp(p,p.Character)
+    end
+    p.CharacterAdded:Connect(function(cr)
+        esp(p,cr)
+    end)
+end
+
+for i,p in next, ps:GetPlayers() do 
+    if p ~= lp then
+        p_added(p)
     end
 end
 
-for _, player in ipairs(game.Players:GetPlayers()) do
-    if player.Character then
-        createNameESP(player)
-    else
-        player.CharacterAdded:Connect(function()
-            createNameESP(player)
-        end)
-    end
-end
-
-game.Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        createNameESP(player)
-    end)
-end)
-
-game.Players.PlayerRemoving:Connect(function(player)
-end)
+ps.PlayerAdded:Connect(p_added)
 
 -- Configurações
 _G.temcheck = false
@@ -441,15 +460,6 @@ local ColorPicker55 = Tab:CreateColorPicker({
     end
 })
 
-local ColorPicker55 = Tab:CreateColorPicker({
-    Name = "Name Outline Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "namespoutlinecolor",
-    Callback = function(Value)
-        _G.NameESP.OutlineColor = Value
-    end
-})
-
 local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider1 = Tab:CreateSlider({
@@ -547,18 +557,6 @@ local Slider7 = Tab:CreateSlider({
     Flag = "namesize",
     Callback = function(Value)
         _G.NameESP.TextSize = Value
-    end,
-})
-
-local Slider7 = Tab:CreateSlider({
-    Name = "Name Outline Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "outlinenamethick",
-    Callback = function(Value)
-        _G.NameESP.OutlineThickness = Value
     end,
 })
 
