@@ -1,17 +1,6 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local lplr = game.Players.LocalPlayer
-local camera = game:GetService("Workspace").CurrentCamera
-local currentCamera = workspace.CurrentCamera
-local worldToViewportPoint = currentCamera.worldToViewportPoint
-
-local HeadOff = Vector3.new(0, 0.5, 0)
-local LegOff = Vector3.new(0, 3, 0)
-
 _G.temcheck = false
-_G.temcheckmode = "colors"
-_G.teamcolor = Color3.new(0, 1, 0)
-_G.enemycolor = Color3.new(1, 0, 0)
 
 _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
@@ -19,15 +8,10 @@ _G.boxTransparency = 1
 _G.boxVisible = false
 _G.ShowBox = false
 
-_G.boxFilledColor = Color3.new(0, 0, 0)
-_G.boxFilledTransparency = 0.5
-_G.boxFilledVisible = false
-
 _G.HealthBarThickness = 1
 _G.HealthBarVisible = false
 _G.HealthBarTransparency = 1
 _G.HealthBarColor = Color3.new(0, 1, 0)
-_G.HealthBarFilled = true
 
 _G.HealthBarPosition = "Left"
 
@@ -39,232 +23,163 @@ _G.TracerColor = Color3.new(0, 0, 0)
 _G.TracerFrom = "Bottom"
 
 _G.Name = false
-_G.Namec = Color3.new(0, 0, 0)
-_G.Names = 13
+
+_G.Textsc = Color3.new(0, 0, 0)
+_G.Textss = 13
 
 _G.Distance = false
-_G.Distancec = Color3.new(0, 0, 0)
-_G.Distancess = 13
 
-local function getTracerFromPosition()
-    if _G.TracerFrom == "Bottom" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
-    elseif _G.TracerFrom == "Middle" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    elseif _G.TracerFrom == "Top" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 4)
-    end
-end
+_G.Health = false
 
-local function createDrawingObjects()
-    local Box = Drawing.new("Square")
-    Box.Visible = _G.boxVisible
-    Box.Color = _G.boxColor
-    Box.Thickness = _G.boxThickness
-    Box.Transparency = _G.boxTransparency
-    Box.Filled = false
+_G.ShowSkel = false
+_G.skelcol = Color3.new(1, 1, 1)
+_G.skeltranspa = 1
+_G.skelthick = 1.5
 
-    local BoxFilled = Drawing.new("Square")
-    BoxFilled.Visible = _G.boxFilledVisible
-    BoxFilled.Color = _G.boxFilledColor
-    BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Filled = true
+_G.Showhd = false
+_G.hdcol = Color3.new(1, 1, 1)
+_G.hdtranspa = 1
+_G.hdthick = 1.5
 
-    local HealthBar = Drawing.new("Square")
-    HealthBar.Thickness = _G.HealthBarThickness
-    HealthBar.Visible = _G.HealthBarVisible
-    HealthBar.Transparency = _G.HealthBarTransparency
-    HealthBar.Color = _G.HealthBarColor
-    HealthBar.Filled = _G.HealthBarFilled
+_G.Showlt = false
+_G.ltcol = Color3.new(1, 1, 1)
+_G.lttranspa = 1
+_G.ltthick = 1.5
 
-    local Tracer = Drawing.new("Line")
-    Tracer.Visible = _G.TracerVisible
-    Tracer.Thickness = _G.TracerThickness
-    Tracer.Transparency = _G.TracerTransparency
-    Tracer.Color = _G.TracerColor
-
-    local NameTag = Drawing.new("Text")
-    NameTag.Visible = _G.Name
-    NameTag.Color = _G.Namec
-    NameTag.Size = _G.Names
-    NameTag.Center = true
-    NameTag.Outline = true
-    NameTag.OutlineColor = _G.Namec
-
-    local DistanceTag = Drawing.new("Text")
-    DistanceTag.Visible = _G.Distance
-    DistanceTag.Color = _G.Distancec
-    DistanceTag.Size = _G.Distancess
-    DistanceTag.Center = true
-    DistanceTag.Outline = true
-    DistanceTag.OutlineColor = _G.Distancec
-
-    return Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag
-end
-
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag)
-    Box.Color = _G.boxColor
-    Box.Thickness = _G.boxThickness
-    Box.Transparency = _G.boxTransparency
-    Box.Visible = _G.boxVisible
-
-    BoxFilled.Color = _G.boxFilledColor
-    BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Visible = _G.boxFilledVisible
-
-    HealthBar.Thickness = _G.HealthBarThickness
-    HealthBar.Visible = _G.HealthBarVisible
-    HealthBar.Transparency = _G.HealthBarTransparency
-    HealthBar.Color = _G.HealthBarColor
-    HealthBar.Filled = _G.HealthBarFilled
-
-    Tracer.Visible = _G.TracerVisible
-    Tracer.Thickness = _G.TracerThickness
-    Tracer.Transparency = _G.TracerTransparency
-    Tracer.Color = _G.TracerColor
-
-    NameTag.Visible = _G.Name
-    NameTag.Color = _G.Namec
-    NameTag.Size = _G.Names
-    NameTag.Center = true
-    NameTag.Outline = true
-    NameTag.OutlineColor = Color3.new(1, 1, 1)
-
-    DistanceTag.Visible = _G.Distance
-    DistanceTag.Color = _G.Distancec
-    DistanceTag.Size = _G.Distancess
-    DistanceTag.Center = true
-    DistanceTag.Outline = true
-    DistanceTag.OutlineColor = Color3.new(1, 1, 1)
-
-end
-
-local function getHealthValues(player)
-    local maxHealth, health
-    if player:FindFirstChild("NRPBS") then
-        maxHealth = player.NRPBS["MaxHealth"].Value
-        health = player.NRPBS["Health"].Value
-    else
-        maxHealth = player.Character.Humanoid.MaxHealth
-        health = player.Character.Humanoid.Health
-    end
-    return maxHealth, health
-end
-
-local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
-    local offset = isOutline and 6 or 4
-    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
-
-    if _G.HealthBarPosition == "Left" then
-        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
-    elseif _G.HealthBarPosition == "Right" then
-        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
-    end
-
-    HealthBar.Size = Vector2.new(2, healthBarSize)
-end
-
-local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag = createDrawingObjects()
-
-    game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag)
-
-        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
-            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-
-            local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
-            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
-
-            if onScreen then
-                local maxHealth, health = getHealthValues(v)
-
-                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                Box.Visible = _G.boxVisible
-
-                BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                BoxFilled.Visible = _G.boxFilledVisible
-
-                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
-                updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
-                HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
-                HealthBar.Visible = _G.HealthBarVisible
-
-                -- Atualizando a posição do Tracer
-                Tracer.From = getTracerFromPosition()
-                Tracer.To = Vector2.new(Vector.X, Vector.Y)
-
-                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / -20, Head.Position.Y + 1 + Box.Size.Y)
-                NameTag.Text = v.Name
-                NameTag.Visible = _G.Name
-
-                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / -10, Head.Position.Y + 2 + Box.Size.Y)
-                DistanceTag.Text = tostring(math.floor((lplr.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)) .. "m"
-                DistanceTag.Visible = _G.Distance
-
-                if _G.teamcheck == true then
-                    if _G.temcheckmode == "colors" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Color = _G.teamcolor
-                            BoxFilled.Color = _G.teamcolor
-                            Tracer.Color = _G.teamcolor
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                            Tracer.Color = _G.enemycolor
-                        end
-                    elseif _G.temcheckmode == "invisible" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Visible = false
-                            BoxFilled.Visible = false
-                            HealthBar.Visible = false
-                            Tracer.Visible = false
-                            Box.Color = _G.boxColor
-                            BoxFilled.Color = _G.boxFilledColor
-                            Tracer.Color = _G.TracerColor
-                            NameTag.Visible = false
-                            DistanceTag.Visible = false
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                            Tracer.Color = _G.enemycolor
-                        end
-                    end
-                end
-            else
-                Box.Visible = false
-                BoxFilled.Visible = false
-                HealthBar.Visible = false
-                Tracer.Visible = false
-                Box.Color = _G.boxColor
-                BoxFilled.Color = _G.boxFilledColor
-                Tracer.Color = _G.TracerColor
-                NameTag.Visible = false
-                DistanceTag.Visible = false
-            end
-        else
-            Box.Visible = false
-            BoxFilled.Visible = false
-            HealthBar.Visible = false
-            Tracer.Visible = false
-            NameTag.Visible = false
-            DistanceTag.Visible = false
-        end
-    end)
-end
-
-for _, player in pairs(game.Players:GetChildren()) do
-    setupPlayerBox(player)
-end
-
-game.Players.PlayerAdded:Connect(function(player)
-    setupPlayerBox(player)
-end)
+getgenv().EspSettings = {
+	TeamCheck = _G.teamcheck,
+	ToggleKey = "",
+	RefreshRate = 10, -- how fast the esp updates (milliseconds)
+	MaximumDistance = 500, -- only renders players within this distance
+	FaceCamera = true, -- Makes esp appear 2D
+	AlignPoints = true, -- Improves 2D effect; only works while FaceCamera is enabled
+	-- AlignPoints: This may cause esp to have abnormal behavior when looking from certain angles
+	MouseVisibility = {
+		Enabled = false, -- makes any drawing objects transparent when they are near your mouse
+		Radius = 60,
+		Transparency = 0.3,
+		Method = "Hover", -- "Radius" or "Hover" | Hover is newest method and is a lot more accurate than Radius
+		HoverRadius = 50,
+		Selected = { -- set any of these to false to ignore them
+			Boxes = true,
+			Tracers = true,
+			Names = true,
+			Skeletons = true,
+			HealthBars = true,
+			HeadDots = true,
+			LookTracers = true
+		}
+	},
+	Highlights = {
+		Enabled = false,
+		Players = {game.Players}, -- put player usernames into this table to 'highlight' them
+		Transparency = 1,
+		Color = Color3.fromRGB(255, 150, 0),
+		AlwaysOnTop = true
+	},
+	NPC = {
+		Color = Color3.fromRGB(150,150,150),
+		Transparency = 1,
+		RainbowColor = false,
+		Overrides = {
+			Boxes = false,
+			Tracers = false,
+			Names = false,
+			Skeletons = false,
+			HealthBars = false,
+			HeadDots = false,
+			LookTracers = false
+		}
+	},
+	Boxes = {
+		Enabled = _G.boxVisible,
+		Transparency = _G.boxTransparency,
+		Color = _G.boxColor,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = _G.boxThickness
+	},
+	Tracers = {
+		Enabled = _G.TracerVisible,
+		Transparency = _G.TracerTransparency,
+		Color = _G.TracerColor,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = _G.TracerFrom, -- "Top" or "Center" or "Bottom" or "Mouse"
+		Thickness = _G.TracerThickness
+	},
+	Names = {
+		Enabled = _G.Name,
+		Transparency = 1,
+		Color = _G.Textsc,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = true,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		Font = Drawing.Fonts.UI, -- UI or System or Plex or Monospace
+		Size = _G.Textss,
+		ShowDistance = _G.Distance,
+		ShowHealth = _G.Health,
+		UseDisplayName = false,
+		DistanceDataType = "m", -- what it says after the distance (ex. 100m)
+		HealthDataType = "Percentage" -- "Percentage" or "Value"
+	},
+	Skeletons = {
+		Enabled = _G.ShowSkel,
+        Transparency = _G.skeltranspa,
+		Color = _G.skelcol,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = _G.skelthick
+	},
+	HealthBars = {
+		Enabled = _G.HealthBarVisible,
+		Transparency = _G.HealthBarTransparency,
+		Color = _G.HealthBarColor,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = _G.HealthBarPosition, -- "None" or "Left" or "Right"
+		OutlineBarOnly = true
+	},
+	HeadDots = {
+		Enabled = _G.Showhd,
+		Transparency = _G.hdtranspa,
+		Color = _G.hdcol,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = _G.hdthick,
+		Filled = false,
+		Scale = 1
+	},
+	LookTracers = {
+		Enabled = _G.Showlt,
+		Transparency = _G.lttranspa,
+		Color = _G.ltcol,
+		UseTeamColor = false,
+		RainbowColor = false,
+		Outline = true,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = _G.ltthick,
+		Length = 5
+	}
+} -- v1.6.14
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -315,15 +230,6 @@ local Toggle = Tab:CreateToggle({
     end,
 })
 
-local Toggle1 = Tab:CreateToggle({
-    Name = "Box Filled",
-    CurrentValue = false,
-    Flag = "BoxFilled",
-    Callback = function(Value)
-        _G.boxFilledVisible = Value
-    end,
-})
-
 local Toggle2 = Tab:CreateToggle({
     Name = "Show Health Bar",
     CurrentValue = false,
@@ -360,6 +266,33 @@ local Toggle5 = Tab:CreateToggle({
     end,
 })
 
+local Toggle5 = Tab:CreateToggle({
+    Name = "Show Skeleton",
+    CurrentValue = false,
+    Flag = "syuhhjg",
+    Callback = function(Value)
+        _G.ShowSkel = Value
+    end,
+})
+
+local Toggle5 = Tab:CreateToggle({
+    Name = "Show Look Tracer",
+    CurrentValue = false,
+    Flag = "jhgfxdghhgh",
+    Callback = function(Value)
+        _G.Showlt = Value
+    end,
+})
+
+local Toggle5 = Tab:CreateToggle({
+    Name = "Show Head Dot",
+    CurrentValue = false,
+    Flag = "hgfgfgfgfhjhjh",
+    Callback = function(Value)
+        _G.Showhd = Value
+    end,
+})
+
 local Toggle6 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
@@ -371,24 +304,6 @@ local Toggle6 = Tab:CreateToggle({
 
 local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local ColorPicker1 = Tab:CreateColorPicker({
-    Name = "Team Color",
-    Color = Color3.fromRGB(0, 255, 0),
-    Flag = "teamcolor",
-    Callback = function(Value)
-        _G.teamcolor = Value
-    end
-})
-
-local ColorPicker2 = Tab:CreateColorPicker({
-    Name = "Enemy Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "enemycolor",
-    Callback = function(Value)
-        _G.enemycolor = Value
-    end
-})
-
 local ColorPicker3 = Tab:CreateColorPicker({
     Name = "Box Color",
     Color = Color3.fromRGB(255, 255, 255),
@@ -398,12 +313,12 @@ local ColorPicker3 = Tab:CreateColorPicker({
     end
 })
 
-local ColorPicker4 = Tab:CreateColorPicker({
-    Name = "Box Filled Color",
+local ColorPicker3 = Tab:CreateColorPicker({
+    Name = "Health Bar Color",
     Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxFilledColor",
+    Flag = "bbbbhbjycoxColor",
     Callback = function(Value)
-        _G.boxFilledColor = Value
+        _G.HealthBarColor = Value
     end
 })
 
@@ -417,11 +332,29 @@ local ColorPicker5 = Tab:CreateColorPicker({
 })
 
 local ColorPicker6 = Tab:CreateColorPicker({
-    Name = "Name Color",
+    Name = "Text Color",
     Color = Color3.fromRGB(255, 255, 255),
-    Flag = "Namec",
+    Flag = "textc",
     Callback = function(Value)
-        _G.Namec = Value
+        _G.Textsc = Value
+    end
+})
+
+local ColorPicker7 = Tab:CreateColorPicker({
+    Name = "Skeleton Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Distgfgjancec",
+    Callback = function(Value)
+        _G.skelcol = Value
+    end
+})
+
+local ColorPicker7 = Tab:CreateColorPicker({
+    Name = "Head Dot Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Disthgghghhancec",
+    Callback = function(Value)
+        _G.hdcol = Value
     end
 })
 
@@ -430,7 +363,7 @@ local ColorPicker7 = Tab:CreateColorPicker({
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "Distancec",
     Callback = function(Value)
-        _G.Distancec = Value
+        _G.ltcol = Value
     end
 })
 
@@ -445,18 +378,6 @@ local Slider1 = Tab:CreateSlider({
     Flag = "boxTransparency",
     Callback = function(Value)
         _G.boxTransparency = Value
-    end,
-})
-
-local Slider2 = Tab:CreateSlider({
-    Name = "Box Filled Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxFilledTransparency",
-    Callback = function(Value)
-        _G.boxFilledTransparency = Value
     end,
 })
 
@@ -481,6 +402,42 @@ local Slider4 = Tab:CreateSlider({
     Flag = "TracerTransparency",
     Callback = function(Value)
         _G.TracerTransparency = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Skeleton Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerThhhjghransparency",
+    Callback = function(Value)
+        _G.skeltranspa = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Head Dot Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTransparency",
+    Callback = function(Value)
+        _G.hdtranspa = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Look Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracergghgjhvbgvhTransparency",
+    Callback = function(Value)
+        _G.lttranspa = Value
     end,
 })
 
@@ -522,42 +479,55 @@ local Slider7 = Tab:CreateSlider({
     end,
 })
 
-local Slider8 = Tab:CreateSlider({
-    Name = "Name Size",
-    Range = {5, 30},
+local Slider4 = Tab:CreateSlider({
+    Name = "Skeleton Transparency",
+    Range = {0, 1},
     Increment = .05,
     Suffix = "",
-    CurrentValue = 13,
-    Flag = "Names",
+    CurrentValue = 1,
+    Flag = "TracerghjkjhgfghjkkjhhhhhjhjhTransparency",
     Callback = function(Value)
-        _G.TracerThickness = Value
+        _G.skelthick = Value
     end,
 })
 
-local Slider9 = Tab:CreateSlider({
-    Name = "Disatance Size",
+local Slider4 = Tab:CreateSlider({
+    Name = "Head Dot Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTjmgntfbyvngfransparency",
+    Callback = function(Value)
+        _G.hdthick = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Look Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracgfhghjhuherTransparency",
+    Callback = function(Value)
+        _G.ltthick = Value
+    end,
+})
+
+local Slider8 = Tab:CreateSlider({
+    Name = "Text Size",
     Range = {5, 30},
     Increment = .05,
     Suffix = "",
     CurrentValue = 13,
-    Flag = "Distancess",
+    Flag = "Namhhhghes",
     Callback = function(Value)
-        _G.Distancess = Value
+        _G.Textss = Value
     end,
 })
 
 local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Dropdown1 = Tab:CreateDropdown({
-    Name = "Teamcheck Mode",
-    Options = {"colors", "invisible"},
-    CurrentOption = {"colors"},
-    MultipleOptions = false,
-    Flag = "TeamcheckMode",
-    Callback = function(Options)
-        _G.temcheckmode = Options[1]
-    end,
-})
 
 local Dropdown2 = Tab:CreateDropdown({
     Name = "Health Bar Position",
@@ -591,36 +561,5 @@ local Dropdown3 = Tab:CreateDropdown({
         
     end,
 })
-
-local Dropdown4 = Tab:CreateDropdown({
-    Name = "Box Type",
-    Options = {"Box", "Corner Box"},
-    CurrentOption = {"Box"},
-    MultipleOptions = false,
-    Flag = "BoxType",
-    Callback = function(Options)
-        if Options[1] == "Corner Box" then
-            if _G.boxVisible then
-                _G.boxVisible = false
-                _G.boxFilledVisible = false
-                _G.ShowBox = true
-                if _G.boxFilledVisible == true then
-                    _G.boxFilledVisible = false
-                end
-            end
-        elseif Options[1] == "Box" then
-            if _G.ShowBox then
-                _G.ShowBox = false
-                _G.boxVisible = true
-            end
-        end
-    end,
-})
-
-while wait(0) do
-    if _G.boxFilledVisible == true and _G.ShowBox == true then
-        _G.boxFilledVisible = false
-    end
-end
 
 Rayfield:LoadConfiguration()
