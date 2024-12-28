@@ -258,7 +258,7 @@ local function p_added(p)
     end)
 end
 
-ps.PlayerAdded:Connect(p_added)
+
 
 for _, player in pairs(game.Players:GetChildren()) do
     setupPlayerBox(player)
