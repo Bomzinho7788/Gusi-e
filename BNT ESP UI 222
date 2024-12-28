@@ -8,9 +8,6 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
---[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-]]
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
@@ -93,9 +90,7 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
-    if _G.BOXTYPE == "Box" then
-        Box.Visible = _G.boxVisible
-    end
+    Box.Visible = _G.boxVisible
 
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
@@ -159,9 +154,7 @@ local function setupPlayerBox(v)
 
                 Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                if _G.BOXTYPE == "Box" then
-                    Box.Visible = _G.boxVisible
-                end
+                Box.Visible = _G.boxVisible
 
                 BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
