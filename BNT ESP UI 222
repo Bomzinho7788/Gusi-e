@@ -193,97 +193,100 @@ local function draw(player, Character)
 
                 if RootPart_onscreen then
                     if Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-                        local head_2d = camera:WorldToViewportPoint(Character.Head.Position)
-                        local uppertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position + Vector3.new(0, 1, 0))
-                        local lowertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position - Vector3.new(0, 1, 0))
-                        local leftarm_2d = camera:WorldToViewportPoint(Character["Left Arm"].Position)
-                        local rightarm_2d = camera:WorldToViewportPoint(Character["Right Arm"].Position)
-                        local leftleg_2d = camera:WorldToViewportPoint(Character["Left Leg"].Position - Vector3.new(0, 1, 0))
-                        local rightleg_2d = camera:WorldToViewportPoint(Character["Right Leg"].Position - Vector3.new(0, 1, 0))
+                        if Character:FindFirstChild("Head") and Character:FindFirstChild("Torso") and Character:FindFirstChild("Left Arm") and Character:FindFirstChild("Right Arm") and Character:FindFirstChild("Left Leg") and Character:FindFirstChild("Right Leg") then
+                            local head_2d = camera:WorldToViewportPoint(Character.Head.Position)
+                            local uppertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position + Vector3.new(0, 1, 0))
+                            local lowertorso_2d = camera:WorldToViewportPoint(Character.Torso.Position - Vector3.new(0, 1, 0))
+                            local leftarm_2d = camera:WorldToViewportPoint(Character["Left Arm"].Position)
+                            local rightarm_2d = camera:WorldToViewportPoint(Character["Right Arm"].Position)
+                            local leftleg_2d = camera:WorldToViewportPoint(Character["Left Leg"].Position - Vector3.new(0, 1, 0))
+                            local rightleg_2d = camera:WorldToViewportPoint(Character["Right Leg"].Position - Vector3.new(0, 1, 0))
 
-                        skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
-                        skel_head.To = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
+                            skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
+                            skel_head.To = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
 
-                        skel_torso.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
-                        skel_torso.To = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
+                            skel_torso.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
+                            skel_torso.To = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
 
-                        skel_leftarm.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
-                        skel_leftarm.To = Vector2.new(leftarm_2d.X, leftarm_2d.Y)
+                            skel_leftarm.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
+                            skel_leftarm.To = Vector2.new(leftarm_2d.X, leftarm_2d.Y)
 
-                        skel_rightarm.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
-                        skel_rightarm.To = Vector2.new(rightarm_2d.X, rightarm_2d.Y)
+                            skel_rightarm.From = Vector2.new(uppertorso_2d.X, uppertorso_2d.Y)
+                            skel_rightarm.To = Vector2.new(rightarm_2d.X, rightarm_2d.Y)
 
-                        skel_leftleg.From = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
-                        skel_leftleg.To = Vector2.new(leftleg_2d.X, leftleg_2d.Y)
+                            skel_leftleg.From = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
+                            skel_leftleg.To = Vector2.new(leftleg_2d.X, leftleg_2d.Y)
 
-                        skel_rightleg.From = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
-                        skel_rightleg.To = Vector2.new(rightleg_2d.X, rightleg_2d.Y)
+                            skel_rightleg.From = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
+                            skel_rightleg.To = Vector2.new(rightleg_2d.X, rightleg_2d.Y)
+                        end
 
                     elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-                        local head15_2d = camera:WorldToViewportPoint(Character.Head.Position)
-                        local uppertorso15_2d = camera:WorldToViewportPoint(Character.UpperTorso.Position)
-                        local lowertorso15_2d = camera:WorldToViewportPoint(Character.LowerTorso.Position)
+                        if Character:FindFirstChild("Head") and Character:FindFirstChild("UpperTorso") and Character:FindFirstChild("LowerTorso") and Character:FindFirstChild("RightUpperArm") and Character:FindFirstChild("LeftUpperArm") and Character:FindFirstChild("RightLowerArm") and Character:FindFirstChild("LeftLowerArm") and Character:FindFirstChild("RightHand") and Character:FindFirstChild("LeftHand") and Character:FindFirstChild("RightUpperLeg") and Character:FindFirstChild("LeftUpperLeg") and Character:FindFirstChild("RightLowerLeg") and Character:FindFirstChild("LeftLowerLeg") and Character:FindFirstChild("RightFoot") and Character:FindFirstChild("LeftFoot") then
+                            local head15_2d = camera:WorldToViewportPoint(Character.Head.Position)
+                            local uppertorso15_2d = camera:WorldToViewportPoint(Character.UpperTorso.Position)
+                            local lowertorso15_2d = camera:WorldToViewportPoint(Character.LowerTorso.Position)
 
-                        local rightupperarm_2d = camera:WorldToViewportPoint(Character["RightUpperArm"].Position)
-                        local leftupperarm_2d = camera:WorldToViewportPoint(Character["LeftUpperArm"].Position)
+                            local rightupperarm_2d = camera:WorldToViewportPoint(Character["RightUpperArm"].Position)
+                            local leftupperarm_2d = camera:WorldToViewportPoint(Character["LeftUpperArm"].Position)
 
-                        local rightlowerarm_2d = camera:WorldToViewportPoint(Character["RightLowerArm"].Position)
-                        local leftlowerarm_2d = camera:WorldToViewportPoint(Character["LeftLowerArm"].Position)
+                            local rightlowerarm_2d = camera:WorldToViewportPoint(Character["RightLowerArm"].Position)
+                            local leftlowerarm_2d = camera:WorldToViewportPoint(Character["LeftLowerArm"].Position)
 
-                        local righthand_2d = camera:WorldToViewportPoint(Character["RightHand"].Position)
-                        local lefthand_2d = camera:WorldToViewportPoint(Character["LeftHand"].Position)
+                            local righthand_2d = camera:WorldToViewportPoint(Character["RightHand"].Position)
+                            local lefthand_2d = camera:WorldToViewportPoint(Character["LeftHand"].Position)
 
-                        local rightupperleg_2d = camera:WorldToViewportPoint(Character["RightUpperLeg"].Position)
-                        local leftupperleg_2d = camera:WorldToViewportPoint(Character["LeftUpperLeg"].Position)
+                            local rightupperleg_2d = camera:WorldToViewportPoint(Character["RightUpperLeg"].Position)
+                            local leftupperleg_2d = camera:WorldToViewportPoint(Character["LeftUpperLeg"].Position)
 
-                        local rightlowerleg_2d = camera:WorldToViewportPoint(Character["RightLowerLeg"].Position)
-                        local leftlowerleg_2d = camera:WorldToViewportPoint(Character["LeftLowerLeg"].Position)
+                            local rightlowerleg_2d = camera:WorldToViewportPoint(Character["RightLowerLeg"].Position)
+                            local leftlowerleg_2d = camera:WorldToViewportPoint(Character["LeftLowerLeg"].Position)
 
-                        local rightfoot_2d = camera:WorldToViewportPoint(Character["RightFoot"].Position)
-                        local leftfoot_2d = camera:WorldToViewportPoint(Character["LeftFoot"].Position)
+                            local rightfoot_2d = camera:WorldToViewportPoint(Character["RightFoot"].Position)
+                            local leftfoot_2d = camera:WorldToViewportPoint(Character["LeftFoot"].Position)
 
-                        skel_head15.From = Vector2.new(head15_2d.X, head15_2d.Y)
-                        skel_head15.To = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
+                            skel_head15.From = Vector2.new(head15_2d.X, head15_2d.Y)
+                            skel_head15.To = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
 
-                        skel_uppertorso15.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
-                        skel_uppertorso15.To = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
+                            skel_uppertorso15.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
+                            skel_uppertorso15.To = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
 
-                        skel_rightupperarm.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
-                        skel_rightupperarm.To = Vector2.new(rightupperarm_2d.X, rightupperarm_2d.Y)
+                            skel_rightupperarm.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
+                            skel_rightupperarm.To = Vector2.new(rightupperarm_2d.X, rightupperarm_2d.Y)
 
-                        skel_leftupperarm.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
-                        skel_leftupperarm.To = Vector2.new(leftupperarm_2d.X, leftupperarm_2d.Y)
+                            skel_leftupperarm.From = Vector2.new(uppertorso15_2d.X, uppertorso15_2d.Y)
+                            skel_leftupperarm.To = Vector2.new(leftupperarm_2d.X, leftupperarm_2d.Y)
 
-                        skel_rightlowerarm.From = Vector2.new(rightupperarm_2d.X, rightupperarm_2d.Y)
-                        skel_rightlowerarm.To = Vector2.new(rightlowerarm_2d.X, rightlowerarm_2d.Y)
+                            skel_rightlowerarm.From = Vector2.new(rightupperarm_2d.X, rightupperarm_2d.Y)
+                            skel_rightlowerarm.To = Vector2.new(rightlowerarm_2d.X, rightlowerarm_2d.Y)
 
-                        skel_leftlowerarm.From = Vector2.new(leftupperarm_2d.X, leftupperarm_2d.Y)
-                        skel_leftlowerarm.To = Vector2.new(leftlowerarm_2d.X, leftlowerarm_2d.Y)
+                            skel_leftlowerarm.From = Vector2.new(leftupperarm_2d.X, leftupperarm_2d.Y)
+                            skel_leftlowerarm.To = Vector2.new(leftlowerarm_2d.X, leftlowerarm_2d.Y)
 
-                        skel_righthand.From = Vector2.new(rightlowerarm_2d.X, rightlowerarm_2d.Y)
-                        skel_righthand.To = Vector2.new(righthand_2d.X, righthand_2d.Y)
+                            skel_righthand.From = Vector2.new(rightlowerarm_2d.X, rightlowerarm_2d.Y)
+                            skel_righthand.To = Vector2.new(righthand_2d.X, righthand_2d.Y)
 
-                        skel_lefthand.From = Vector2.new(leftlowerarm_2d.X, leftlowerarm_2d.Y)
-                        skel_lefthand.To = Vector2.new(lefthand_2d.X, lefthand_2d.Y)
+                            skel_lefthand.From = Vector2.new(leftlowerarm_2d.X, leftlowerarm_2d.Y)
+                            skel_lefthand.To = Vector2.new(lefthand_2d.X, lefthand_2d.Y)
 
-                        skel_rightupperleg.From = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
-                        skel_rightupperleg.To = Vector2.new(rightupperleg_2d.X, rightupperleg_2d.Y)
+                            skel_rightupperleg.From = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
+                            skel_rightupperleg.To = Vector2.new(rightupperleg_2d.X, rightupperleg_2d.Y)
 
-                        skel_rightlowerleg.From = Vector2.new(rightupperleg_2d.X, rightupperleg_2d.Y)
-                        skel_rightlowerleg.To = Vector2.new(rightlowerleg_2d.X, rightlowerleg_2d.Y)
+                            skel_rightlowerleg.From = Vector2.new(rightupperleg_2d.X, rightupperleg_2d.Y)
+                            skel_rightlowerleg.To = Vector2.new(rightlowerleg_2d.X, rightlowerleg_2d.Y)
 
-                        skel_rightfoot.From = Vector2.new(rightlowerleg_2d.X, rightlowerleg_2d.Y)
-                        skel_rightfoot.To = Vector2.new(rightfoot_2d.X, rightfoot_2d.Y)
+                            skel_rightfoot.From = Vector2.new(rightlowerleg_2d.X, rightlowerleg_2d.Y)
+                            skel_rightfoot.To = Vector2.new(rightfoot_2d.X, rightfoot_2d.Y)
 
-                        skel_leftupperleg.From = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
-                        skel_leftupperleg.To = Vector2.new(leftupperleg_2d.X, leftupperleg_2d.Y)
+                            skel_leftupperleg.From = Vector2.new(lowertorso15_2d.X, lowertorso15_2d.Y)
+                            skel_leftupperleg.To = Vector2.new(leftupperleg_2d.X, leftupperleg_2d.Y)
 
-                        skel_leftlowerleg.From = Vector2.new(leftupperleg_2d.X, leftupperleg_2d.Y)
-                        skel_leftlowerleg.To = Vector2.new(leftlowerleg_2d.X, leftlowerleg_2d.Y)
+                            skel_leftlowerleg.From = Vector2.new(leftupperleg_2d.X, leftupperleg_2d.Y)
+                            skel_leftlowerleg.To = Vector2.new(leftlowerleg_2d.X, leftlowerleg_2d.Y)
 
-                        skel_leftfoot.From = Vector2.new(leftlowerleg_2d.X, leftlowerleg_2d.Y)
-                        skel_leftfoot.To = Vector2.new(leftfoot_2d.X, leftfoot_2d.Y)
-
+                            skel_leftfoot.From = Vector2.new(leftlowerleg_2d.X, leftlowerleg_2d.Y)
+                            skel_leftfoot.To = Vector2.new(leftfoot_2d.X, leftfoot_2d.Y)
+                        end
                     end
 
                     skel_head.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
