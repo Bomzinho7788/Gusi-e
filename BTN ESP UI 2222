@@ -25,9 +25,15 @@ local bones = {
 
 --// Settings
 local ESP_SETTINGS = {
+    BoxOutlineColor = Color3.new(0, 0, 0),
     BoxColor = Color3.new(1, 1, 1),
     BoxThickness = 1.5,
+    BoxTransparency = 1,
     NameColor = Color3.new(1, 1, 1),
+    NameSize = 13,
+    DistaceSize = 13,
+    DistanceColor = Color3.new(1, 1, 1),
+    HealthOutlineColor = Color3.new(0, 0, 0),
     HealthHighColor = Color3.new(0, 1, 0),
     HealthLowColor = Color3.new(1, 0, 0),
     CharSize = Vector2.new(4, 6),
@@ -64,19 +70,19 @@ local function createEsp(player)
         }),
         boxOutline = create("Square", {
             Color = ESP_SETTINGS.BoxOutlineColor,
-            Thickness = 3,
+            Thickness = 1,
             Filled = false
         }),
         box = create("Square", {
             Color = ESP_SETTINGS.BoxColor,
-            Thickness = 1,
+            Thickness = ESP_SETTINGS.BoxThickness,
             Filled = false
         }),
         name = create("Text", {
             Color = ESP_SETTINGS.NameColor,
             Outline = true,
             Center = true,
-            Size = 13
+            Size = ESP_SETTINGS.NameSize
         }),
         healthOutline = create("Line", {
             Thickness = 3,
@@ -86,8 +92,8 @@ local function createEsp(player)
             Thickness = 1
         }),
         distance = create("Text", {
-            Color = Color3.new(1, 1, 1),
-            Size = 12,
+            Color = ESP_SETTINGS.DistanceColor,
+            Size = ESP_SETTINGS.Distance,
             Outline = true,
             Center = true
         }),
@@ -160,17 +166,19 @@ local function updateEsp()
                     if ESP_SETTINGS.ShowBox and ESP_SETTINGS.Enabled then
                         if ESP_SETTINGS.BoxType == "2D" then
                             esp.boxOutline.Size = boxSize
+                            esp.boxOutline.Position = boxPosition
                             esp.box.Size = boxSize
                             esp.box.Position = boxPosition
                             esp.box.Color = ESP_SETTINGS.BoxColor
                             esp.box.Visible = true
+                            esp.boxOutline.Visible = true
                             for _, line in ipairs(esp.boxLines) do
                                 line:Remove()
                             end
                         elseif ESP_SETTINGS.BoxType == "Corner Box Esp" then
                             local lineW = (boxSize.X / 5)
                             local lineH = (boxSize.Y / 6)
-                            local lineT = ESP_SETTINGS.BoxThickness
+                            local lineT = 1
     
                             if #esp.boxLines == 0 then
                                 for i = 1, 8 do
@@ -213,10 +221,42 @@ local function updateEsp()
                             boxLines[8].From = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + boxSize.Y - lineH)
                             boxLines[8].To = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + boxSize.Y + lineT)
     
+                            -- inline
+                            for i = 9, 16 do
+                                boxLines[i].Thickness = 0
+                                boxLines[i].Color = ESP_SETTINGS.BoxOutlineColor
+                                boxLines[i].Transparency = 0
+                            end
+    
+                            boxLines[9].From = Vector2.new(boxPosition.X, boxPosition.Y)
+                            boxLines[9].To = Vector2.new(boxPosition.X, boxPosition.Y + lineH)
+    
+                            boxLines[10].From = Vector2.new(boxPosition.X, boxPosition.Y)
+                            boxLines[10].To = Vector2.new(boxPosition.X + lineW, boxPosition.Y)
+    
+                            boxLines[11].From = Vector2.new(boxPosition.X + boxSize.X - lineW, boxPosition.Y)
+                            boxLines[11].To = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y)
+    
+                            boxLines[12].From = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y)
+                            boxLines[12].To = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y + lineH)
+    
+                            boxLines[13].From = Vector2.new(boxPosition.X, boxPosition.Y + boxSize.Y - lineH)
+                            boxLines[13].To = Vector2.new(boxPosition.X, boxPosition.Y + boxSize.Y)
+    
+                            boxLines[14].From = Vector2.new(boxPosition.X, boxPosition.Y + boxSize.Y)
+                            boxLines[14].To = Vector2.new(boxPosition.X + lineW, boxPosition.Y + boxSize.Y)
+    
+                            boxLines[15].From = Vector2.new(boxPosition.X + boxSize.X - lineW, boxPosition.Y + boxSize.Y)
+                            boxLines[15].To = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y + boxSize.Y)
+    
+                            boxLines[16].From = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y + boxSize.Y - lineH)
+                            boxLines[16].To = Vector2.new(boxPosition.X + boxSize.X, boxPosition.Y + boxSize.Y)
+    
                             for _, line in ipairs(boxLines) do
                                 line.Visible = true
                             end
                             esp.box.Visible = false
+                            esp.boxOutline.Visible = false
                         end
                     else
                         esp.box.Visible = false
@@ -228,12 +268,16 @@ local function updateEsp()
                     end
 
                     if ESP_SETTINGS.ShowHealth and ESP_SETTINGS.Enabled then
+                        esp.healthOutline.Visible = false
                         esp.health.Visible = true
                         local healthPercentage = player.Character.Humanoid.Health / player.Character.Humanoid.MaxHealth
+                        esp.healthOutline.From = Vector2.new(boxPosition.X - 6, boxPosition.Y + boxSize.Y)
+                        esp.healthOutline.To = Vector2.new(esp.healthOutline.From.X, esp.healthOutline.From.Y - boxSize.Y)
                         esp.health.From = Vector2.new((boxPosition.X - 5), boxPosition.Y + boxSize.Y)
                         esp.health.To = Vector2.new(esp.health.From.X, esp.health.From.Y - (player.Character.Humanoid.Health / player.Character.Humanoid.MaxHealth) * boxSize.Y)
                         esp.health.Color = ESP_SETTINGS.HealthLowColor:Lerp(ESP_SETTINGS.HealthHighColor, healthPercentage)
                     else
+                        esp.healthOutline.Visible = false
                         esp.health.Visible = false
                     end
 
