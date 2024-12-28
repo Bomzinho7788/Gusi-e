@@ -1,811 +1,370 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- esp.lua
+--// Variables
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local cache = {}
 
-local lplr = game.Players.LocalPlayer
-local camera = game:GetService("Workspace").CurrentCamera
-local currentCamera = workspace.CurrentCamera
-local worldToViewportPoint = currentCamera.worldToViewportPoint
+local bones = {
+    {"Head", "UpperTorso"},
+    {"UpperTorso", "RightUpperArm"},
+    {"RightUpperArm", "RightLowerArm"},
+    {"RightLowerArm", "RightHand"},
+    {"UpperTorso", "LeftUpperArm"},
+    {"LeftUpperArm", "LeftLowerArm"},
+    {"LeftLowerArm", "LeftHand"},
+    {"UpperTorso", "LowerTorso"},
+    {"LowerTorso", "LeftUpperLeg"},
+    {"LeftUpperLeg", "LeftLowerLeg"},
+    {"LeftLowerLeg", "LeftFoot"},
+    {"LowerTorso", "RightUpperLeg"},
+    {"RightUpperLeg", "RightLowerLeg"},
+    {"RightLowerLeg", "RightFoot"}
+}
 
-local HeadOff = Vector3.new(0, 0.5, 0)
-local LegOff = Vector3.new(0, 3, 0)
+--// Settings
+local ESP_SETTINGS = {
+    BoxColor = Color3.new(1, 1, 1),
+    BoxThickness = 1.5,
+    NameColor = Color3.new(1, 1, 1),
+    HealthHighColor = Color3.new(0, 1, 0),
+    HealthLowColor = Color3.new(1, 0, 0),
+    CharSize = Vector2.new(4, 6),
+    Teamcheck = false,
+    WallCheck = false,
+    Enabled = false,
+    ShowBox = false,
+    BoxType = "2D",
+    ShowName = false,
+    ShowHealth = false,
+    ShowDistance = false,
+    ShowSkeletons = false,
+    ShowTracer = false,
+    TracerColor = Color3.new(1, 1, 1), 
+    TracerThickness = 2,
+    SkeletonsColor = Color3.new(1, 1, 1),
+    TracerPosition = "Bottom",
+}
 
--- Configurações
-_G.temcheck = false
-_G.temcheckmode = "colors" -- opções: "colors", "invisible"
-_G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
-_G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
-
-_G.boxColor = Color3.new(0, 0, 0)
-_G.boxThickness = 1
-_G.boxTransparency = 1
-_G.boxVisible = false
-
--- Configurações BoxFilled
-_G.boxFilledColor = Color3.new(0, 0, 0)
-_G.boxFilledTransparency = 0.5
-_G.boxFilledVisible = false
-
-_G.HealthBarThickness = 1
-_G.HealthBarVisible = false
-_G.HealthBarTransparency = 1
-_G.HealthBarColor = Color3.new(0, 1, 0)
-_G.HealthBarFilled = true
-
-_G.HealthBarPosition = "Left"
-
-_G.TracerVisible = false
-_G.TracerThickness = 1.5
-_G.TracerTransparency = 1
-_G.TracerColor = Color3.new(0, 0, 0)
-
-_G.TracerFrom = "Bottom"
-
-_G.SKVI = false
-_G.SKCOLOR = Color3.new(255, 255, 255)
-_G.SKTHICK = 2
-_G.SKTRANSPA = 1
-
---Skeleton
-do
-    local Player = game:GetService("Players").LocalPlayer
-local Mouse = Player:GetMouse()
-local Camera = game:GetService("Workspace").CurrentCamera
-
-local function DrawLine()
-    local l = Drawing.new("Line")
-    l.Visible = _G.SKVI
-    l.From = Vector2.new(0, 0)
-    l.To = Vector2.new(1, 1)
-    l.Color = _G.SKCOLOR
-    l.Thickness = _G.SKTHICK
-    l.Transparency = _G.SKTRANSPA
-    return l
+local function create(class, properties)
+    local drawing = Drawing.new(class)
+    for property, value in pairs(properties) do
+        drawing[property] = value
+    end
+    return drawing
 end
 
-local function DrawESP(plr)
-    repeat wait() until plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil
-    local limbs = {}
-    local R15 = (plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15) and true or false
-    if R15 then 
-        limbs = {
-            -- Spine
-            Head_UpperTorso = DrawLine(),
-            UpperTorso_LowerTorso = DrawLine(),
-            -- Left Arm
-            UpperTorso_LeftUpperArm = DrawLine(),
-            LeftUpperArm_LeftLowerArm = DrawLine(),
-            LeftLowerArm_LeftHand = DrawLine(),
-            -- Right Arm
-            UpperTorso_RightUpperArm = DrawLine(),
-            RightUpperArm_RightLowerArm = DrawLine(),
-            RightLowerArm_RightHand = DrawLine(),
-            -- Left Leg
-            LowerTorso_LeftUpperLeg = DrawLine(),
-            LeftUpperLeg_LeftLowerLeg = DrawLine(),
-            LeftLowerLeg_LeftFoot = DrawLine(),
-            -- Right Leg
-            LowerTorso_RightUpperLeg = DrawLine(),
-            RightUpperLeg_RightLowerLeg = DrawLine(),
-            RightLowerLeg_RightFoot = DrawLine(),
-        }
-    else 
-        limbs = {
-            Head_Spine = DrawLine(),
-            Spine = DrawLine(),
-            LeftArm = DrawLine(),
-            LeftArm_UpperTorso = DrawLine(),
-            RightArm = DrawLine(),
-            RightArm_UpperTorso = DrawLine(),
-            LeftLeg = DrawLine(),
-            LeftLeg_LowerTorso = DrawLine(),
-            RightLeg = DrawLine(),
-            RightLeg_LowerTorso = DrawLine()
-        }
+local function createEsp(player)
+    local esp = {
+        tracer = create("Line", {
+            Thickness = ESP_SETTINGS.TracerThickness,
+            Color = ESP_SETTINGS.TracerColor,
+            Transparency = 0.5
+        }),
+        boxOutline = create("Square", {
+            Color = ESP_SETTINGS.BoxOutlineColor,
+            Thickness = 3,
+            Filled = false
+        }),
+        box = create("Square", {
+            Color = ESP_SETTINGS.BoxColor,
+            Thickness = 1,
+            Filled = false
+        }),
+        name = create("Text", {
+            Color = ESP_SETTINGS.NameColor,
+            Outline = true,
+            Center = true,
+            Size = 13
+        }),
+        healthOutline = create("Line", {
+            Thickness = 3,
+            Color = ESP_SETTINGS.HealthOutlineColor
+        }),
+        health = create("Line", {
+            Thickness = 1
+        }),
+        distance = create("Text", {
+            Color = Color3.new(1, 1, 1),
+            Size = 12,
+            Outline = true,
+            Center = true
+        }),
+        tracer = create("Line", {
+            Thickness = ESP_SETTINGS.TracerThickness,
+            Color = ESP_SETTINGS.TracerColor,
+            Transparency = 1
+        }),
+        boxLines = {},
+    }
+
+    cache[player] = esp
+    cache[player]["skeletonlines"] = {}
+end
+
+local function isPlayerBehindWall(player)
+    local character = player.Character
+    if not character then
+        return false
     end
-    local function Visibility(state)
-        for i, v in pairs(limbs) do
-            v.Visible = state
-        end
+
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then
+        return false
     end
 
-    local function Colorize(color)
-        for i, v in pairs(limbs) do
-            v.Color = color
-        end
+    local ray = Ray.new(camera.CFrame.Position, (rootPart.Position - camera.CFrame.Position).Unit * (rootPart.Position - camera.CFrame.Position).Magnitude)
+    local hit, position = workspace:FindPartOnRayWithIgnoreList(ray, {localPlayer.Character, character})
+    
+    return hit and hit:IsA("Part")
+end
+
+local function removeEsp(player)
+    local esp = cache[player]
+    if not esp then return end
+
+    for _, drawing in pairs(esp) do
+        drawing:Remove()
     end
 
-    local function UpdaterR15()
-        local connection
-        connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character.Humanoid.Health > 0 then
-                local HUM, vis = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
-                if vis then
-                    -- Head
-                    local H = Camera:WorldToViewportPoint(plr.Character.Head.Position)
-                    if limbs.Head_UpperTorso.From ~= Vector2.new(H.X, H.Y) then
-                        --Spine
-                        local UT = Camera:WorldToViewportPoint(plr.Character.UpperTorso.Position)
-                        local LT = Camera:WorldToViewportPoint(plr.Character.LowerTorso.Position)
-                        -- Left Arm
-                        local LUA = Camera:WorldToViewportPoint(plr.Character.LeftUpperArm.Position)
-                        local LLA = Camera:WorldToViewportPoint(plr.Character.LeftLowerArm.Position)
-                        local LH = Camera:WorldToViewportPoint(plr.Character.LeftHand.Position)
-                        -- Right Arm
-                        local RUA = Camera:WorldToViewportPoint(plr.Character.RightUpperArm.Position)
-                        local RLA = Camera:WorldToViewportPoint(plr.Character.RightLowerArm.Position)
-                        local RH = Camera:WorldToViewportPoint(plr.Character.RightHand.Position)
-                        -- Left leg
-                        local LUL = Camera:WorldToViewportPoint(plr.Character.LeftUpperLeg.Position)
-                        local LLL = Camera:WorldToViewportPoint(plr.Character.LeftLowerLeg.Position)
-                        local LF = Camera:WorldToViewportPoint(plr.Character.LeftFoot.Position)
-                        -- Right leg
-                        local RUL = Camera:WorldToViewportPoint(plr.Character.RightUpperLeg.Position)
-                        local RLL = Camera:WorldToViewportPoint(plr.Character.RightLowerLeg.Position)
-                        local RF = Camera:WorldToViewportPoint(plr.Character.RightFoot.Position)
+    cache[player] = nil
+end
 
-                        --Head
-                        limbs.Head_UpperTorso.From = Vector2.new(H.X, H.Y)
-                        limbs.Head_UpperTorso.To = Vector2.new(UT.X, UT.Y)
+local function updateEsp()
+    for player, esp in pairs(cache) do
+        local character, team = player.Character, player.Team
+        if character and (not ESP_SETTINGS.Teamcheck or (team and team ~= localPlayer.Team)) then
+            local rootPart = character:FindFirstChild("HumanoidRootPart")
+            local head = character:FindFirstChild("Head")
+            local humanoid = character:FindFirstChild("Humanoid")
+            local isBehindWall = ESP_SETTINGS.WallCheck and isPlayerBehindWall(player)
+            local shouldShow = not isBehindWall and ESP_SETTINGS.Enabled
+            if rootPart and head and humanoid and shouldShow then
+                local position, onScreen = camera:WorldToViewportPoint(rootPart.Position)
+                if onScreen then
+                    local hrp2D = camera:WorldToViewportPoint(rootPart.Position)
+                    local charSize = (camera:WorldToViewportPoint(rootPart.Position - Vector3.new(0, 3, 0)).Y - camera:WorldToViewportPoint(rootPart.Position + Vector3.new(0, 2.6, 0)).Y) / 2
+                    local boxSize = Vector2.new(math.floor(charSize * 1.8), math.floor(charSize * 1.9))
+                    local boxPosition = Vector2.new(math.floor(hrp2D.X - charSize * 1.8 / 2), math.floor(hrp2D.Y - charSize * 1.6 / 2))
 
-                        --Spine
-                        limbs.UpperTorso_LowerTorso.From = Vector2.new(UT.X, UT.Y)
-                        limbs.UpperTorso_LowerTorso.To = Vector2.new(LT.X, LT.Y)
-
-                        -- Left Arm
-                        limbs.UpperTorso_LeftUpperArm.From = Vector2.new(UT.X, UT.Y)
-                        limbs.UpperTorso_LeftUpperArm.To = Vector2.new(LUA.X, LUA.Y)
-
-                        limbs.LeftUpperArm_LeftLowerArm.From = Vector2.new(LUA.X, LUA.Y)
-                        limbs.LeftUpperArm_LeftLowerArm.To = Vector2.new(LLA.X, LLA.Y)
-
-                        limbs.LeftLowerArm_LeftHand.From = Vector2.new(LLA.X, LLA.Y)
-                        limbs.LeftLowerArm_LeftHand.To = Vector2.new(LH.X, LH.Y)
-
-                        -- Right Arm
-                        limbs.UpperTorso_RightUpperArm.From = Vector2.new(UT.X, UT.Y)
-                        limbs.UpperTorso_RightUpperArm.To = Vector2.new(RUA.X, RUA.Y)
-
-                        limbs.RightUpperArm_RightLowerArm.From = Vector2.new(RUA.X, RUA.Y)
-                        limbs.RightUpperArm_RightLowerArm.To = Vector2.new(RLA.X, RLA.Y)
-
-                        limbs.RightLowerArm_RightHand.From = Vector2.new(RLA.X, RLA.Y)
-                        limbs.RightLowerArm_RightHand.To = Vector2.new(RH.X, RH.Y)
-
-                        -- Left Leg
-                        limbs.LowerTorso_LeftUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                        limbs.LowerTorso_LeftUpperLeg.To = Vector2.new(LUL.X, LUL.Y)
-
-                        limbs.LeftUpperLeg_LeftLowerLeg.From = Vector2.new(LUL.X, LUL.Y)
-                        limbs.LeftUpperLeg_LeftLowerLeg.To = Vector2.new(LLL.X, LLL.Y)
-
-                        limbs.LeftLowerLeg_LeftFoot.From = Vector2.new(LLL.X, LLL.Y)
-                        limbs.LeftLowerLeg_LeftFoot.To = Vector2.new(LF.X, LF.Y)
-
-                        -- Right Leg
-                        limbs.LowerTorso_RightUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                        limbs.LowerTorso_RightUpperLeg.To = Vector2.new(RUL.X, RUL.Y)
-
-                        limbs.RightUpperLeg_RightLowerLeg.From = Vector2.new(RUL.X, RUL.Y)
-                        limbs.RightUpperLeg_RightLowerLeg.To = Vector2.new(RLL.X, RLL.Y)
-
-                        limbs.RightLowerLeg_RightFoot.From = Vector2.new(RLL.X, RLL.Y)
-                        limbs.RightLowerLeg_RightFoot.To = Vector2.new(RF.X, RF.Y)
+                    if ESP_SETTINGS.ShowName and ESP_SETTINGS.Enabled then
+                        esp.name.Visible = true
+                        esp.name.Text = string.lower(player.Name)
+                        esp.name.Position = Vector2.new(boxSize.X / 2 + boxPosition.X, boxPosition.Y - 16)
+                        esp.name.Color = ESP_SETTINGS.NameColor
+                    else
+                        esp.name.Visible = false
                     end
 
-                    if limbs.Head_UpperTorso.Visible ~= true then
-                        Visibility(true)
-                    end
-                else 
-                    if limbs.Head_UpperTorso.Visible ~= false then
-                        Visibility(false)
-                    end
-                end
-            else 
-                if limbs.Head_UpperTorso.Visible ~= false then
-                    Visibility(false)
-                end
-                if game.Players:FindFirstChild(plr.Name) == nil then 
-                    for i, v in pairs(limbs) do
-                        v:Remove()
-                    end
-                    connection:Disconnect()
-                end
-            end
-        end)
-    end
-
-    local function UpdaterR6()
-        local connection
-        connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character.Humanoid.Health > 0 then
-                local HUM, vis = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
-                if vis then
-                    local H = Camera:WorldToViewportPoint(plr.Character.Head.Position)
-                    if limbs.Head_Spine.From ~= Vector2.new(H.X, H.Y) then
-                        local T_Height = plr.Character.Torso.Size.Y/2 - 0.2
-                        local UT = Camera:WorldToViewportPoint((plr.Character.Torso.CFrame * CFrame.new(0, T_Height, 0)).p)
-                        local LT = Camera:WorldToViewportPoint((plr.Character.Torso.CFrame * CFrame.new(0, -T_Height, 0)).p)
-
-                        local LA_Height = plr.Character["Left Arm"].Size.Y/2 - 0.2
-                        local LUA = Camera:WorldToViewportPoint((plr.Character["Left Arm"].CFrame * CFrame.new(0, LA_Height, 0)).p)
-                        local LLA = Camera:WorldToViewportPoint((plr.Character["Left Arm"].CFrame * CFrame.new(0, -LA_Height, 0)).p)
-
-                        local RA_Height = plr.Character["Right Arm"].Size.Y/2 - 0.2
-                        local RUA = Camera:WorldToViewportPoint((plr.Character["Right Arm"].CFrame * CFrame.new(0, RA_Height, 0)).p)
-                        local RLA = Camera:WorldToViewportPoint((plr.Character["Right Arm"].CFrame * CFrame.new(0, -RA_Height, 0)).p)
-
-                        local LL_Height = plr.Character["Left Leg"].Size.Y/2 - 0.2
-                        local LUL = Camera:WorldToViewportPoint((plr.Character["Left Leg"].CFrame * CFrame.new(0, LL_Height, 0)).p)
-                        local LLL = Camera:WorldToViewportPoint((plr.Character["Left Leg"].CFrame * CFrame.new(0, -LL_Height, 0)).p)
-
-                        local RL_Height = plr.Character["Right Leg"].Size.Y/2 - 0.2
-                        local RUL = Camera:WorldToViewportPoint((plr.Character["Right Leg"].CFrame * CFrame.new(0, RL_Height, 0)).p)
-                        local RLL = Camera:WorldToViewportPoint((plr.Character["Right Leg"].CFrame * CFrame.new(0, -RL_Height, 0)).p)
-
-                        -- Head
-                        limbs.Head_Spine.From = Vector2.new(H.X, H.Y)
-                        limbs.Head_Spine.To = Vector2.new(UT.X, UT.Y)
-
-                        --Spine
-                        limbs.Spine.From = Vector2.new(UT.X, UT.Y)
-                        limbs.Spine.To = Vector2.new(LT.X, LT.Y)
-
-                        --Left Arm
-                        limbs.LeftArm.From = Vector2.new(LUA.X, LUA.Y)
-                        limbs.LeftArm.To = Vector2.new(LLA.X, LLA.Y)
-
-                        limbs.LeftArm_UpperTorso.From = Vector2.new(UT.X, UT.Y)
-                        limbs.LeftArm_UpperTorso.To = Vector2.new(LUA.X, LUA.Y)
-
-                        --Right Arm
-                        limbs.RightArm.From = Vector2.new(RUA.X, RUA.Y)
-                        limbs.RightArm.To = Vector2.new(RLA.X, RLA.Y)
-
-                        limbs.RightArm_UpperTorso.From = Vector2.new(UT.X, UT.Y)
-                        limbs.RightArm_UpperTorso.To = Vector2.new(RUA.X, RUA.Y)
-
-                        --Left Leg
-                        limbs.LeftLeg.From = Vector2.new(LUL.X, LUL.Y)
-                        limbs.LeftLeg.To = Vector2.new(LLL.X, LLL.Y)
-
-                        limbs.LeftLeg_LowerTorso.From = Vector2.new(LT.X, LT.Y)
-                        limbs.LeftLeg_LowerTorso.To = Vector2.new(LUL.X, LUL.Y)
-
-                        --Right Leg
-                        limbs.RightLeg.From = Vector2.new(RUL.X, RUL.Y)
-                        limbs.RightLeg.To = Vector2.new(RLL.X, RLL.Y)
-
-                        limbs.RightLeg_LowerTorso.From = Vector2.new(LT.X, LT.Y)
-                        limbs.RightLeg_LowerTorso.To = Vector2.new(RUL.X, RUL.Y)
-                    end
-
-                    if limbs.Head_Spine.Visible ~= true then
-                        Visibility(true)
-                    end
-                else 
-                    if limbs.Head_Spine.Visible ~= false then
-                        Visibility(false)
-                    end
-                end
-            else 
-                if limbs.Head_Spine.Visible ~= false then
-                    Visibility(false)
-                end
-                if game.Players:FindFirstChild(plr.Name) == nil then 
-                    for i, v in pairs(limbs) do
-                        v:Remove()
-                    end
-                    connection:Disconnect()
-                end
-            end
-        end)
-    end
-
-    if R15 then
-        coroutine.wrap(UpdaterR15)()
-    else 
-        coroutine.wrap(UpdaterR6)()
-    end
-end
-
-for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-    if v.Name ~= Player.Name then
-        DrawESP(v)
-    end
-end
-
-game.Players.PlayerAdded:Connect(function(newplr)
-    if newplr.Name ~= Player.Name then
-        DrawESP(newplr)
-    end
-end)
-end
-
--- Função para definir a posição do tracer com base na seleção do dropdown
-local function getTracerFromPosition()
-    if _G.TracerFrom == "Bottom" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
-    elseif _G.TracerFrom == "Middle" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    elseif _G.TracerFrom == "Top" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 4)
-    end
-end
-
--- Definir Box, BoxOutline e BoxFilled no início
-local function createDrawingObjects()
-    local Box = Drawing.new("Square")
-    Box.Visible = _G.boxVisible
-    Box.Color = _G.boxColor
-    Box.Thickness = _G.boxThickness
-    Box.Transparency = _G.boxTransparency
-    Box.Filled = false
-
-    local BoxFilled = Drawing.new("Square")
-    BoxFilled.Visible = _G.boxFilledVisible
-    BoxFilled.Color = _G.boxFilledColor
-    BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Filled = true
-
-    local HealthBar = Drawing.new("Square")
-    HealthBar.Thickness = _G.HealthBarThickness
-    HealthBar.Visible = _G.HealthBarVisible
-    HealthBar.Transparency = _G.HealthBarTransparency
-    HealthBar.Color = _G.HealthBarColor
-    HealthBar.Filled = _G.HealthBarFilled
-
-    local Tracer = Drawing.new("Line")
-    Tracer.Visible = _G.TracerVisible
-    Tracer.Thickness = _G.TracerThickness
-    Tracer.Transparency = _G.TracerTransparency
-    Tracer.Color = _G.TracerColor
-
-    return Box, BoxFilled, HealthBar, Tracer
-end
-
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
-    Box.Color = _G.boxColor
-    Box.Thickness = _G.boxThickness
-    Box.Transparency = _G.boxTransparency
-    Box.Visible = _G.boxVisible
-
-    BoxFilled.Color = _G.boxFilledColor
-    BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Visible = _G.boxFilledVisible
-
-    HealthBar.Thickness = _G.HealthBarThickness
-    HealthBar.Visible = _G.HealthBarVisible
-    HealthBar.Transparency = _G.HealthBarTransparency
-    HealthBar.Color = _G.HealthBarColor
-    HealthBar.Filled = _G.HealthBarFilled
-
-    Tracer.Visible = _G.TracerVisible
-    Tracer.Thickness = _G.TracerThickness
-    Tracer.Transparency = _G.TracerTransparency
-    Tracer.Color = _G.TracerColor
-end
-
-local function getHealthValues(player)
-    local maxHealth, health
-    if player:FindFirstChild("NRPBS") then
-        maxHealth = player.NRPBS["MaxHealth"].Value
-        health = player.NRPBS["Health"].Value
-    else
-        maxHealth = player.Character.Humanoid.MaxHealth
-        health = player.Character.Humanoid.Health
-    end
-    return maxHealth, health
-end
-
-local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
-    local offset = isOutline and 6 or 4
-    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
-
-    if _G.HealthBarPosition == "Left" then
-        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
-    elseif _G.HealthBarPosition == "Right" then
-        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
-    end
-
-    HealthBar.Size = Vector2.new(2, healthBarSize)
-end
-
-local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
-
-    game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
-
-        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
-            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-
-            local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
-            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
-
-            if onScreen then
-                local maxHealth, health = getHealthValues(v)
-
-                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                Box.Visible = _G.boxVisible
-
-                BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                BoxFilled.Visible = _G.boxFilledVisible
-
-                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
-                updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
-                HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
-                HealthBar.Visible = _G.HealthBarVisible
-
-                -- Atualizando a posição do Tracer
-                Tracer.From = getTracerFromPosition()
-                Tracer.To = Vector2.new(Vector.X, Vector.Y)
-
-                if _G.teamcheck == true then
-                    if _G.temcheckmode == "colors" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Color = _G.teamcolor
-                            BoxFilled.Color = _G.teamcolor
-                            Tracer.Color = _G.teamcolor
-                            _G.SKCOLOR = _G.teamcolor
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                            Tracer.Color = _G.enemycolor
-                            _G.SKCOLOR = _G.enemycolor
+                    if ESP_SETTINGS.ShowBox and ESP_SETTINGS.Enabled then
+                        if ESP_SETTINGS.BoxType == "2D" then
+                            esp.boxOutline.Size = boxSize
+                            esp.box.Size = boxSize
+                            esp.box.Position = boxPosition
+                            esp.box.Color = ESP_SETTINGS.BoxColor
+                            esp.box.Visible = true
+                            for _, line in ipairs(esp.boxLines) do
+                                line:Remove()
+                            end
+                        elseif ESP_SETTINGS.BoxType == "Corner Box Esp" then
+                            local lineW = (boxSize.X / 5)
+                            local lineH = (boxSize.Y / 6)
+                            local lineT = ESP_SETTINGS.BoxThickness
+    
+                            if #esp.boxLines == 0 then
+                                for i = 1, 8 do
+                                    local boxLine = create("Line", {
+                                        Thickness = ESP_SETTINGS.BoxThickness,
+                                        Color = ESP_SETTINGS.BoxColor,
+                                        Transparency = ESP_SETTINGS.BoxTransparency
+                                    })
+                                    esp.boxLines[#esp.boxLines + 1] = boxLine
+                                end
+                            end
+    
+                            local boxLines = esp.boxLines
+    
+                            -- top left
+                            boxLines[1].From = Vector2.new(boxPosition.X - lineT, boxPosition.Y - lineT)
+                            boxLines[1].To = Vector2.new(boxPosition.X + lineW, boxPosition.Y - lineT)
+    
+                            boxLines[2].From = Vector2.new(boxPosition.X - lineT, boxPosition.Y - lineT)
+                            boxLines[2].To = Vector2.new(boxPosition.X - lineT, boxPosition.Y + lineH)
+    
+                            -- top right
+                            boxLines[3].From = Vector2.new(boxPosition.X + boxSize.X - lineW, boxPosition.Y - lineT)
+                            boxLines[3].To = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y - lineT)
+    
+                            boxLines[4].From = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y - lineT)
+                            boxLines[4].To = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + lineH)
+    
+                            -- bottom left
+                            boxLines[5].From = Vector2.new(boxPosition.X - lineT, boxPosition.Y + boxSize.Y - lineH)
+                            boxLines[5].To = Vector2.new(boxPosition.X - lineT, boxPosition.Y + boxSize.Y + lineT)
+    
+                            boxLines[6].From = Vector2.new(boxPosition.X - lineT, boxPosition.Y + boxSize.Y + lineT)
+                            boxLines[6].To = Vector2.new(boxPosition.X + lineW, boxPosition.Y + boxSize.Y + lineT)
+    
+                            -- bottom right
+                            boxLines[7].From = Vector2.new(boxPosition.X + boxSize.X - lineW, boxPosition.Y + boxSize.Y + lineT)
+                            boxLines[7].To = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + boxSize.Y + lineT)
+    
+                            boxLines[8].From = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + boxSize.Y - lineH)
+                            boxLines[8].To = Vector2.new(boxPosition.X + boxSize.X + lineT, boxPosition.Y + boxSize.Y + lineT)
+    
+                            for _, line in ipairs(boxLines) do
+                                line.Visible = true
+                            end
+                            esp.box.Visible = false
                         end
-                    elseif _G.temcheckmode == "invisible" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Visible = false
-                            BoxFilled.Visible = false
-                            HealthBar.Visible = false
-                            Tracer.Visible = false
-                            _G.SKVI = false
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                            Tracer.Color = _G.enemycolor
-                            _G.vtcolor = _G.enemycolor
-                            _G.SKCOLOR = _G.enemycolor
+                    else
+                        esp.box.Visible = false
+                        esp.boxOutline.Visible = false
+                        for _, line in ipairs(esp.boxLines) do
+                            line:Remove()
                         end
+                        esp.boxLines = {}
                     end
+
+                    if ESP_SETTINGS.ShowHealth and ESP_SETTINGS.Enabled then
+                        esp.health.Visible = true
+                        local healthPercentage = player.Character.Humanoid.Health / player.Character.Humanoid.MaxHealth
+                        esp.health.From = Vector2.new((boxPosition.X - 5), boxPosition.Y + boxSize.Y)
+                        esp.health.To = Vector2.new(esp.health.From.X, esp.health.From.Y - (player.Character.Humanoid.Health / player.Character.Humanoid.MaxHealth) * boxSize.Y)
+                        esp.health.Color = ESP_SETTINGS.HealthLowColor:Lerp(ESP_SETTINGS.HealthHighColor, healthPercentage)
+                    else
+                        esp.health.Visible = false
+                    end
+
+                    if ESP_SETTINGS.ShowDistance and ESP_SETTINGS.Enabled then
+                        local distance = (camera.CFrame.p - rootPart.Position).Magnitude
+                        esp.distance.Text = string.format("%.1f studs", distance)
+                        esp.distance.Position = Vector2.new(boxPosition.X + boxSize.X / 2, boxPosition.Y + boxSize.Y + 5)
+                        esp.distance.Visible = true
+                    else
+                        esp.distance.Visible = false
+                    end
+
+                    if ESP_SETTINGS.ShowSkeletons and ESP_SETTINGS.Enabled then
+                        if #esp["skeletonlines"] == 0 then
+                            for _, bonePair in ipairs(bones) do
+                                local parentBone, childBone = bonePair[1], bonePair[2]
+                                
+                                if player.Character and player.Character[parentBone] and player.Character[childBone] then
+                                    local skeletonLine = create("Line", {
+                                        Thickness = 1,
+                                        Color = ESP_SETTINGS.SkeletonsColor,
+                                        Transparency = 1
+                                    })
+                                    esp["skeletonlines"][#esp["skeletonlines"] + 1] = {skeletonLine, parentBone, childBone}
+                                end
+                            end
+                        end
+                    
+                        for _, lineData in ipairs(esp["skeletonlines"]) do
+                            local skeletonLine = lineData[1]
+                            local parentBone, childBone = lineData[2], lineData[3]
+                    
+                            if player.Character and player.Character[parentBone] and player.Character[childBone] then
+                                local parentPosition = camera:WorldToViewportPoint(player.Character[parentBone].Position)
+                                local childPosition = camera:WorldToViewportPoint(player.Character[childBone].Position)
+                    
+                                skeletonLine.From = Vector2.new(parentPosition.X, parentPosition.Y)
+                                skeletonLine.To = Vector2.new(childPosition.X, childPosition.Y)
+                                skeletonLine.Color = ESP_SETTINGS.SkeletonsColor
+                                skeletonLine.Visible = true
+                            else
+                                skeletonLine:Remove()
+                            end
+                        end
+                    else
+                        for _, lineData in ipairs(esp["skeletonlines"]) do
+                            local skeletonLine = lineData[1]
+                            skeletonLine:Remove()
+                        end
+                        esp["skeletonlines"] = {}
+                    end                    
+
+                    if ESP_SETTINGS.ShowTracer and ESP_SETTINGS.Enabled then
+                        local tracerY
+                        if ESP_SETTINGS.TracerPosition == "Top" then
+                            tracerY = 0
+                        elseif ESP_SETTINGS.TracerPosition == "Middle" then
+                            tracerY = camera.ViewportSize.Y / 2
+                        else
+                            tracerY = camera.ViewportSize.Y
+                        end
+                        if ESP_SETTINGS.Teamcheck and player.TeamColor == localPlayer.TeamColor then
+                            esp.tracer.Visible = false
+                        else
+                            esp.tracer.Visible = true
+                            esp.tracer.From = Vector2.new(camera.ViewportSize.X / 2, tracerY)
+                            esp.tracer.To = Vector2.new(hrp2D.X, hrp2D.Y)            
+                        end
+                    else
+                        esp.tracer.Visible = false
+                    end
+                else
+                    for _, drawing in pairs(esp) do
+                        drawing.Visible = false
+                    end
+                    for _, lineData in ipairs(esp["skeletonlines"]) do
+                        local skeletonLine = lineData[1]
+                        skeletonLine:Remove()
+                    end
+                    esp["skeletonlines"] = {}
+                    for _, line in ipairs(esp.boxLines) do
+                        line:Remove()
+                    end
+                    esp.boxLines = {}
                 end
             else
-                Box.Visible = false
-                BoxFilled.Visible = false
-                HealthBar.Visible = false
-                Tracer.Visible = false
-                Box.Color = _G.boxColor
-                BoxFilled.Color = _G.boxFilledColor
-                Tracer.Color = _G.TracerColor
-                _G.SKVI = false
-                _G.SKCOLOR = _G.SKCOLOR
+                for _, drawing in pairs(esp) do
+                    drawing.Visible = false
+                end
+                for _, lineData in ipairs(esp["skeletonlines"]) do
+                    local skeletonLine = lineData[1]
+                    skeletonLine:Remove()
+                end
+                esp["skeletonlines"] = {}
+                for _, line in ipairs(esp.boxLines) do
+                    line:Remove()
+                end
+                esp.boxLines = {}
             end
         else
-            Box.Visible = false
-            BoxFilled.Visible = false
-            HealthBar.Visible = false
-            Tracer.Visible = false
-            _G.SKVI = false
+            for _, drawing in pairs(esp) do
+                drawing.Visible = false
+            end
+            for _, lineData in ipairs(esp["skeletonlines"]) do
+                local skeletonLine = lineData[1]
+                skeletonLine:Remove()
+            end
+            esp["skeletonlines"] = {}
+            for _, line in ipairs(esp.boxLines) do
+                line:Remove()
+            end
+            esp.boxLines = {}
         end
-    end)
+    end
 end
 
-for _, player in pairs(game.Players:GetChildren()) do
-    setupPlayerBox(player)
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= localPlayer then
+        createEsp(player)
+    end
 end
 
-game.Players.PlayerAdded:Connect(function(player)
-    setupPlayerBox(player)
+Players.PlayerAdded:Connect(function(player)
+    if player ~= localPlayer then
+        createEsp(player)
+    end
 end)
 
-local Window = Rayfield:CreateWindow({
-    Name = "BNT ESP",
-    Icon = 0,
-    LoadingTitle = "By Bomzinho",
-    LoadingSubtitle = "Loading....",
-    Theme = "Amethyst",
+Players.PlayerRemoving:Connect(function(player)
+    removeEsp(player)
+end)
 
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false,
-
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil,
-        FileName = "ESPP"
-    },
-
-    Discord = {
-        Enabled = false,
-        Invite = "",
-        RememberJoins = true
-    },
-
-    KeySystem = true,
-    KeySettings = {
-        Title = "BNT ESP",
-        Subtitle = "Key System",
-        Note = "No method of obtaining the key is provided",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = {"4321", "1234"}
-    }
-})
-
-local Tab1 = Window:CreateTab("Aimbot", 4483362458)
-
-local Tab = Window:CreateTab("ESP", 4483362458)
-
-local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Toggle = Tab:CreateToggle({
-    Name = "Show Box",
-    CurrentValue = false,
-    Flag = "Show Box",
-    Callback = function(Value)
-        _G.boxVisible = Value
-    end,
-})
-
-local Toggle2 = Tab:CreateToggle({
-    Name = "Box Filled",
-    CurrentValue = false,
-    Flag = "BoxFilled",
-    Callback = function(Value)
-        _G.boxFilledVisible = Value
-    end,
-})
-
-local Toggle3 = Tab:CreateToggle({
-    Name = "Show Health Bar",
-    CurrentValue = false,
-    Flag = "healthbarouf",
-    Callback = function(Value)
-        _G.HealthBarVisible = Value
-    end,
-})
-
-local Toggle4 = Tab:CreateToggle({
-    Name = "Health Bar Filled",
-    CurrentValue = false,
-    Flag = "healthbarouff",
-    Callback = function(Value)
-        _G.HealthBarFilled = Value
-    end,
-})
-
-local Toggle7 = Tab:CreateToggle({
-    Name = "Show Tracer",
-    CurrentValue = false,
-    Flag = "TracerVisible",
-    Callback = function(Value)
-        _G.TracerVisible = Value
-    end,
-})
-
-local ToggleSKVI = Tab:CreateToggle({
-    Name = "Show Skeletons",
-    CurrentValue = _G.SKVI,
-    Flag = "SKVI",
-    Callback = function(Value)
-        _G.SKVI = Value
-    end,
-})
-
-local Toggle5 = Tab:CreateToggle({
-    Name = "Teamcheck",
-    CurrentValue = false,
-    Flag = "teamcheck",
-    Callback = function(Value)
-        _G.teamcheck = Value
-    end,
-})
-
-local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local ColorPicker1 = Tab:CreateColorPicker({
-    Name = "Team Color",
-    Color = Color3.fromRGB(0, 255, 0),
-    Flag = "teamcolor",
-    Callback = function(Value)
-        _G.teamcolor = Value
-    end
-})
-
-local ColorPicker2 = Tab:CreateColorPicker({
-    Name = "Enemy Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "enemycolor",
-    Callback = function(Value)
-        _G.enemycolor = Value
-    end
-})
-
-local ColorPicker3 = Tab:CreateColorPicker({
-    Name = "Box Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxColor",
-    Callback = function(Value)
-        _G.boxColor = Value
-    end
-})
-
-local ColorPicker4 = Tab:CreateColorPicker({
-    Name = "Box Filled Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxFilledColor",
-    Callback = function(Value)
-        _G.boxFilledColor = Value
-    end
-})
-
-local ColorPicker5 = Tab:CreateColorPicker({
-    Name = "Tracer Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "TracerColor",
-    Callback = function(Value)
-        _G.TracerColor = Value
-    end
-})
-
-local ColorPickerSKCOLOR = Tab:CreateColorPicker({
-    Name = "Skeleton Color",
-    Color = _G.SKCOLOR,
-    Flag = "SKCOLOR",
-    Callback = function(Value)
-        _G.SKCOLOR = Value
-    end
-})
-
-local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Slider1 = Tab:CreateSlider({
-    Name = "Box Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxTransparency",
-    Callback = function(Value)
-        _G.boxTransparency = Value
-    end,
-})
-
-local Slider2 = Tab:CreateSlider({
-    Name = "Box Filled Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxFilledTransparency",
-    Callback = function(Value)
-        _G.boxFilledTransparency = Value
-    end,
-})
-
-local Slider3 = Tab:CreateSlider({
-    Name = "Health Bar Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarTransparency",
-    Callback = function(Value)
-        _G.HealthBarTransparency = Value
-    end,
-})
-
-local Slider4 = Tab:CreateSlider({
-    Name = "Tracer Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "TracerTransparency",
-    Callback = function(Value)
-        _G.TracerTransparency = Value
-    end,
-})
-
-local SliderSKTRANSPA = Tab:CreateSlider({
-    Name = "Skeleton Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = _G.SKTRANSPA,
-    Flag = "SKTRANSPA",
-    Callback = function(Value)
-        _G.SKTRANSPA = Value
-    end,
-})
-
-local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Slider5 = Tab:CreateSlider({
-    Name = "Box Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxThickness",
-    Callback = function(Value)
-        _G.boxThickness = Value
-    end,
-})
-
-local Slider6 = Tab:CreateSlider({
-    Name = "Health Bar Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarThickness",
-    Callback = function(Value)
-        _G.HealthBarThickness = Value
-    end,
-})
-
-local Slider7 = Tab:CreateSlider({
-    Name = "Tracer Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "TracerThickness",
-    Callback = function(Value)
-        _G.TracerThickness = Value
-    end,
-})
-
-local SliderSKTHICK = Tab:CreateSlider({
-    Name = "Skeleton Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = _G.SKTHICK,
-    Flag = "SKTHICK",
-    Callback = function(Value)
-        _G.SKTHICK = Value
-    end,
-})
-
-local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Dropdown1 = Tab:CreateDropdown({
-    Name = "Teamcheck Mode",
-    Options = {"colors", "invisible"},
-    CurrentOption = {"colors"},
-    MultipleOptions = false,
-    Flag = "TeamcheckMode",
-    Callback = function(Options)
-        _G.temcheckmode = Options[1]
-    end,
-})
-
-local Dropdown2 = Tab:CreateDropdown({
-    Name = "Health Bar Position",
-    Options = {"Left", "Right"},
-    CurrentOption = {"Left"},
-    MultipleOptions = false,
-    Flag = "HealthBarPosition",
-    Callback = function(Options)
-        _G.HealthBarPosition = Options[1]
-    end,
-})
-
-local Dropdown3 = Tab:CreateDropdown({
-    Name = "Tracer From",
-    Options = {"Bottom", "Middle", "Top"},
-    CurrentOption = {"Bottom"},
-    MultipleOptions = false,
-    Flag = "TracerFrom",
-    Callback = function(Options)
-        _G.TracerFrom = Options[1]
-    end,
-})
-
-Rayfield:LoadConfiguration()
+RunService.RenderStepped:Connect(updateEsp)
+return ESP_SETTINGS
