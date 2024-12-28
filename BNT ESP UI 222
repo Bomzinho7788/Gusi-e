@@ -8,6 +8,9 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
@@ -49,6 +52,8 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
+_G.BOXTYPE = "Box"
+
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -61,11 +66,13 @@ end
 
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
-    Box.Visible = _G.boxVisible
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
     Box.Filled = false
+    if _G.BOXTYPE == "Box" then
+        Box.Visible = _G.boxVisible
+    end
 
     local BoxFilled = Drawing.new("Square")
     BoxFilled.Visible = _G.boxFilledVisible
@@ -93,7 +100,9 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
-    Box.Visible = _G.boxVisible
+    if _G.BOXTYPE == "Box" then
+        Box.Visible = _G.boxVisible
+    end
 
     BoxFilled.Color = _G.boxFilledColor
     BoxFilled.Transparency = _G.boxFilledTransparency
@@ -157,7 +166,9 @@ local function setupPlayerBox(v)
 
                 Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                Box.Visible = _G.boxVisible
+                if _G.BOXTYPE == "Box" then
+                    Box.Visible = _G.boxVisible
+                end
 
                 BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
@@ -275,10 +286,25 @@ local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0,
 
 local Toggle = Tab:CreateToggle({
     Name = "Show Box",
-    CurrentValue = false,
+    CurrentValue = _G.boxVisible,
     Flag = "Show Box",
     Callback = function(Value)
-        _G.boxVisible = Value
+        if _G.BOXTYPE == "Corner Box" and ESP.ShowBox == false then
+            ESP.ShowBox = false
+            _G.boxVisible = true
+        end
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+    Name = "Show Corner Box",
+    CurrentValue = ESP.ShowBox,
+    Flag = "Show c Box",
+    Callback = function(Value)
+        if _G.BOXTYPE == "Corner Box" and _G.boxVisible == false then
+            ESP.ShowBox = true
+            _G.boxVisible = false
+        end
     end,
 })
 
@@ -522,28 +548,8 @@ local Dropdown4 = Tab:CreateDropdown({
     MultipleOptions = false,
     Flag = "BoxType",
     Callback = function(Options)
-        if Options[1] == "Corner Box" then
-            if _G.boxVisible == true then
-                _G.boxVisible = false
-                _G.boxFilledVisible = false
-                ESP.ShowBox = true
-                if _G.boxFilledVisible == true then
-                    _G.boxFilledVisible = false
-                end
-            end
-        elseif Options[1] == "Box" then
-            if _G.ShowBox == true then
-                ESP.ShowBox = false
-                _G.boxVisible = true
-            end
-        end
+        _G.BOXTYPE = Options
     end,
 })
-
-while wait(0) do
-    if _G.boxFilledVisible == true and _G.ShowBox == true then
-        _G.boxFilledVisible = false
-    end
-end
 
 Rayfield:LoadConfiguration()
