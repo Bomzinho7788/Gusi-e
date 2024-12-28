@@ -8,20 +8,6 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20UI%202222"))();
-
-ESP.Enabled = true;
-
-ESP.ShowBox = _G.ShowBox;
-ESP.BoxColor = _G.boxColor;
-
-ESP.BoxType = "Corner Box Esp";
-
-ESP.ShowName = _G.Name;
-
-ESP.ShowDistance = _G.Distance;
-
--- Configurações
 _G.temcheck = false
 _G.temcheckmode = "colors"
 _G.teamcolor = Color3.new(0, 1, 0)
@@ -97,10 +83,26 @@ local function createDrawingObjects()
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
 
-    return Box, BoxFilled, HealthBar, Tracer
+    local NameTag = Drawing.new("Text")
+    NameTag.Visible = _G.Name
+    NameTag.Color = _G.Namec
+    NameTag.Size = _G.Names
+    NameTag.Center = true
+    NameTag.Outline = true
+    NameTag.OutlineColor = Color3.new(0, 0, 0)
+
+    local DistanceTag = Drawing.new("Text")
+    DistanceTag.Visible = _G.Distance
+    DistanceTag.Color = _G.Distancec
+    DistanceTag.Size = _G.Distancess
+    DistanceTag.Center = true
+    DistanceTag.Outline = true
+    DistanceTag.OutlineColor = Color3.new(0, 0, 0)
+
+    return Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -120,6 +122,21 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Tracer.Thickness = _G.TracerThickness
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
+
+    NameTag.Visible = _G.Name
+    NameTag.Color = _G.Namec
+    NameTag.Size = _G.Names
+    NameTag.Center = true
+    NameTag.Outline = true
+    NameTag.OutlineColor = Color3.new(0, 0, 0)
+
+    DistanceTag.Visible = _G.Distance
+    DistanceTag.Color = _G.Distancec
+    DistanceTag.Size = _G.Distancess
+    DistanceTag.Center = true
+    DistanceTag.Outline = true
+    DistanceTag.OutlineColor = Color3.new(0, 0, 0)
+
 end
 
 local function getHealthValues(player)
@@ -148,10 +165,10 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
 end
 
 local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
+    local Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag = createDrawingObjects()
 
     game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag)
 
         if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -181,29 +198,36 @@ local function setupPlayerBox(v)
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
+                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Box.Position.Y - 20)
+                NameTag.Text = v.Name
+                NameTag.Visible = _G.Name
+
+                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Box.Position.Y + Box.Size.Y)
+                DistanceTag.Text = tostring(math.floor((lplr.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)) .. "m"
+                DistanceTag.Visible = _G.Distance
+
                 if _G.teamcheck == true then
                     if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
-                            _G.ShowBox = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
-                            _G.ShowBox = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
-                            _G.ShowBox = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
+                            NameTag.Visible = false
+                            DistanceTag.Visible = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -213,22 +237,22 @@ local function setupPlayerBox(v)
                 end
             else
                 Box.Visible = false
-                _G.ShowBox = false
                 BoxFilled.Visible = false
                 HealthBar.Visible = false
                 Tracer.Visible = false
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                _G.Name = false
+                NameTag.Visible = false
+                DistanceTag.Visible = false
             end
         else
             Box.Visible = false
-            _G.ShowBox = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            _G.Name = false
+            NameTag.Visible = false
+            DistanceTag.Visible = false
         end
     end)
 end
