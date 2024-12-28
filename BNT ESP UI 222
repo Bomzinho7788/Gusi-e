@@ -44,7 +44,7 @@ local localplayer = entities.LocalPlayer
 local runservice = game:GetService("RunService")
 
 local skel_settings = {
-    Visible = false,
+    Visible = true,
     Transparency = 1,
     thickness = 1.5,
     color = Color3.new(1, 1, 1)
@@ -53,131 +53,131 @@ local skel_settings = {
 local function draw(player, Character)
     -- R6
     local skel_head = Drawing.new("Line")
-    skel_head.Transparency = 1
-    skel_head.Thickness = 1.5
-    skel_head.Visible = false
-    skel_head.Color = Color3.new(1, 1, 1)
+    skel_head.Transparency = skel_settings.Transparency
+    skel_head.Thickness = skel_settings.thickness
+    skel_head.Visible = skel_settings.Visible
+    skel_head.Color = skel_settings.color
 
     local skel_torso = Drawing.new("Line")
-    skel_torso.Transparency = 1
-    skel_torso.Thickness = 1.5
-    skel_torso.Visible = false
-    skel_torso.Color = Color3.new(1, 1, 1)
+    skel_torso.Transparency = skel_settings.Transparency
+    skel_torso.Thickness = skel_settings.thickness
+    skel_torso.Visible = skel_settings.Visible
+    skel_torso.Color = skel_settings.color
 
     local skel_leftarm = Drawing.new("Line")
-    skel_leftarm.Transparency = 1
-    skel_leftarm.Thickness = 1.5
-    skel_leftarm.Visible = false
-    skel_leftarm.Color = Color3.new(1, 1, 1)
+    skel_leftarm.Transparency = skel_settings.Transparency
+    skel_leftarm.Thickness = skel_settings.thickness
+    skel_leftarm.Visible = skel_settings.Visible
+    skel_leftarm.Color = skel_settings.color
 
     local skel_rightarm = Drawing.new("Line")
-    skel_rightarm.Transparency = 1
-    skel_rightarm.Thickness = 1.5
-    skel_rightarm.Visible = false
-    skel_rightarm.Color = Color3.new(1, 1, 1)
+    skel_rightarm.Transparency = skel_settings.Transparency
+    skel_rightarm.Thickness = skel_settings.thickness
+    skel_rightarm.Visible = skel_settings.Visible
+    skel_rightarm.Color = skel_settings.color
 
     local skel_leftleg = Drawing.new("Line")
-    skel_leftleg.Transparency = 1
-    skel_leftleg.Thickness = 1.5
-    skel_leftleg.Visible = false
-    skel_leftleg.Color = Color3.new(1, 1, 1)
+    skel_leftleg.Transparency = skel_settings.Transparency
+    skel_leftleg.Thickness = skel_settings.thickness
+    skel_leftleg.Visible = skel_settings.Visible
+    skel_leftleg.Color = skel_settings.color
 
     local skel_rightleg = Drawing.new("Line")
-    skel_rightleg.Transparency = 1
-    skel_rightleg.Thickness = 1.5
-    skel_rightleg.Visible = false
-    skel_rightleg.Color = Color3.new(1, 1, 1)
+    skel_rightleg.Transparency = skel_settings.Transparency
+    skel_rightleg.Thickness = skel_settings.thickness
+    skel_rightleg.Visible = skel_settings.Visible
+    skel_rightleg.Color = skel_settings.color
 
     -- R15
     local skel_head15 = Drawing.new("Line")
-    skel_head15.Transparency = 1
-    skel_head15.Thickness = 1.5
-    skel_head15.Visible = false
-    skel_head15.Color = Color3.new(1, 1, 1)
+    skel_head15.Transparency = skel_settings.Transparency
+    skel_head15.Thickness = skel_settings.thickness
+    skel_head15.Visible = skel_settings.Visible
+    skel_head15.Color = skel_settings.color
 
     local skel_lowertorso15 = Drawing.new("Line")
-    skel_lowertorso15.Transparency = 1
-    skel_lowertorso15.Thickness = 1.5
-    skel_lowertorso15.Visible = false
-    skel_lowertorso15.Color = Color3.new(1, 1, 1)
+    skel_lowertorso15.Transparency = skel_settings.Transparency
+    skel_lowertorso15.Thickness = skel_settings.thickness
+    skel_lowertorso15.Visible = skel_settings.Visible
+    skel_lowertorso15.Color = skel_settings.color
 
     local skel_uppertorso15 = Drawing.new("Line")
-    skel_uppertorso15.Transparency = 1
-    skel_uppertorso15.Thickness = 1.5
-    skel_uppertorso15.Visible = false
-    skel_uppertorso15.Color = Color3.new(1, 1, 1)
+    skel_uppertorso15.Transparency = skel_settings.Transparency
+    skel_uppertorso15.Thickness = skel_settings.thickness
+    skel_uppertorso15.Visible = skel_settings.Visible
+    skel_uppertorso15.Color = skel_settings.color
 
     local skel_rightupperarm = Drawing.new("Line")
-    skel_rightupperarm.Transparency = 1
-    skel_rightupperarm.Thickness = 1.5
-    skel_rightupperarm.Visible = false
-    skel_rightupperarm.Color = Color3.new(1, 1, 1)
+    skel_rightupperarm.Transparency = skel_settings.Transparency
+    skel_rightupperarm.Thickness = skel_settings.thickness
+    skel_rightupperarm.Visible = skel_settings.Visible
+    skel_rightupperarm.Color = skel_settings.color
 
     local skel_rightlowerarm = Drawing.new("Line")
-    skel_rightlowerarm.Transparency = 1
-    skel_rightlowerarm.Thickness = 1.5
-    skel_rightlowerarm.Visible = false
-    skel_rightlowerarm.Color = Color3.new(1, 1, 1)
+    skel_rightlowerarm.Transparency = skel_settings.Transparency
+    skel_rightlowerarm.Thickness = skel_settings.thickness
+    skel_rightlowerarm.Visible = skel_settings.Visible
+    skel_rightlowerarm.Color = skel_settings.color
 
     local skel_righthand = Drawing.new("Line")
-    skel_righthand.Transparency = 1
-    skel_righthand.Thickness = 1.5
-    skel_righthand.Visible = false
-    skel_righthand.Color = Color3.new(1, 1, 1)
+    skel_righthand.Transparency = skel_settings.Transparency
+    skel_righthand.Thickness = skel_settings.thickness
+    skel_righthand.Visible = skel_settings.Visible
+    skel_righthand.Color = skel_settings.color
 
     local skel_leftupperarm = Drawing.new("Line")
-    skel_leftupperarm.Transparency = 1
-    skel_leftupperarm.Thickness = 1.5
-    skel_leftupperarm.Visible = false
-    skel_leftupperarm.Color = Color3.new(1, 1, 1)
+    skel_leftupperarm.Transparency = skel_settings.Transparency
+    skel_leftupperarm.Thickness = skel_settings.thickness
+    skel_leftupperarm.Visible = skel_settings.Visible
+    skel_leftupperarm.Color = skel_settings.color
 
     local skel_leftlowerarm = Drawing.new("Line")
-    skel_leftlowerarm.Transparency = 1
-    skel_leftlowerarm.Thickness = 1.5
-    skel_leftlowerarm.Visible = false
-    skel_leftlowerarm.Color = Color3.new(1, 1, 1)
+    skel_leftlowerarm.Transparency = skel_settings.Transparency
+    skel_leftlowerarm.Thickness = skel_settings.thickness
+    skel_leftlowerarm.Visible = skel_settings.Visible
+    skel_leftlowerarm.Color = skel_settings.color
 
     local skel_lefthand = Drawing.new("Line")
-    skel_lefthand.Transparency = 1
-    skel_lefthand.Thickness = 1.5
-    skel_lefthand.Visible = false
-    skel_lefthand.Color = Color3.new(1, 1, 1)
+    skel_lefthand.Transparency = skel_settings.Transparency
+    skel_lefthand.Thickness = skel_settings.thickness
+    skel_lefthand.Visible = skel_settings.Visible
+    skel_lefthand.Color = skel_settings.color
 
     local skel_rightupperleg = Drawing.new("Line")
-    skel_rightupperleg.Transparency = 1
-    skel_rightupperleg.Thickness = 1.5
-    skel_rightupperleg.Visible = false
-    skel_rightupperleg.Color = Color3.new(1, 1, 1)
+    skel_rightupperleg.Transparency = skel_settings.Transparency
+    skel_rightupperleg.Thickness = skel_settings.thickness
+    skel_rightupperleg.Visible = skel_settings.Visible
+    skel_rightupperleg.Color = skel_settings.color
 
     local skel_rightlowerleg = Drawing.new("Line")
-    skel_rightlowerleg.Transparency = 1
-    skel_rightlowerleg.Thickness = 1.5
-    skel_rightlowerleg.Visible = false
-    skel_rightlowerleg.Color = Color3.new(1, 1, 1)
+    skel_rightlowerleg.Transparency = skel_settings.Transparency
+    skel_rightlowerleg.Thickness = skel_settings.thickness
+    skel_rightlowerleg.Visible = skel_settings.Visible
+    skel_rightlowerleg.Color = skel_settings.color
 
     local skel_rightfoot = Drawing.new("Line")
-    skel_rightfoot.Transparency = 1
-    skel_rightfoot.Thickness = 1.5
-    skel_rightfoot.Visible = false
-    skel_rightfoot.Color = Color3.new(1, 1, 1)
+    skel_rightfoot.Transparency = skel_settings.Transparency
+    skel_rightfoot.Thickness = skel_settings.thickness
+    skel_rightfoot.Visible = skel_settings.Visible
+    skel_rightfoot.Color = skel_settings.color
 
     local skel_leftupperleg = Drawing.new("Line")
-    skel_leftupperleg.Transparency = 1
-    skel_leftupperleg.Thickness = 1.5
-    skel_leftupperleg.Visible = false
-    skel_leftupperleg.Color = Color3.new(1, 1, 1)
+    skel_leftupperleg.Transparency = skel_settings.Transparency
+    skel_leftupperleg.Thickness = skel_settings.thickness
+    skel_leftupperleg.Visible = skel_settings.Visible
+    skel_leftupperleg.Color = skel_settings.color
 
     local skel_leftlowerleg = Drawing.new("Line")
-    skel_leftlowerleg.Transparency = 1
-    skel_leftlowerleg.Thickness = 1.5
-    skel_leftlowerleg.Visible = false
-    skel_leftlowerleg.Color = Color3.new(1, 1, 1)
+    skel_leftlowerleg.Transparency = skel_settings.Transparency
+    skel_leftlowerleg.Thickness = skel_settings.thickness
+    skel_leftlowerleg.Visible = skel_settings.Visible
+    skel_leftlowerleg.Color = skel_settings.color
 
     local skel_leftfoot = Drawing.new("Line")
-    skel_leftfoot.Transparency = 1
-    skel_leftfoot.Thickness = 1.5
-    skel_leftfoot.Visible = false
-    skel_leftfoot.Color = Color3.new(1, 1, 1)
+    skel_leftfoot.Transparency = skel_settings.Transparency
+    skel_leftfoot.Thickness = skel_settings.thickness
+    skel_leftfoot.Visible = skel_settings.Visible
+    skel_leftfoot.Color = skel_settings.color
 
     local function update()
         local connection
@@ -218,34 +218,6 @@ local function draw(player, Character)
 
                         skel_rightleg.From = Vector2.new(lowertorso_2d.X, lowertorso_2d.Y)
                         skel_rightleg.To = Vector2.new(rightleg_2d.X, rightleg_2d.Y)
-
-                        skel_head.Visible = skel_settings.Visible
-                        skel_torso.Visible = skel_settings.Visible
-                        skel_leftarm.Visible = skel_settings.Visible
-                        skel_rightarm.Visible = skel_settings.Visible
-                        skel_leftleg.Visible = skel_settings.Visible
-                        skel_rightleg.Visible = skel_settings.Visible
-
-                        skel_head.Color = skel_settings.color
-                        skel_torso.Color = skel_settings.color
-                        skel_leftarm.Color = skel_settings.color
-                        skel_rightarm.Color = skel_settings.color
-                        skel_leftleg.Color = skel_settings.color
-                        skel_rightleg.Color = skel_settings.color
-
-                        skel_head.Thickness = skel_settings.thickness
-                        skel_torso.Thickness = skel_settings.thickness
-                        skel_leftarm.Thickness = skel_settings.thickness
-                        skel_rightarm.Thickness = skel_settings.thickness
-                        skel_leftleg.Thickness = skel_settings.thickness
-                        skel_rightleg.Thickness = skel_settings.thickness
-
-                        skel_head.Transparency = skel_settings.Transparency
-                        skel_torso.Transparency = skel_settings.Transparency
-                        skel_leftarm.Transparency = skel_settings.Transparency
-                        skel_rightarm.Transparency = skel_settings.Transparency
-                        skel_leftleg.Transparency = skel_settings.Transparency
-                        skel_rightleg.Transparency = skel_settings.Transparency
 
                     elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
                         local head15_2d = camera:WorldToViewportPoint(Character.Head.Position)
@@ -312,70 +284,31 @@ local function draw(player, Character)
                         skel_leftfoot.From = Vector2.new(leftlowerleg_2d.X, leftlowerleg_2d.Y)
                         skel_leftfoot.To = Vector2.new(leftfoot_2d.X, leftfoot_2d.Y)
 
-                        skel_head15.Visible = skel_settings.Visible
-                        skel_lowertorso15.Visible = skel_settings.Visible
-                        skel_uppertorso15.Visible = skel_settings.Visible
-                        skel_rightupperarm.Visible = skel_settings.Visible
-                        skel_rightlowerarm.Visible = skel_settings.Visible
-                        skel_righthand.Visible = skel_settings.Visible
-                        skel_leftupperarm.Visible = skel_settings.Visible
-                        skel_leftlowerarm.Visible = skel_settings.Visible
-                        skel_lefthand.Visible = skel_settings.Visible
-                        skel_rightupperleg.Visible = skel_settings.Visible
-                        skel_rightlowerleg.Visible = skel_settings.Visible
-                        skel_rightfoot.Visible = skel_settings.Visible
-                        skel_leftupperleg.Visible = skel_settings.Visible
-                        skel_leftlowerleg.Visible = skel_settings.Visible
-                        skel_leftfoot.Visible = skel_settings.Visible
-
-                        skel_head15.Color = skel_settings.color
-                        skel_lowertorso15.Color = skel_settings.color
-                        skel_uppertorso15.Color = skel_settings.color
-                        skel_rightupperarm.Color = skel_settings.color
-                        skel_rightlowerarm.Color = skel_settings.color
-                        skel_righthand.Color = skel_settings.color
-                        skel_leftupperarm.Color = skel_settings.color
-                        skel_leftlowerarm.Color = skel_settings.color
-                        skel_lefthand.Color = skel_settings.color
-                        skel_rightupperleg.Color = skel_settings.color
-                        skel_rightlowerleg.Color = skel_settings.color
-                        skel_rightfoot.Color = skel_settings.color
-                        skel_leftupperleg.Color = skel_settings.color
-                        skel_leftlowerleg.Color = skel_settings.color
-                        skel_leftfoot.Color = skel_settings.color
-
-                        skel_head15.Thickness = skel_settings.thickness
-                        skel_lowertorso15.Thickness = skel_settings.thickness
-                        skel_uppertorso15.Thickness = skel_settings.thickness
-                        skel_rightupperarm.Thickness = skel_settings.thickness
-                        skel_rightlowerarm.Thickness = skel_settings.thickness
-                        skel_righthand.Thickness = skel_settings.thickness
-                        skel_leftupperarm.Thickness = skel_settings.thickness
-                        skel_leftlowerarm.Thickness = skel_settings.thickness
-                        skel_lefthand.Thickness = skel_settings.thickness
-                        skel_rightupperleg.Thickness = skel_settings.thickness
-                        skel_rightlowerleg.Thickness = skel_settings.thickness
-                        skel_rightfoot.Thickness = skel_settings.thickness
-                        skel_leftupperleg.Thickness = skel_settings.thickness
-                        skel_leftlowerleg.Thickness = skel_settings.thickness
-                        skel_leftfoot.Thickness = skel_settings.thickness
-
-                        skel_head15.Transparency = skel_settings.Transparency
-                        skel_lowertorso15.Transparency = skel_settings.Transparency
-                        skel_uppertorso15.Transparency = skel_settings.Transparency
-                        skel_rightupperarm.Transparency = skel_settings.Transparency
-                        skel_rightlowerarm.Transparency = skel_settings.Transparency
-                        skel_righthand.Transparency = skel_settings.Transparency
-                        skel_leftupperarm.Transparency = skel_settings.Transparency
-                        skel_leftlowerarm.Transparency = skel_settings.Transparency
-                        skel_lefthand.Transparency = skel_settings.Transparency
-                        skel_rightupperleg.Transparency = skel_settings.Transparency
-                        skel_rightlowerleg.Transparency = skel_settings.Transparency
-                        skel_rightfoot.Transparency = skel_settings.Transparency
-                        skel_leftupperleg.Transparency = skel_settings.Transparency
-                        skel_leftlowerleg.Transparency = skel_settings.Transparency
-                        skel_leftfoot.Transparency = skel_settings.Transparency
                     end
+
+                    skel_head.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+                    skel_torso.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+                    skel_leftarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+                    skel_rightarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+                    skel_leftleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+                    skel_rightleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and skel_settings.Visible
+
+                    skel_head15.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_lowertorso15.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_uppertorso15.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_rightupperarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_rightlowerarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_righthand.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_leftupperarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_leftlowerarm.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_lefthand.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_rightupperleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_rightlowerleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_rightfoot.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_leftupperleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_leftlowerleg.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+                    skel_leftfoot.Visible = Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and skel_settings.Visible
+
                 else
                     skel_head.Visible = false
                     skel_torso.Visible = false
@@ -448,6 +381,7 @@ for a, b in next, entities:GetPlayers() do
 end
 
 entities.PlayerAdded:Connect(playeradded)
+
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
