@@ -89,7 +89,7 @@ local function createDrawingObjects()
     NameTag.Size = _G.Names
     NameTag.Center = true
     NameTag.Outline = true
-    NameTag.OutlineColor = Color3.new(0, 0, 0)
+    NameTag.OutlineColor = _G.Namec
 
     local DistanceTag = Drawing.new("Text")
     DistanceTag.Visible = _G.Distance
@@ -97,7 +97,7 @@ local function createDrawingObjects()
     DistanceTag.Size = _G.Distancess
     DistanceTag.Center = true
     DistanceTag.Outline = true
-    DistanceTag.OutlineColor = Color3.new(0, 0, 0)
+    DistanceTag.OutlineColor = _G.Distancec
 
     return Box, BoxFilled, HealthBar, Tracer, NameTag, DistanceTag
 end
@@ -128,14 +128,14 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, NameTag, 
     NameTag.Size = _G.Names
     NameTag.Center = true
     NameTag.Outline = true
-    NameTag.OutlineColor = Color3.new(0, 0, 0)
+    NameTag.OutlineColor = Color3.new(1, 1, 1)
 
     DistanceTag.Visible = _G.Distance
     DistanceTag.Color = _G.Distancec
     DistanceTag.Size = _G.Distancess
     DistanceTag.Center = true
     DistanceTag.Outline = true
-    DistanceTag.OutlineColor = Color3.new(0, 0, 0)
+    DistanceTag.OutlineColor = Color3.new(1, 1, 1)
 
 end
 
@@ -199,11 +199,11 @@ local function setupPlayerBox(v)
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
-                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 5)
+                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position + Box.Size.Y + 1)
                 NameTag.Text = v.Name
                 NameTag.Visible = _G.Name
 
-                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 10)
+                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position + Box.Size.Y + 2)
                 DistanceTag.Text = tostring(math.floor((lplr.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)) .. "m"
                 DistanceTag.Visible = _G.Distance
 
