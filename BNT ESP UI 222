@@ -180,6 +180,9 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
+                            Box.Color = _G.boxColor
+                            BoxFilled.Color = _G.boxFilledColor
+                            Tracer.Color = _G.TracerColor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
