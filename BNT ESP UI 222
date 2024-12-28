@@ -15,7 +15,7 @@ local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaste
 
 ESP.Enabled = true;
 Teamcheck = _G.teamcheck;
-ESP.ShowBox = false;
+ESP.ShowBox = true;
 ESP.BoxColor = _G.boxColor;
 ESP.BoxType = "Corner Box Esp";
 ESP.ShowName = false;
@@ -517,7 +517,7 @@ local Dropdown4 = Tab:CreateDropdown({
     Flag = "BoxType",
     Callback = function(Options)
         if Options[1] == "Corner Box" then
-            if _G.boxVisible then
+            if _G.boxVisible == true then
                 _G.boxVisible = false
                 _G.boxFilledVisible = false
                 ESP.ShowBox = true
@@ -526,7 +526,7 @@ local Dropdown4 = Tab:CreateDropdown({
                 end
             end
         elseif Options[1] == "Box" then
-            if _G.ShowBox then
+            if _G.ShowBox == true then
                 ESP.ShowBox = false
                 _G.boxVisible = true
             end
