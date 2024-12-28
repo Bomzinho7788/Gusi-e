@@ -48,7 +48,6 @@ _G.ltthick = 1.5
 
 getgenv().EspSettings = {
 	TeamCheck = _G.teamcheck,
-	ToggleKey = "",
 	RefreshRate = 10, -- how fast the esp updates (milliseconds)
 	MaximumDistance = 500, -- only renders players within this distance
 	FaceCamera = true, -- Makes esp appear 2D
