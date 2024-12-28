@@ -199,11 +199,11 @@ local function setupPlayerBox(v)
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
-                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Box.Position.Y - 20)
+                NameTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 5)
                 NameTag.Text = v.Name
                 NameTag.Visible = _G.Name
 
-                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Box.Position.Y + Box.Size.Y)
+                DistanceTag.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Head.Position.Y + 10)
                 DistanceTag.Text = tostring(math.floor((lplr.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)) .. "m"
                 DistanceTag.Visible = _G.Distance
 
@@ -356,7 +356,7 @@ local Toggle5 = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Distance",
     Callback = function(Value)
-        _G.Distancess = Value
+        _G.Distance = Value
     end,
 })
 
@@ -591,5 +591,36 @@ local Dropdown3 = Tab:CreateDropdown({
         
     end,
 })
+
+local Dropdown4 = Tab:CreateDropdown({
+    Name = "Box Type",
+    Options = {"Box", "Corner Box"},
+    CurrentOption = {"Box"},
+    MultipleOptions = false,
+    Flag = "BoxType",
+    Callback = function(Options)
+        if Options[1] == "Corner Box" then
+            if _G.boxVisible then
+                _G.boxVisible = false
+                _G.boxFilledVisible = false
+                _G.ShowBox = true
+                if _G.boxFilledVisible == true then
+                    _G.boxFilledVisible = false
+                end
+            end
+        elseif Options[1] == "Box" then
+            if _G.ShowBox then
+                _G.ShowBox = false
+                _G.boxVisible = true
+            end
+        end
+    end,
+})
+
+while wait(0) do
+    if _G.boxFilledVisible == true and _G.ShowBox == true then
+        _G.boxFilledVisible = false
+    end
+end
 
 Rayfield:LoadConfiguration()
