@@ -8,16 +8,18 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
+-- Configurações
 _G.temcheck = false
-_G.temcheckmode = "colors"
-_G.teamcolor = Color3.new(0, 1, 0)
-_G.enemycolor = Color3.new(1, 0, 0)
+_G.temcheckmode = "colors" -- opções: "colors", "invisible"
+_G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
+_G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
 
 _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
 
+-- Configurações BoxFilled
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
 _G.boxFilledVisible = false
@@ -37,8 +39,7 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
---Skeleton
-
+-- Função para definir a posição do tracer com base na seleção do dropdown
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -49,6 +50,7 @@ local function getTracerFromPosition()
     end
 end
 
+-- Definir Box, BoxOutline e BoxFilled no início
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
     Box.Visible = _G.boxVisible
@@ -157,6 +159,7 @@ local function setupPlayerBox(v)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
 
+                -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
@@ -177,7 +180,6 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -202,6 +204,14 @@ local function setupPlayerBox(v)
         end
     end)
 end
+
+for _, player in pairs(game.Players:GetChildren()) do
+    setupPlayerBox(player)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    setupPlayerBox(player)
+end)
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -252,7 +262,7 @@ local Toggle = Tab:CreateToggle({
     end,
 })
 
-local Toggle1 = Tab:CreateToggle({
+local Toggle2 = Tab:CreateToggle({
     Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
@@ -261,7 +271,7 @@ local Toggle1 = Tab:CreateToggle({
     end,
 })
 
-local Toggle2 = Tab:CreateToggle({
+local Toggle3 = Tab:CreateToggle({
     Name = "Show Health Bar",
     CurrentValue = false,
     Flag = "healthbarouf",
@@ -270,7 +280,7 @@ local Toggle2 = Tab:CreateToggle({
     end,
 })
 
-local Toggle3 = Tab:CreateToggle({
+local Toggle4 = Tab:CreateToggle({
     Name = "Health Bar Filled",
     CurrentValue = false,
     Flag = "healthbarouff",
@@ -279,7 +289,7 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Toggle5 = Tab:CreateToggle({
+local Toggle7 = Tab:CreateToggle({
     Name = "Show Tracer",
     CurrentValue = false,
     Flag = "TracerVisible",
@@ -288,7 +298,7 @@ local Toggle5 = Tab:CreateToggle({
     end,
 })
 
-local Toggle6 = Tab:CreateToggle({
+local Toggle5 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
@@ -396,7 +406,7 @@ local Slider4 = Tab:CreateSlider({
 
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Slider6 = Tab:CreateSlider({
+local Slider5 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -408,7 +418,7 @@ local Slider6 = Tab:CreateSlider({
     end,
 })
 
-local Slider7 = Tab:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -420,7 +430,7 @@ local Slider7 = Tab:CreateSlider({
     end,
 })
 
-local Slider8 = Tab:CreateSlider({
+local Slider7 = Tab:CreateSlider({
     Name = "Tracer Thickness",
     Range = {0, 10},
     Increment = .05,
