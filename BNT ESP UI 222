@@ -43,7 +43,6 @@ _G.Namespsize = 13
 
 --Skeleton
 
-
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -81,18 +80,10 @@ local function createDrawingObjects()
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
 
-    local Text = Drawing.new("Text")
-    Text.Visible = _G.Namespvis
-    Text.Center = true
-    Text.Outline = true
-    Text.Font = 2
-    Text.Color = _G.Namespcolor
-    Text.Size = _G.Namespsize
-
-    return Box, BoxFilled, HealthBar, Tracer, Text
+    return Box, BoxFilled, HealthBar, Tracer
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, Text, p, hrp)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -112,15 +103,6 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, Text, p, 
     Tracer.Thickness = _G.TracerThickness
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
-
-    local hrp_pos, hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
-    if hrp_onscreen then
-        Text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - (Box.Size.Y / 2) - 15) -- Ajuste a posição do texto para ficar acima do Box
-        Text.Text = p.Name
-        Text.Visible = true
-    else
-        Text.Visible = false
-    end
 end
 
 local function getHealthValues(player)
@@ -148,45 +130,23 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
-local function setupPlayerBox(p, cr)
-    local Box, BoxFilled, HealthBar, Tracer, Text = createDrawingObjects()
+local function setupPlayerBox(v)
+    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
-    local h = cr:WaitForChild("Humanoid")
-    local hrp = cr:WaitForChild("HumanoidRootPart")
-    local ps = game.Players
-    local lp = ps.LocalPlayer
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
 
-    local function dc()
-        Text.Visible = false
-        Text:Remove()
-    end
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
-    cr.AncestryChanged:Connect(function(_, parent)
-        if not parent then
-            dc()
-        end
-    end)
-
-    h.HealthChanged:Connect(function(v)
-        if v <= 0 or h:GetState() == Enum.HumanoidStateType.Dead then
-            dc()
-        end
-    end)
-
-    rs.RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, Text, p, hrp)
-
-        if cr and h and hrp and p ~= lp and h.Health > 0 then
-            local Vector, onScreen = c:WorldToViewportPoint(hrp.Position)
-
-            local RootPart = hrp
-            local Head = cr.Head
-            local RootPosition, RootVis = c:WorldToViewportPoint(RootPart.Position)
-            local HeadPosition = c:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.5, 0))
-            local LegPosition = c:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0))
+            local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
+            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
 
             if onScreen then
-                local maxHealth, health = getHealthValues(p)
+                local maxHealth, health = getHealthValues(v)
 
                 Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
@@ -206,7 +166,7 @@ local function setupPlayerBox(p, cr)
 
                 if _G.teamcheck == true then
                     if _G.temcheckmode == "colors" then
-                        if p.TeamColor == lp.TeamColor then
+                        if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
@@ -216,12 +176,12 @@ local function setupPlayerBox(p, cr)
                             Tracer.Color = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
-                        if p.TeamColor == lp.TeamColor then
+                        if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            Text.Visible = false
+                            
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -237,36 +197,101 @@ local function setupPlayerBox(p, cr)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                Text.Visible = false
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            Text.Visible = false
+        end
+    end)
+end
+
+local c = workspace.CurrentCamera
+local ps = game:GetService("Players")
+local lp = ps.LocalPlayer
+local rs = game:GetService("RunService")
+
+local function esp(p, cr)
+    local h = cr:WaitForChild("Humanoid")
+    local hrp = cr:WaitForChild("HumanoidRootPart")
+
+    local text = Drawing.new("Text")
+    text.Visible = _G.Namespvis
+    text.Center = true
+    text.Outline = true
+    text.Font = 2
+    text.Color = _G.Namespcolor
+    text.Size = _G.Namespsize
+
+    local c1
+    local c2
+    local c3
+
+    local function dc()
+        text.Visible = false
+        text:Remove()
+        if c1 then
+            c1:Disconnect()
+            c1 = nil
+        end
+        if c2 then
+            c2:Disconnect()
+            c2 = nil
+        end
+        if c3 then
+            c3:Disconnect()
+            c3 = nil
+        end
+    end
+
+    c2 = cr.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            dc()
+        end
+    end)
+
+    c3 = h.HealthChanged:Connect(function(v)
+        if (v <= 0) or (h:GetState() == Enum.HumanoidStateType.Dead) then
+            dc()
+        end
+    end)
+
+    c1 = rs.RenderStepped:Connect(function()
+        local hrp_pos, hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
+        if hrp_onscreen then
+            text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - 20)  -- Ajuste aqui o valor do deslocamento para mover o texto acima da cabeça
+            text.Text = p.Name
+            text.Visible = true
+        else
+            text.Visible = false
+        end
+
+        if _G.teamcheck == true then
+            text.Visible = false
+        elseif _G.teamcheck == false then
+            text.Visible = _G.Namespvis
         end
     end)
 end
 
 local function p_added(p)
     if p.Character then
-        setupPlayerBox(p, p.Character)
+        esp(p, p.Character)
     end
     p.CharacterAdded:Connect(function(cr)
-        setupPlayerBox(p, cr)
+        esp(p, cr)
     end)
 end
 
-
-
-for _, player in pairs(game.Players:GetChildren()) do
-    setupPlayerBox(player)
+for i, p in next, ps:GetPlayers() do
+    if p ~= lp then
+        p_added(p)
+    end
 end
 
-game.Players.PlayerAdded:Connect(function(player)
-    setupPlayerBox(player)
-end)
+ps.PlayerAdded:Connect(p_added)
+
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
