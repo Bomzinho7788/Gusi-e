@@ -186,8 +186,6 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            ESP.ShowName = false
-                            ESP.ShowDistance = false
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
