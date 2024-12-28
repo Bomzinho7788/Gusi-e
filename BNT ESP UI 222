@@ -67,7 +67,7 @@ local function esp(p,cr)
     c1 = rs.RenderStepped:Connect(function()
         local hrp_pos,hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
         if hrp_onscreen then
-            text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y + Vector2.new(0,2,0))
+            text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y + 2)
             text.Text = p.Name
             text.Visible = true
         else
