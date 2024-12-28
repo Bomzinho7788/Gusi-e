@@ -14,12 +14,9 @@ local LegOff = Vector3.new(0, 3, 0)
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
-Teamcheck = _G.teamcheck;
-ESP.ShowBox = true;
-ESP.BoxColor = _G.boxColor;
-ESP.BoxType = "Corner Box Esp";
+Teamcheck = false;
 ESP.ShowName = false;
-ESP.ShowDistance = true;
+ESP.ShowDistance = false;
 
 _G.temcheck = false
 _G.temcheckmode = "colors"
@@ -68,9 +65,7 @@ local function createDrawingObjects()
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
     Box.Filled = false
-    if _G.BOXTYPE == "Box" then
-        Box.Visible = _G.boxVisible
-    end
+    Box.Visible = _G.boxVisible
 
     local BoxFilled = Drawing.new("Square")
     BoxFilled.Visible = _G.boxFilledVisible
@@ -284,19 +279,10 @@ local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(0,
 
 local Toggle = Tab:CreateToggle({
     Name = "Show Box",
-    CurrentValue = _G.boxVisible,
+    CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
         _G.boxVisible = Value
-    end,
-})
-
-local Toggle = Tab:CreateToggle({
-    Name = "Show Corner Box",
-    CurrentValue = ESP.ShowBox,
-    Flag = "Show c Box",
-    Callback = function(Value)
-        ESP.ShowBox = Value
     end,
 })
 
