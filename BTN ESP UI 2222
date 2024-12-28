@@ -165,8 +165,6 @@ local function updateEsp()
 
                     if ESP_SETTINGS.ShowBox and ESP_SETTINGS.Enabled then
                         if ESP_SETTINGS.BoxType == "2D" then
-                            esp.box.Size = boxSize
-                            esp.box.Position = boxPosition
                             esp.box.Color = ESP_SETTINGS.BoxColor
                             esp.box.Visible = true
                             esp.boxOutline.Visible = false
