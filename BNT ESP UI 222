@@ -174,6 +174,7 @@ local function setupPlayerBox(v)
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
             local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
             local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
             local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
@@ -590,36 +591,5 @@ local Dropdown3 = Tab:CreateDropdown({
         
     end,
 })
-
-local Dropdown4 = Tab:CreateDropdown({
-    Name = "Box Type",
-    Options = {"Box", "Corner Box"},
-    CurrentOption = {"Box"},
-    MultipleOptions = false,
-    Flag = "BoxType",
-    Callback = function(Options)
-        if Options[1] == "Corner Box" then
-            if _G.boxVisible then
-                _G.boxVisible = false
-                _G.boxFilledVisible = false
-                _G.ShowBox = true
-                if _G.boxFilledVisible == true then
-                    _G.boxFilledVisible = false
-                end
-            end
-        elseif Options[1] == "Box" then
-            if _G.ShowBox then
-                _G.ShowBox = false
-                _G.boxVisible = true
-            end
-        end
-    end,
-})
-
-while wait(0) do
-    if _G.boxFilledVisible == true and _G.ShowBox == true then
-        _G.boxFilledVisible = false
-    end
-end
 
 Rayfield:LoadConfiguration()
