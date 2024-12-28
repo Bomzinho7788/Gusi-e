@@ -313,6 +313,15 @@ local Toggle3 = Tab:CreateToggle({
 })
 
 local Toggle4 = Tab:CreateToggle({
+    Name = "Show Tracer",
+    CurrentValue = false,
+    Flag = "Name",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
+local Toggle4 = Tab:CreateToggle({
     Name = "Show Name",
     CurrentValue = false,
     Flag = "Name",
