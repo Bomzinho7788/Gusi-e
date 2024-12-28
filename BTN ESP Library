@@ -11,7 +11,6 @@ local VERSION = "v1.7.2"
 if not EspSettings then
 	getgenv().EspSettings = {
 		TeamCheck = false,
-		ToggleKey = "RightAlt",
 		RefreshRate = 10, -- how fast the esp updates (milliseconds)
 		MaximumDistance = 500, -- only renders players within this distance
 		FaceCamera = false, -- Makes esp appear 2D
@@ -1645,9 +1644,6 @@ function NewCham(part, options)
 	return ChamObj
 end
 
-if typeof(ss.ToggleKey) == "EnumItem" then
-	ss.ToggleKey = ss.ToggleKey.Name
-end
 for _,v in next, players:GetPlayers() do
 	if v ~= player then
 		NewPlayer(v)
