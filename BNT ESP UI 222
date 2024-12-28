@@ -175,12 +175,10 @@ local function setupPlayerBox(v)
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
-                            ESP.BoxColor = _G.teamcolor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
-                            ESP.BoxColor = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
@@ -188,16 +186,15 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
+                            ESP.ShowName = false
+                            ESP.ShowDistance = false
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
-                            ESP.ShowBox = false
-                            ESP.BoxColor = _G.boxColor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
-                            ESP.BoxColor = _G.enemycolor
                         end
                     end
                 end
@@ -209,15 +206,16 @@ local function setupPlayerBox(v)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                ESP.ShowBox = false
-                ESP.BoxColor = _G.boxColor
+                ESP.ShowName = false
+                ESP.ShowDistance = false
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            ESP.ShowBox = false
+            ESP.ShowName = false
+            ESP.ShowDistance = false
         end
     end)
 end
