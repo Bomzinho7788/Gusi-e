@@ -40,7 +40,7 @@ _G.TracerFrom = "Bottom"
 --Skeleton
 local camera = workspace.CurrentCamera
 local entities = game:GetService("Players")
-local localplayer = entities.localplayer
+local localplayer = entities.LocalPlayer
 local runservice = game:GetService("RunService")
 
 local skel_settings = {
