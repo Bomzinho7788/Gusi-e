@@ -8,6 +8,27 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20UI%202222"))();
+
+ESP.Enabled = true;
+
+ESP.ShowBox = _G.ShowBox;
+ESP.BoxColor = _G.boxColor;
+ESP.BoxThickness = _G.boxThickness;
+ESP.BoxTransparency = _G.boxTransparency
+
+ESP.BoxType = "Corner Box Esp";
+
+ESP.ShowName = _G.Name;
+ESP.NameColor = _G.Namec;
+ESP.NameSize = _G.Names;
+
+
+ESP.ShowDistance = _G.Distance;
+ESP.DistanceColor = _G.Distancec;
+ESP.DistanceSize = _G.Distancess;
+
+
 -- Configurações
 _G.temcheck = false
 _G.temcheckmode = "colors"
@@ -18,6 +39,7 @@ _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
+_G.ShowBox = false
 
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
@@ -37,6 +59,14 @@ _G.TracerTransparency = 1
 _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
+
+_G.Name = false
+_G.Namec = Color3.new(0, 0, 0)
+_G.Names = 13
+
+_G.Distance = false
+_G.Distancec = Color3.new(0, 0, 0)
+_G.Distancess = 13
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
@@ -164,23 +194,25 @@ local function setupPlayerBox(v)
                     if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
+                            _G.ShowBox = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
+                            _G.ShowBox = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
+                            _G.ShowBox = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
-                            _G.NameESP.Visible = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -190,20 +222,22 @@ local function setupPlayerBox(v)
                 end
             else
                 Box.Visible = false
+                _G.ShowBox = false
                 BoxFilled.Visible = false
                 HealthBar.Visible = false
                 Tracer.Visible = false
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                _G.NameESP.Visible = false
+                _G.Name = false
             end
         else
             Box.Visible = false
+            _G.ShowBox = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            _G.NameESP.Visible = false
+            _G.Name = false
         end
     end)
 end
@@ -265,7 +299,7 @@ local Toggle = Tab:CreateToggle({
     end,
 })
 
-local Toggle2 = Tab:CreateToggle({
+local Toggle1 = Tab:CreateToggle({
     Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
@@ -274,7 +308,7 @@ local Toggle2 = Tab:CreateToggle({
     end,
 })
 
-local Toggle3 = Tab:CreateToggle({
+local Toggle2 = Tab:CreateToggle({
     Name = "Show Health Bar",
     CurrentValue = false,
     Flag = "healthbarouf",
@@ -283,7 +317,7 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Toggle4 = Tab:CreateToggle({
+local Toggle3 = Tab:CreateToggle({
     Name = "Health Bar Filled",
     CurrentValue = false,
     Flag = "healthbarouff",
@@ -292,16 +326,25 @@ local Toggle4 = Tab:CreateToggle({
     end,
 })
 
-local Toggle8 = Tab:CreateToggle({
+local Toggle4 = Tab:CreateToggle({
     Name = "Show Name",
     CurrentValue = false,
-    Flag = "namesp",
+    Flag = "Name",
     Callback = function(Value)
-        _G.NameESP.Visible = Value
+        _G.Name = Value
     end,
 })
 
 local Toggle5 = Tab:CreateToggle({
+    Name = "Show Distance",
+    CurrentValue = false,
+    Flag = "Distance",
+    Callback = function(Value)
+        _G.Distancess = Value
+    end,
+})
+
+local Toggle6 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
@@ -354,6 +397,24 @@ local ColorPicker5 = Tab:CreateColorPicker({
     Flag = "TracerColor",
     Callback = function(Value)
         _G.TracerColor = Value
+    end
+})
+
+local ColorPicker6 = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Namec",
+    Callback = function(Value)
+        _G.Namec = Value
+    end
+})
+
+local ColorPicker7 = Tab:CreateColorPicker({
+    Name = "Distance Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Distancec",
+    Callback = function(Value)
+        _G.Distancec = Value
     end
 })
 
@@ -445,6 +506,30 @@ local Slider7 = Tab:CreateSlider({
     end,
 })
 
+local Slider8 = Tab:CreateSlider({
+    Name = "Name Size",
+    Range = {5, 30},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 13,
+    Flag = "Names",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+local Slider9 = Tab:CreateSlider({
+    Name = "Disatance Size",
+    Range = {5, 30},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 13,
+    Flag = "Distancess",
+    Callback = function(Value)
+        _G.Distancess = Value
+    end,
+})
+
 local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Dropdown1 = Tab:CreateDropdown({
@@ -479,5 +564,47 @@ local Dropdown3 = Tab:CreateDropdown({
         _G.TracerFrom = Options[1]
     end,
 })
+
+local Dropdown3 = Tab:CreateDropdown({
+    Name = "Tracer From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "TracerFrom",
+    Callback = function(Options)
+        
+    end,
+})
+
+local Dropdown4 = Tab:CreateDropdown({
+    Name = "Box Type",
+    Options = {"Box", "Corner Box"},
+    CurrentOption = {"Box"},
+    MultipleOptions = false,
+    Flag = "BoxType",
+    Callback = function(Options)
+        if Options[1] == "Corner Box" then
+            if _G.boxVisible then
+                _G.boxVisible = false
+                _G.boxFilledVisible = false
+                _G.ShowBox = true
+                if _G.boxFilledVisible == true then
+                    _G.boxFilledVisible = false
+                end
+            end
+        elseif Options[1] == "Box" then
+            if _G.ShowBox then
+                _G.ShowBox = false
+                _G.boxVisible = true
+            end
+        end
+    end,
+})
+
+while wait(0) do
+    if _G.boxFilledVisible == true and _G.ShowBox == true then
+        _G.boxFilledVisible = false
+    end
+end
 
 Rayfield:LoadConfiguration()
