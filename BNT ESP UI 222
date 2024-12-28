@@ -153,6 +153,8 @@ local function setupPlayerBox(p, cr)
 
     local h = cr:WaitForChild("Humanoid")
     local hrp = cr:WaitForChild("HumanoidRootPart")
+    local ps = game.Players
+    local lp = ps.LocalPlayer
 
     local function dc()
         Text.Visible = false
@@ -256,7 +258,7 @@ local function p_added(p)
     end)
 end
 
-for i, p in next, game.Players:GetPlayers() do
+for i, p in next, ps:GetPlayers() do
     if p ~= lp then
         p_added(p)
     end
