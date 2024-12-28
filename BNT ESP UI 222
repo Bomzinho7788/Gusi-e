@@ -37,7 +37,12 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
+_G.Namespvis = false
+_G.Namespcolor = Color3.new(1, 1, 1)
+_G.Namespsize = 13
+
 --Skeleton
+
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
@@ -76,10 +81,18 @@ local function createDrawingObjects()
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
 
-    return Box, BoxFilled, HealthBar, Tracer
+    local Text = Drawing.new("Text")
+    Text.Visible = _G.Namespvis
+    Text.Center = true
+    Text.Outline = true
+    Text.Font = 2
+    Text.Color = _G.Namespcolor
+    Text.Size = _G.Namespsize
+
+    return Box, BoxFilled, HealthBar, Tracer, Text
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, Text, p, hrp)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -99,6 +112,15 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     Tracer.Thickness = _G.TracerThickness
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
+
+    local hrp_pos, hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
+    if hrp_onscreen then
+        Text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - (Box.Size.Y / 2) - 15) -- Ajuste a posição do texto para ficar acima do Box
+        Text.Text = p.Name
+        Text.Visible = true
+    else
+        Text.Visible = false
+    end
 end
 
 local function getHealthValues(player)
@@ -126,23 +148,43 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
-local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
+local function setupPlayerBox(p, cr)
+    local Box, BoxFilled, HealthBar, Tracer, Text = createDrawingObjects()
 
-    game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+    local h = cr:WaitForChild("Humanoid")
+    local hrp = cr:WaitForChild("HumanoidRootPart")
 
-        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
-            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+    local function dc()
+        Text.Visible = false
+        Text:Remove()
+    end
 
-            local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
-            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+    cr.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            dc()
+        end
+    end)
+
+    h.HealthChanged:Connect(function(v)
+        if v <= 0 or h:GetState() == Enum.HumanoidStateType.Dead then
+            dc()
+        end
+    end)
+
+    rs.RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, Text, p, hrp)
+
+        if cr and h and hrp and p ~= lp and h.Health > 0 then
+            local Vector, onScreen = c:WorldToViewportPoint(hrp.Position)
+
+            local RootPart = hrp
+            local Head = cr.Head
+            local RootPosition, RootVis = c:WorldToViewportPoint(RootPart.Position)
+            local HeadPosition = c:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.5, 0))
+            local LegPosition = c:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0))
 
             if onScreen then
-                local maxHealth, health = getHealthValues(v)
+                local maxHealth, health = getHealthValues(p)
 
                 Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
@@ -162,7 +204,7 @@ local function setupPlayerBox(v)
 
                 if _G.teamcheck == true then
                     if _G.temcheckmode == "colors" then
-                        if v.TeamColor == lplr.TeamColor then
+                        if p.TeamColor == lp.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
@@ -172,12 +214,12 @@ local function setupPlayerBox(v)
                             Tracer.Color = _G.enemycolor
                         end
                     elseif _G.temcheckmode == "invisible" then
-                        if v.TeamColor == lplr.TeamColor then
+                        if p.TeamColor == lp.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                            skel_settings.Visible = false
+                            Text.Visible = false
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
@@ -193,17 +235,34 @@ local function setupPlayerBox(v)
                 Box.Color = _G.boxColor
                 BoxFilled.Color = _G.boxFilledColor
                 Tracer.Color = _G.TracerColor
-                skel_settings.Visible = false
+                Text.Visible = false
             end
         else
             Box.Visible = false
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
-            skel_settings.Visible = false
+            Text.Visible = false
         end
     end)
 end
+
+local function p_added(p)
+    if p.Character then
+        setupPlayerBox(p, p.Character)
+    end
+    p.CharacterAdded:Connect(function(cr)
+        setupPlayerBox(p, cr)
+    end)
+end
+
+for i, p in next, ps:GetPlayers() do
+    if p ~= lp then
+        p_added(p)
+    end
+end
+
+ps.PlayerAdded:Connect(p_added)
 
 for _, player in pairs(game.Players:GetChildren()) do
     setupPlayerBox(player)
@@ -289,12 +348,21 @@ local Toggle3 = Tab:CreateToggle({
     end,
 })
 
-local Toggle4 = Tab:CreateToggle({
+local Toggle5 = Tab:CreateToggle({
     Name = "Show Tracer",
     CurrentValue = false,
     Flag = "TracerVisible",
     Callback = function(Value)
         _G.TracerVisible = Value
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+    Name = "Show Name",
+    CurrentValue = false,
+    Flag = "Namespvis",
+    Callback = function(Value)
+        _G.Namespvis = Value
     end,
 })
 
@@ -351,6 +419,15 @@ local ColorPicker5 = Tab:CreateColorPicker({
     Flag = "TracerColor",
     Callback = function(Value)
         _G.TracerColor = Value
+    end
+})
+
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Name Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Namespcolor",
+    Callback = function(Value)
+        _G.Namespcolor = Value
     end
 })
 
@@ -439,6 +516,18 @@ local Slider8 = Tab:CreateSlider({
     Flag = "TracerThickness",
     Callback = function(Value)
         _G.TracerThickness = Value
+    end,
+})
+
+local Slider9 = Tab:CreateSlider({
+    Name = "Name Size",
+    Range = {0, 25},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Namespsize",
+    Callback = function(Value)
+        _G.Namespsize = Value
     end,
 })
 
