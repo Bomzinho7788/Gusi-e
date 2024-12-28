@@ -52,8 +52,6 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
-_G.BOXTYPE = "Box"
-
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -289,8 +287,7 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = _G.boxVisible,
     Flag = "Show Box",
     Callback = function(Value)
-        if _G.BOXTYPE == "Corner Box" and ESP.ShowBox == false then
-            ESP.ShowBox = false
+        if ESP.ShowBox == false then
             _G.boxVisible = true
         end
     end,
@@ -301,9 +298,8 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = ESP.ShowBox,
     Flag = "Show c Box",
     Callback = function(Value)
-        if _G.BOXTYPE == "Corner Box" and _G.boxVisible == false then
+        if __G.boxVisible == false then
             ESP.ShowBox = true
-            _G.boxVisible = false
         end
     end,
 })
@@ -538,17 +534,6 @@ local Dropdown3 = Tab:CreateDropdown({
     Flag = "TracerFrom",
     Callback = function(Options)
         _G.TracerFrom = Options[1]
-    end,
-})
-
-local Dropdown4 = Tab:CreateDropdown({
-    Name = "Box Type",
-    Options = {"Box", "Corner Box"},
-    CurrentOption = {"Box"},
-    MultipleOptions = false,
-    Flag = "BoxType",
-    Callback = function(Options)
-        _G.BOXTYPE = Options
     end,
 })
 
