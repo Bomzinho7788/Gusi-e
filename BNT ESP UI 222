@@ -256,7 +256,7 @@ local function p_added(p)
     end)
 end
 
-for i, p in next, ps:GetPlayers() do
+for i, p in next, game.Players:GetPlayers() do
     if p ~= lp then
         p_added(p)
     end
