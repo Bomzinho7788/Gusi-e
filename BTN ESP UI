@@ -1,215 +1,968 @@
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20Library"))()
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
+
+getgenv().EspSettings = {
+	TeamCheck = false,
+	ToggleKey = "RightAlt",
+	RefreshRate = 25,
+	MaximumDistance = 9999999999999999999999,
+	FaceCamera = true,
+	AlignPoints = false,
+    
+	MouseVisibility = {
+		Enabled = false,
+		Radius = 60,
+		Transparency = 0.3,
+		Method = "Hover",
+		HoverRadius = 50,
+		Selected = {
+			Boxes = true,
+			Tracers = true,
+			Names = true,
+			Skeletons = true,
+			HealthBars = true,
+			HeadDots = true,
+			LookTracers = true
+		}
+	},
+	Highlights = {
+		Enabled = false,
+		Players = {},
+		Transparency = 1,
+		Color = Color3.fromRGB(255, 150, 0),
+		AlwaysOnTop = true
+	},
+	NPC = {
+		Color = Color3.fromRGB(150,150,150),
+		Transparency = 1,
+		RainbowColor = false,
+		Overrides = {
+			Boxes = true,
+			Tracers = true,
+			Names = true,
+			Skeletons = true,
+			HealthBars = true,
+			HeadDots = true,
+			LookTracers = true
+		}
+	},
+	Boxes = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1
+	},
+	Tracers = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = "Top",
+		Thickness = 1
+	},
+	Names = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		Font = Drawing.Fonts.UI,
+		Size = 18,
+		ShowDistance = false,
+		ShowHealth = false,
+		UseDisplayName = false,
+		DistanceDataType = "m",
+		HealthDataType = "Percentage"
+	},
+	Skeletons = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1
+	},
+	HealthBars = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(0,255,0),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = "None",
+		OutlineBarOnly = true
+	},
+	HeadDots = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1,
+		Filled = false,
+		Scale = 1
+	},
+	LookTracers = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1,
+		Length = 5
+	}
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
+
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
+
+ESP.Enabled = true;
+ESP.Teamcheck = false;
+ESP.ShowName = false;
+ESP.ShowDistance = false;
+
+_G.temcheck = false
+_G.temcheckmode = "colors"
+_G.teamcolor = Color3.new(0, 1, 0)
+_G.enemycolor = Color3.new(1, 0, 0)
+
+_G.boxColor = Color3.new(0, 0, 0)
+_G.boxThickness = 1
+_G.boxTransparency = 1
+_G.boxVisible = false
+
+_G.ShowBox = false
+
+_G.boxFilledColor = Color3.new(0, 0, 0)
+_G.boxFilledTransparency = 0.5
+_G.boxFilledVisible = false
+
+_G.HealthBarThickness = 1
+_G.HealthBarVisible = false
+_G.HealthBarTransparency = 1
+_G.HealthBarColor = Color3.new(0, 1, 0)
+_G.HealthBarFilled = true
+
+_G.HealthBarPosition = "Left"
+
+_G.TracerVisible = false
+_G.TracerThickness = 1.5
+_G.TracerTransparency = 1
+_G.TracerColor = Color3.new(0, 0, 0)
+
+_G.TracerFrom = "Bottom"
+
+local function getTracerFromPosition()
+    if _G.TracerFrom == "Bottom" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+    elseif _G.TracerFrom == "Middle" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif _G.TracerFrom == "Top" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 4)
+    end
+end
+
+local function createDrawingObjects()
+    local Box = Drawing.new("Square")
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Filled = false
+    Box.Visible = _G.boxVisible
+
+    local BoxFilled = Drawing.new("Square")
+    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Filled = true
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    local Tracer = Drawing.new("Line")
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
+    return Box, BoxFilled, HealthBar, Tracer
+end
+
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Visible = _G.boxVisible
+
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Visible = _G.boxFilledVisible
+
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
+end
+
+local function getHealthValues(player)
+    local maxHealth, health
+    if player:FindFirstChild("NRPBS") then
+        maxHealth = player.NRPBS["MaxHealth"].Value
+        health = player.NRPBS["Health"].Value
+    else
+        maxHealth = player.Character.Humanoid.MaxHealth
+        health = player.Character.Humanoid.Health
+    end
+    return maxHealth, health
+end
+
+local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
+    local offset = isOutline and 6 or 4
+    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
+
+    if _G.HealthBarPosition == "Left" then
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
+    elseif _G.HealthBarPosition == "Right" then
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
+    end
+
+    HealthBar.Size = Vector2.new(2, healthBarSize)
+end
+
+local function setupPlayerBox(v)
+    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+            local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
+            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+
+            if onScreen then
+                local maxHealth, health = getHealthValues(v)
+
+                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                Box.Visible = _G.boxVisible
+
+                BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                BoxFilled.Visible = _G.boxFilledVisible
+
+                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+                updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
+                HealthBar.Visible = _G.HealthBarVisible
+
+                -- Atualizando a posição do Tracer
+                Tracer.From = getTracerFromPosition()
+                Tracer.To = Vector2.new(Vector.X, Vector.Y)
+
+                if _G.teamcheck == true then
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                            Tracer.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                            Tracer.Visible = false
+                            Box.Color = _G.boxColor
+                            BoxFilled.Color = _G.boxFilledColor
+                            Tracer.Color = _G.TracerColor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    end
+                end
+            else
+                Box.Visible = false
+                BoxFilled.Visible = false
+                HealthBar.Visible = false
+                Tracer.Visible = false
+                Box.Color = _G.boxColor
+                BoxFilled.Color = _G.boxFilledColor
+                Tracer.Color = _G.TracerColor
+            end
+        else
+            Box.Visible = false
+            BoxFilled.Visible = false
+            HealthBar.Visible = false
+            Tracer.Visible = false
+        end
+    end)
+end
+
+for _, player in pairs(game.Players:GetChildren()) do
+    setupPlayerBox(player)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    setupPlayerBox(player)
+end)
+
+_G.AimBotEnabled = false
+_G.AimPart = "Head"
+_G.WallCheckEnabled = false
+_G.TeamCheckEnabled = false
+
+_G.FovThickness = 1.5
+_G.FovFilled = false
+_G.FovColor = Color3.new(1, 1, 1)
+_G.FovTransparency = 1
+_G.FovVisible = false
+_G.FovSize = 75
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+local aimPart = _G.AimPart
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = _G.FovThickness
+fovCircle.Filled = _G.FovFilled
+fovCircle.Color = _G.FovColor
+fovCircle.Transparency = _G.FovTransparency
+fovCircle.Visible = _G.FovVisible
+
+local fovRadius = _G.FovSize
+
+local fovEnabled = _G.FovVisible
+
+local aimbotEnabled = _G.AimBotEnabled
+local wallcheckEnabled = _G.WallCheckEnabled
+local teamCheckEnabled = _G.TeamCheckEnabled
+
+local function updateFovCircle()
+    if fovEnabled then
+        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        fovCircle.Position = mousePos
+        fovCircle.Radius = fovRadius
+        fovCircle.Visible = true
+    else
+        fovCircle.Visible = false
+    end
+end
+
+RunService.RenderStepped:Connect(updateFovCircle)
+
+local function notBehindWall(target)
+    local ray = Ray.new(LocalPlayer.Character.Head.Position, (target.Position - LocalPlayer.Character.Head.Position).Unit * 300)
+    local part, position = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character}, false, true)
+    if part then
+        local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
+        if not humanoid then
+            humanoid = part.Parent.Parent:FindFirstChildOfClass("Humanoid")
+        end
+        if humanoid and target and humanoid.Parent == target.Parent then
+            local pos, visible = camera:WorldToScreenPoint(target.Position)
+            if visible then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function getClosestPlayerInFOV()
+    local closestPlayer = nil
+    local shortestDistance = fovRadius
+
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
+            if teamCheckEnabled and targetPlayer.Team == LocalPlayer.Team then
+                continue
+            end
+            
+            local head = targetPlayer.Character[aimPart]
+            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
+
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = head
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function silentAimAtClosestPlayer()
+    if aimbotEnabled then
+        local targetHead = getClosestPlayerInFOV()
+
+        if targetHead then
+            if not wallcheckEnabled or notBehindWall(targetHead) then
+                local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
+                camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+            end
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
 
 local Window = Rayfield:CreateWindow({
-   Name = "ESP Configuration",
-   LoadingTitle = "Loading ESP Configurator",
-   LoadingSubtitle = "by Rayfield",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "ESP_Config"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "", -- The Discord invite code, do not include discord.gg/
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Key System",
-      Subtitle = "Enter your key",
-      Note = "Join the discord",
-      FileName = "ESP_Key",
-      SaveKey = true,
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = "YourKey"
-   }
-})
+    Name = "BNT ESP",
+    Icon = 0,
+    LoadingTitle = "By Bomzinho",
+    LoadingSubtitle = "Loading....",
+    Theme = "Amethyst",
 
-local Tab = Window:CreateTab("ESP Settings", 4483362458) -- Title, Image
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
 
-local Section = Tab:CreateSection("General Settings")
-
-local Toggle = Tab:CreateToggle({
-   Name = "Enable ESP",
-   CurrentValue = ESP.Enabled,
-   Flag = "Toggle_ESP", -- Identifier for the configuration file
-   Callback = function(Value)
-       ESP.Enabled = Value
-   end,
-})
-
-local ColorPicker_BoxOutline = Tab:CreateColorPicker({
-    Name = "Box Outline Color",
-    Color = ESP.BoxOutlineColor,
-    Flag = "ColorPicker_BoxOutline",
-    Callback = function(Value)
-        ESP.BoxOutlineColor = Value
-    end,
-})
-
-local ColorPicker_Box = Tab:CreateColorPicker({
-    Name = "Box Color",
-    Color = ESP.BoxColor,
-    Flag = "ColorPicker_Box",
-    Callback = function(Value)
-        ESP.BoxColor = Value
-    end,
-})
-
-local ColorPicker_Name = Tab:CreateColorPicker({
-    Name = "Name Color",
-    Color = ESP.NameColor,
-    Flag = "ColorPicker_Name",
-    Callback = function(Value)
-        ESP.NameColor = Value
-    end,
-})
-
-local ColorPicker_HealthOutline = Tab:CreateColorPicker({
-    Name = "Health Outline Color",
-    Color = ESP.HealthOutlineColor,
-    Flag = "ColorPicker_HealthOutline",
-    Callback = function(Value)
-        ESP.HealthOutlineColor = Value
-    end,
-})
-
-local ColorPicker_HealthHigh = Tab:CreateColorPicker({
-    Name = "Health High Color",
-    Color = ESP.HealthHighColor,
-    Flag = "ColorPicker_HealthHigh",
-    Callback = function(Value)
-        ESP.HealthHighColor = Value
-    end,
-})
-
-local ColorPicker_HealthLow = Tab:CreateColorPicker({
-    Name = "Health Low Color",
-    Color = ESP.HealthLowColor,
-    Flag = "ColorPicker_HealthLow",
-    Callback = function(Value)
-        ESP.HealthLowColor = Value
-    end,
-})
-
-local ColorPicker_Tracer = Tab:CreateColorPicker({
-    Name = "Tracer Color",
-    Color = ESP.TracerColor,
-    Flag = "ColorPicker_Tracer",
-    Callback = function(Value)
-        ESP.TracerColor = Value
-    end,
-})
-
-local ColorPicker_Skeletons = Tab:CreateColorPicker({
-    Name = "Skeletons Color",
-    Color = ESP.SkeletonsColor,
-    Flag = "ColorPicker_Skeletons",
-    Callback = function(Value)
-        ESP.SkeletonsColor = Value
-    end,
-})
-
-local Slider_TracerThickness = Tab:CreateSlider({
-    Name = "Tracer Thickness",
-    Range = {1, 10},
-    Increment = 1,
-    Suffix = "px",
-    CurrentValue = ESP.TracerThickness,
-    Flag = "Slider_TracerThickness",
-    Callback = function(Value)
-        ESP.TracerThickness = Value
-    end,
-})
-
-local Dropdown_BoxType = Tab:CreateDropdown({
-   Name = "Box Type",
-   Options = {"2D", "Corner Box Esp"},
-   CurrentOption = ESP.BoxType,
-   Flag = "Dropdown_BoxType",
-   Callback = function(Option)
-       ESP.BoxType = Option
-   end,
-})
-
-local Dropdown_TracerPosition = Tab:CreateDropdown({
-   Name = "Tracer Position",
-   Options = {"Top", "Middle", "Bottom"},
-   CurrentOption = ESP.TracerPosition,
-   Flag = "Dropdown_TracerPosition",
-   Callback = function(Option)
-       ESP.TracerPosition = Option
-   end,
-})
-
-local Toggle_ShowBox = Tab:CreateToggle({
-   Name = "Show Box",
-   CurrentValue = ESP.ShowBox,
-   Flag = "Toggle_ShowBox",
-   Callback = function(Value)
-       ESP.ShowBox = Value
-   end,
-})
-
-local Toggle_ShowName = Tab:CreateToggle({
-   Name = "Show Name",
-   CurrentValue = ESP.ShowName,
-   Flag = "Toggle_ShowName",
-   Callback = function(Value)
-       ESP.ShowName = Value
-   end,
-})
-
-local Toggle_ShowHealth = Tab:CreateToggle({
-   Name = "Show Health",
-   CurrentValue = ESP.ShowHealth,
-   Flag = "Toggle_ShowHealth",
-   Callback = function(Value)
-       ESP.ShowHealth = Value
-   end,
-})
-
-local Toggle_ShowDistance = Tab:CreateToggle({
-   Name = "Show Distance",
-   CurrentValue = ESP.ShowDistance,
-   Flag = "Toggle_ShowDistance",
-   Callback = function(Value)
-       ESP.ShowDistance = Value
-   end,
-})
-
-local Toggle_ShowSkeletons = Tab:CreateToggle({
-   Name = "Show Skeletons",
-   CurrentValue = ESP.ShowSkeletons,
-   Flag = "Toggle_ShowSkeletons",
-   Callback = function(Value)
-       ESP.ShowSkeletons = Value
-   end,
-})
-
-local Toggle_ShowTracer = Tab:CreateToggle({
-   Name = "Show Tracer",
-   CurrentValue = ESP.ShowTracer,
-   Flag = "Toggle_ShowTracer",
-   Callback = function(Value)
-       ESP.ShowTracer = Value
-   end,
-})
-
--- Notificação de exemplo
-Rayfield:Notify({
-    Title = "ESP Configurator",
-    Content = "Configuration loaded successfully!",
-    Duration = 6.5,
-    Image = 4483362458,
-    Actions = { -- Notification Buttons
-        Ignore = {
-            Name = "Okay!",
-            Callback = function()
-                print("Configuration acknowledged!")
-            end
-        },
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "ESPP"
     },
+
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+
+    KeySystem = true,
+    KeySettings = {
+        Title = "BNT ESP",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"4321", "1234"}
+    }
 })
+
+local Tab = Window:CreateTab("Aimbot", 4483362458)
+
+Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab:CreateToggle({
+    Name = "Enable Aimbot",
+    CurrentValue = false,
+    Flag = "Enable Aimbot",
+    Callback = function(Value)
+        _G.AimBotEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Enable WallCheck",
+    CurrentValue = false,
+    Flag = "Enable WallCheck",
+    Callback = function(Value)
+        _G.WallCheckEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Enable TeamCheck",
+    CurrentValue = false,
+    Flag = "Enable TeamCheck",
+    Callback = function(Value)
+        _G.TeamCheckEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Show Fov",
+    CurrentValue = false,
+    Flag = "Show Fov",
+    Callback = function(Value)
+        _G.FovVisible = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Fov Filled",
+    CurrentValue = false,
+    Flag = "Fov Filled",
+    Callback = function(Value)
+        _G.FovFilled = Value
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "Fov Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Fov Color",
+    Callback = function(Value)
+        _G.FovColor = Value
+    end
+})
+
+Tab:CreateSlider({
+    Name = "Fov Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        _G.FovTransparency = Value
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Fov Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Thickness",
+    Callback = function(Value)
+        _G.FovThickness = Value
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "AimPart",
+    Options = {"Head", "Humanoid"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "AimPart",
+    Callback = function(Options)
+        _G.AimPart = Options[1]
+    end,
+})
+
+local Tab1 = Window:CreateTab("ESP", 4483362458)
+
+Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateToggle({
+    Name = "Show Box",
+    CurrentValue = false,
+    Flag = "Show Box",
+    Callback = function(Value)
+        _G.boxVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Box Filled",
+    CurrentValue = false,
+    Flag = "BoxFilled",
+    Callback = function(Value)
+        _G.boxFilledVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Health Bar",
+    CurrentValue = false,
+    Flag = "healthbarouf",
+    Callback = function(Value)
+        _G.HealthBarVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Health Bar Filled",
+    CurrentValue = false,
+    Flag = "healthbarouff",
+    Callback = function(Value)
+        _G.HealthBarFilled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Tracer",
+    CurrentValue = false,
+    Flag = "Name",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Name",
+    CurrentValue = false,
+    Flag = "Name",
+    Callback = function(Value)
+        ESP.ShowName = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Distance",
+    CurrentValue = false,
+    Flag = "Distance",
+    Callback = function(Value)
+        ESP.ShowDistance = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Skeleton",
+    CurrentValue = false,
+    Flag = "Disthhance",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Look Tracer",
+    CurrentValue = false,
+    Flag = "Disthhhance",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show HeadDots",
+    CurrentValue = false,
+    Flag = "Disthhhhance",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Teamcheck",
+    CurrentValue = false,
+    Flag = "teamcheck",
+    Callback = function(Value)
+        _G.teamcheck = Value
+        ESP.Teamcheck = Value
+        getfenv().EspSettings.TeamCheck = Value
+    end,
+})
+
+Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateDropdown({
+    Name = "Team Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "teamcolor",
+    Callback = function(Value)
+        _G.teamcolor = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Enemy Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "enemycolor",
+    Callback = function(Value)
+        _G.enemycolor = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Box Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxColor",
+    Callback = function(Value)
+        _G.boxColor = Value
+        ESP.BoxColor = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Box Filled Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilledColor",
+    Callback = function(Value)
+        _G.boxFilledColor = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Tracer Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TracerColor",
+    Callback = function(Value)
+        _G.TracerColor = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Skeleton Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TracerColohuggdfr",
+    Callback = function(Value)
+       getfenv().EspSettings.Skeletons.Color = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Head Dot Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TragfgfgfggkjhgfgcerColor",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Color = Value
+    end
+})
+
+Tab1:CreateDropdown({
+    Name = "Look Tracer Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "jbfbjdbbjdb",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Color = Value
+    end
+})
+
+Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxTransparency",
+    Callback = function(Value)
+        _G.boxTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Box Filled Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        _G.boxFilledTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarTransparency",
+    Callback = function(Value)
+        _G.HealthBarTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTransparency",
+    Callback = function(Value)
+        _G.TracerTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeleton Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TraceghfvbvfdcdgrrTransparency",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Transparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Head Dot Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTrabdydfgdrdghhhhhhhyhnsparency",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Transparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Look Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTrahbvgdghhhhhhhhhhhhhhhhhhhhhhhrnsparency",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Transparency = Value
+    end,
+})
+
+Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxThickness",
+    Callback = function(Value)
+        _G.boxThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarThickness",
+    Callback = function(Value)
+        _G.HealthBarThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerThickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeleton Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracefghfvbvfdcdgrrTransparency",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Thickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Head Dot Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerhTrabdydfgdrdghhhhhhhyhnsparency",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Thickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Look Tracer Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Tracehhhhhhhhhhhhhhhhhhrnsparency",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Thickness = Value
+    end,
+})
+
+Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"colors", "invisible"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "TeamcheckMode",
+    Callback = function(Options)
+        _G.temcheckmode = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Health Bar Position",
+    Options = {"Left", "Right"},
+    CurrentOption = {"Left"},
+    MultipleOptions = false,
+    Flag = "HealthBarPosition",
+    Callback = function(Options)
+        _G.HealthBarPosition = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Tracer From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "TracerFrom",
+    Callback = function(Options)
+        _G.TracerFrom = Options[1]
+    end,
+})
+
+Rayfield:LoadConfiguration()
