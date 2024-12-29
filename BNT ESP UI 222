@@ -14,7 +14,7 @@ getgenv().EspSettings = {
 	RefreshRate = 25,
 	MaximumDistance = 9999999999999999999999,
 	FaceCamera = true,
-	AlignPoints = true,
+	AlignPoints = false,
     
 	MouseVisibility = {
 		Enabled = false,
