@@ -203,7 +203,7 @@ local function getTracerFromPosition()
     elseif _G.TracerFrom == "Middle" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     elseif _G.TracerFrom == "Top" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 4)
+        return Vector2.new(camera.ViewportSize.X / 2, 0)
     end
 end
 
