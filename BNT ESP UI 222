@@ -922,7 +922,7 @@ local Dropdown1 = Tab:CreateDropdown({
 })
 
 local Dropdown1 = Tab:CreateDropdown({
-    Name = "Teamcheck Mode",
+    Name = "Health Value Type",
     Options = {"Value", "Percentage"},
     CurrentOption = {"Percentage"},
     MultipleOptions = false,
