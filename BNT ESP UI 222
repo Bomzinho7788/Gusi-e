@@ -14,7 +14,7 @@ getgenv().EspSettings = {
 	RefreshRate = 10, -- how fast the esp updates (milliseconds)
 	MaximumDistance = 9999999999999999999999, -- only renders players within this distance
 	FaceCamera = true, -- Makes esp appear 2D
-	AlignPoints = false, -- Improves 2D effect; only works while FaceCamera is enabled
+	AlignPoints = true, -- Improves 2D effect; only works while FaceCamera is enabled
 	-- AlignPoints: This may cause esp to have abnormal behavior when looking from certain angles
 	MouseVisibility = {
 		Enabled = false, -- makes any drawing objects transparent when they are near your mouse
@@ -143,6 +143,77 @@ getgenv().EspSettings = {
 } -- v1.6.14
 loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
 
+local outlineEnabled = false
+local highlightEnabled = false
+
+local colorBehindWall = Color3.fromRGB(255, 0, 0)
+local colorVisible = Color3.fromRGB(0, 255, 0)
+local outlineColor = Color3.fromRGB(0, 0, 255)
+local transparencyOutline = 0.5
+local transparencyHighlight = 0.5
+local outlineThickness = 1
+
+if _G.teamcheck then
+    if _G.teamcheckmode == "invisible" then
+        highlightEnabled = false
+        outlineColor = false
+    end
+end
+
+local function isVisible(localPlayer, targetPlayer)
+    local ray = workspace:Raycast(localPlayer.Character.HumanoidRootPart.Position, targetPlayer.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position)
+    return not ray
+end
+
+local function applyHighlight(localPlayer, targetPlayer)
+    if highlightEnabled then
+        local isTargetVisible = isVisible(localPlayer, targetPlayer)
+        
+        local highlight = targetPlayer.Character:FindFirstChild("Highlight")
+        if not highlight then
+            highlight = Instance.new("Highlight")
+            highlight.Name = "Highlight"
+            highlight.Parent = targetPlayer.Character
+        end
+
+        if isTargetVisible then
+            highlight.FillColor = colorVisible
+            highlight.FillTransparency = transparencyHighlight
+        else
+            highlight.FillColor = colorBehindWall
+            highlight.FillTransparency = transparencyHighlight
+        end
+
+        if outlineEnabled then
+            if not highlight.Outline then
+                local outline = Instance.new("Outline")
+                outline.Parent = highlight
+                outline.Color = outlineColor
+                outline.Thickness = outlineThickness
+                outline.Transparency = transparencyOutline
+            end
+        else
+            if highlight.Outline then
+                highlight.Outline:Destroy()
+            end
+        end
+    end
+end
+
+local function updateHighlights(localPlayer)
+    for _, targetPlayer in pairs(game:GetService("Players"):GetPlayers()) do
+        if targetPlayer ~= localPlayer then
+            applyHighlight(localPlayer, targetPlayer)
+        end
+    end
+end
+
+local localPlayer = game.Players.LocalPlayer
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    updateHighlights(localPlayer)
+end)
+
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
@@ -150,8 +221,8 @@ ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
 
-_G.temcheck = false
-_G.temcheckmode = "colors"
+_G.teamcheck = false
+_G.teamcheckmode = "colors"
 _G.teamcolor = Color3.new(0, 1, 0)
 _G.enemycolor = Color3.new(1, 0, 0)
 
@@ -305,7 +376,7 @@ local function setupPlayerBox(v)
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
                 if _G.teamcheck == true then
-                    if _G.temcheckmode == "colors" then
+                    if _G.teamcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
@@ -315,7 +386,7 @@ local function setupPlayerBox(v)
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
                         end
-                    elseif _G.temcheckmode == "invisible" then
+                    elseif _G.teamcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
@@ -487,6 +558,24 @@ local Toggle7 = Tab:CreateToggle({
     end,
 })
 
+local Toggle7 = Tab:CreateToggle({
+    Name = "Enable Chams",
+    CurrentValue = false,
+    Flag = "Disthgggghhhance",
+    Callback = function(Value)
+        highlightEnabled = Value
+    end,
+})
+
+local Toggle7 = Tab:CreateToggle({
+    Name = "Enable Chams Outline",
+    CurrentValue = false,
+    Flag = "Disthkkkkgghhggghhhance",
+    Callback = function(Value)
+        outlineEnabled = Value
+    end,
+})
+
 local Toggle6 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
@@ -569,6 +658,33 @@ local ColorPicker5 = Tab:CreateColorPicker({
     Flag = "jbfbjdbbjdb",
     Callback = function(Value)
         getfenv().EspSettings.LookTracers.Color = Value
+    end
+})
+
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Chams Behind Wall Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "jbfbjdbbhhjdb",
+    Callback = function(Value)
+        colorBehindWall = Value
+    end
+})
+
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Chams Visible Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "jbfbjdbbhhumhjdb",
+    Callback = function(Value)
+        colorVisible = Value
+    end
+})
+
+local ColorPicker5 = Tab:CreateColorPicker({
+    Name = "Chams Outline Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "jbfbjdbbhhggjdb",
+    Callback = function(Value)
+        outlineColor = Value
     end
 })
 
@@ -658,6 +774,30 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
+local Slider4 = Tab:CreateSlider({
+    Name = "Chams Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TraceksksksrTransparency",
+    Callback = function(Value)
+        transparencyHighlight = Value
+    end,
+})
+
+local Slider4 = Tab:CreateSlider({
+    Name = "Chams Outline Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTrajksjksjksnsparency",
+    Callback = function(Value)
+        transparencyOutline = Value
+    end,
+})
+
 local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Slider5 = Tab:CreateSlider({
@@ -732,6 +872,18 @@ local Slider4 = Tab:CreateSlider({
     end,
 })
 
+local Slider4 = Tab:CreateSlider({
+    Name = "Chams Outline Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTrajksjksjksnsbbgostsoparency",
+    Callback = function(Value)
+        outlineThickness = Value
+    end,
+})
+
 local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 local Dropdown1 = Tab:CreateDropdown({
@@ -741,7 +893,7 @@ local Dropdown1 = Tab:CreateDropdown({
     MultipleOptions = false,
     Flag = "TeamcheckMode",
     Callback = function(Options)
-        _G.temcheckmode = Options[1]
+        _G.teamcheckmode = Options[1]
     end,
 })
 
