@@ -190,8 +190,8 @@ local highlightSettings = {
     fillTransparency = 0.5,
     outlineColor = Color3.new(1, 1, 1),
     outlineTransparency = 0.3,
-    fillVisible = true,
-    outlineVisible = true
+    fillVisible = false,
+    outlineVisible = false
 }
 
 local function applyChams(player)
@@ -516,7 +516,16 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Show uc Box",
     Callback = function(Value)
-        
+        highlightSettings.fillVisible = Value
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+    Name = "Chams Outline",
+    CurrentValue = false,
+    Flag = "Show o Box",
+    Callback = function(Value)
+        highlightSettings.outlineVisible = Value
     end,
 })
 
@@ -670,6 +679,24 @@ local ColorPicker5 = Tab:CreateColorPicker({
     end
 })
 
+local ColorPicker1 = Tab:CreateColorPicker({
+    Name = "Chams Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "teamcccc olor",
+    Callback = function(Value)
+        highlightSettings.fillColor = Value
+    end
+})
+
+local ColorPicker2 = Tab:CreateColorPicker({
+    Name = "Chams Outline Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "enemychfghtnhtg tngolor",
+    Callback = function(Value)
+        highlightSettings.outlineColor = Value
+    end
+})
+
 local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Skeleton Color",
     Color = Color3.fromRGB(255, 255, 255),
@@ -744,6 +771,30 @@ local Slider4 = Tab:CreateSlider({
     Flag = "TracerTransparency",
     Callback = function(Value)
         _G.TracerTransparency = Value
+    end,
+})
+
+local Slider1 = Tab:CreateSlider({
+    Name = "Chams Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxhggggggggggggghTransparency",
+    Callback = function(Value)
+        highlightSettings.fillTransparency = Value
+    end,
+})
+
+local Slider1 = Tab:CreateSlider({
+    Name = "Chams Outline Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxTOutlineksksksksksksksksksksskskskskskskskskransparency",
+    Callback = function(Value)
+        highlightSettings.outlineTransparency = Value
     end,
 })
 
