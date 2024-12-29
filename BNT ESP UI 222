@@ -143,6 +143,22 @@ getgenv().EspSettings = {
 }
 loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
 
+if _G.teamcheck and _G.teamcheckmode == "colors" and getfenv().EspSettings.TeamCheck then
+    getfenv().EspSettings.Skeletons.UseTeamColor = true
+    getfenv().EspSettings.LookTracersg.UseTeamColor = true
+    getfenv().EspSettings.HeadDots.UseTeamColor = true
+elseif _G.teamcheck and _G.teamcheckmode == "invisible" and getfenv().EspSettings.TeamCheck then
+    getfenv().EspSettings.Skeletons.UseTeamColor = false
+    getfenv().EspSettings.LookTracers.UseTeamColor = false
+    getfenv().EspSettings.HeadDots.UseTeamColor = false
+end
+
+if _G.teamcheck == false and _G.teamcheckmode == "colors" and getfenv().EspSettings.TeamCheck == false and getfenv().EspSettings.Skeletons.UseTeamColor == true and getfenv().EspSettings.LookTracersg.UseTeamColor == true and getfenv().EspSettings.HeadDots.UseTeamColor == true then
+    getfenv().EspSettings.Skeletons.UseTeamColor = false
+    getfenv().EspSettings.LookTracers.UseTeamColor = false
+    getfenv().EspSettings.HeadDots.UseTeamColor = false
+end
+
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
@@ -150,8 +166,8 @@ ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
 
-_G.temcheck = false
-_G.temcheckmode = "colors"
+_G.teamcheck = false
+_G.teamcheckmode = "colors"
 _G.teamcolor = Color3.new(0, 1, 0)
 _G.enemycolor = Color3.new(1, 0, 0)
 
@@ -305,7 +321,7 @@ local function setupPlayerBox(v)
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
                 if _G.teamcheck == true then
-                    if _G.temcheckmode == "colors" then
+                    if _G.teamcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
@@ -315,7 +331,7 @@ local function setupPlayerBox(v)
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
                         end
-                    elseif _G.temcheckmode == "invisible" then
+                    elseif _G.teamcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
@@ -740,7 +756,7 @@ Tab1:CreateDropdown({
     MultipleOptions = false,
     Flag = "TeamcheckMode",
     Callback = function(Options)
-        _G.temcheckmode = Options[1]
+        _G.teamcheckmode = Options[1]
     end,
 })
 
