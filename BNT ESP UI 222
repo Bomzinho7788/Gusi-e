@@ -11,7 +11,7 @@ local LegOff = Vector3.new(0, 3, 0)
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
-ESP.Teamcheck = _G.temcheck;
+ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
 
@@ -331,7 +331,7 @@ local Toggle6 = Tab:CreateToggle({
     Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
-        _G.temcheck = Value
+        ESP.Teamcheck = Value
     end,
 })
 
