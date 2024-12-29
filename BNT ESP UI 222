@@ -14,7 +14,7 @@ getgenv().EspSettings = {
 	RefreshRate = 10, -- how fast the esp updates (milliseconds)
 	MaximumDistance = 9999999999999999999999, -- only renders players within this distance
 	FaceCamera = true, -- Makes esp appear 2D
-	AlignPoints = true, -- Improves 2D effect; only works while FaceCamera is enabled
+	AlignPoints = false, -- Improves 2D effect; only works while FaceCamera is enabled
 	-- AlignPoints: This may cause esp to have abnormal behavior when looking from certain angles
 	MouseVisibility = {
 		Enabled = false, -- makes any drawing objects transparent when they are near your mouse
