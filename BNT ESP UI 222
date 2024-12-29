@@ -147,38 +147,13 @@ local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaste
 
 ESP.Enabled = true;
 
-ESP.ShowBox = false;
-ESP.BoxColor = Color3.New(0, 0, 0)
 
-ESP.BoxType = "Corner Box Esp"
+
+
 
 ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
-
-local function applyTeamCheck(v, lplr)
-    if ESP.Teamcheck and _G.teamcheck then
-        if _G.teamcheckmode == "invisible" then
-            if v.TeamColor == lplr.TeamColor then
-                ESP.ShowBox = false
-            else
-                ESP.BoxColor = _G.enemycolor
-            end
-        elseif _G.teamcheckmode == "colors" then
-            if v.TeamColor == lplr.TeamColor then
-                ESP.BoxColor = _G.teamcolor
-            else
-                ESP.BoxColor = _G.enemycolor
-            end
-        end
-    end
-end
-
-for _, v in pairs(game:GetService("Players"):GetPlayers()) do
-    if v ~= lplr then
-        applyTeamCheck(v, lplr)
-    end
-end
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -486,28 +461,7 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
-        if Value then
-            _G.boxvisible = true
-            ESP.ShowBox = false
-        else
-            _G.boxvisible = false
-            ESP.ShowBox = true
-        end
-    end,
-})
-
-local Toggle = Tab:CreateToggle({
-    Name = "Show Corner Bpx",
-    CurrentValue = false,
-    Flag = "Show c Box",
-    Callback = function(Value)
-        if Value then
-            ESP.ShowBox = true
-            _G.boxvisible = false
-        else
-            ESP.ShowBox = false
-            _G.boxvisible = true
-        end
+        _G.boxvisible = value
     end,
 })
 
@@ -909,17 +863,6 @@ local Dropdown1 = Tab:CreateDropdown({
     Flag = "TeamcheckMode",
     Callback = function(Options)
         _G.temcheckmode = Options[1]
-    end,
-})
-
-local Dropdown1 = Tab:CreateDropdown({
-    Name = "Health Value Type",
-    Options = {"Value", "Percentage"},
-    CurrentOption = {"Percentage"},
-    MultipleOptions = false,
-    Flag = "TeamchecggggkMode",
-    Callback = function(Options)
-        getfenv().EspSettings.Names.HealthDataType = Options[1]
     end,
 })
 
