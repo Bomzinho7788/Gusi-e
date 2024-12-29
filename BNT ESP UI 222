@@ -11,18 +11,18 @@ local LegOff = Vector3.new(0, 3, 0)
 getgenv().EspSettings = {
 	TeamCheck = false,
 	ToggleKey = "RightAlt",
-	RefreshRate = 10, -- how fast the esp updates (milliseconds)
-	MaximumDistance = 9999999999999999999999, -- only renders players within this distance
-	FaceCamera = true, -- Makes esp appear 2D
-	AlignPoints = true, -- Improves 2D effect; only works while FaceCamera is enabled
-	-- AlignPoints: This may cause esp to have abnormal behavior when looking from certain angles
+	RefreshRate = 25,
+	MaximumDistance = 9999999999999999999999,
+	FaceCamera = true,
+	AlignPoints = true,
+    
 	MouseVisibility = {
-		Enabled = false, -- makes any drawing objects transparent when they are near your mouse
+		Enabled = false,
 		Radius = 60,
 		Transparency = 0.3,
-		Method = "Hover", -- "Radius" or "Hover" | Hover is newest method and is a lot more accurate than Radius
+		Method = "Hover",
 		HoverRadius = 50,
-		Selected = { -- set any of these to false to ignore them
+		Selected = {
 			Boxes = true,
 			Tracers = true,
 			Names = true,
@@ -34,7 +34,7 @@ getgenv().EspSettings = {
 	},
 	Highlights = {
 		Enabled = false,
-		Players = {}, -- put player usernames into this table to 'highlight' them
+		Players = {},
 		Transparency = 1,
 		Color = Color3.fromRGB(255, 150, 0),
 		AlwaysOnTop = true
@@ -73,24 +73,24 @@ getgenv().EspSettings = {
 		outline = false,
 		OutlineColor = Color3.fromRGB(0,0,0),
 		OutlineThickness = 1,
-		Origin = "Top", -- "Top" or "Center" or "Bottom" or "Mouse"
+		Origin = "Top",
 		Thickness = 1
 	},
 	Names = {
-		Enabled = false,
+		Enabled = true,
 		Transparency = 1,
 		Color = Color3.fromRGB(255,255,255),
 		UseTeamColor = false,
 		RainbowColor = false,
 		outline = false,
 		OutlineColor = Color3.fromRGB(0,0,0),
-		Font = Drawing.Fonts.UI, -- UI or System or Plex or Monospace
+		Font = Drawing.Fonts.UI,
 		Size = 18,
 		ShowDistance = false,
-		ShowHealth = true,
+		ShowHealth = false,
 		UseDisplayName = false,
-		DistanceDataType = "m", -- what it says after the distance (ex. 100m)
-		HealthDataType = "Percentage" -- "Percentage" or "Value"
+		DistanceDataType = "m",
+		HealthDataType = "Percentage"
 	},
 	Skeletons = {
 		Enabled = false,
@@ -112,7 +112,7 @@ getgenv().EspSettings = {
 		outline = false,
 		OutlineColor = Color3.fromRGB(0,0,0),
 		OutlineThickness = 1,
-		Origin = "None", -- "None" or "Left" or "Right"
+		Origin = "None",
 		OutlineBarOnly = true
 	},
 	HeadDots = {
@@ -140,15 +140,45 @@ getgenv().EspSettings = {
 		Thickness = 1,
 		Length = 5
 	}
-} -- v1.6.14
+}
 loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
 
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
+
+ESP.ShowBox = false;
+ESP.BoxColor = Color3.New(0, 0, 0)
+
+ESP.BoxType = "Corner Box Esp"
+
 ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
+
+local function applyTeamCheck(v, lplr)
+    if ESP.Teamcheck and _G.teamcheck then
+        if _G.teamcheckmode == "invisible" then
+            if v.TeamColor == lplr.TeamColor then
+                ESP.ShowBox = false
+            else
+                ESP.BoxColor = _G.enemycolor
+            end
+        elseif _G.teamcheckmode == "colors" then
+            if v.TeamColor == lplr.TeamColor then
+                ESP.BoxColor = _G.teamcolor
+            else
+                ESP.BoxColor = _G.enemycolor
+            end
+        end
+    end
+end
+
+for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+    if v ~= lplr then
+        applyTeamCheck(v, lplr)
+    end
+end
 
 _G.temcheck = false
 _G.temcheckmode = "colors"
@@ -402,7 +432,28 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
-        _G.boxVisible = Value
+        if Value then
+            _G.boxvisible = true
+            ESP.ShowBox = false
+        else
+            _G.boxvisible = false
+            ESP.ShowBox = true
+        end
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+    Name = "Show Corner Bpx",
+    CurrentValue = false,
+    Flag = "Show c Box",
+    Callback = function(Value)
+        if Value then
+            ESP.ShowBox = true
+            _G.boxvisible = false
+        else
+            ESP.ShowBox = false
+            _G.boxvisible = true
+        end
     end,
 })
 
@@ -430,6 +481,15 @@ local Toggle3 = Tab:CreateToggle({
     Flag = "healthbarouff",
     Callback = function(Value)
         _G.HealthBarFilled = Value
+    end,
+})
+
+local Toggle2 = Tab:CreateToggle({
+    Name = "Show Health Value",
+    CurrentValue = false,
+    Flag = "healthbgstarouf",
+    Callback = function(Value)
+        getfenv().EspSettings.Names.ShowHealth = Value
     end,
 })
 
@@ -524,6 +584,7 @@ local ColorPicker3 = Tab:CreateColorPicker({
     Flag = "boxColor",
     Callback = function(Value)
         _G.boxColor = Value
+        ESP.BoxColor = Value
     end
 })
 
@@ -742,6 +803,17 @@ local Dropdown1 = Tab:CreateDropdown({
     Flag = "TeamcheckMode",
     Callback = function(Options)
         _G.temcheckmode = Options[1]
+    end,
+})
+
+local Dropdown1 = Tab:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"Value", "Percentage"},
+    CurrentOption = {"Percentage"},
+    MultipleOptions = false,
+    Flag = "TeamchecggggkMode",
+    Callback = function(Options)
+        getfenv().EspSettings.Names.HealthDataType = Options[1]
     end,
 })
 
