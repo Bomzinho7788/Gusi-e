@@ -147,6 +147,10 @@ local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaste
 
 ESP.Enabled = true;
 
+
+
+
+
 ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
@@ -868,17 +872,6 @@ local Dropdown1 = Tab:CreateDropdown({
     Flag = "TeamcheckMode",
     Callback = function(Options)
         _G.temcheckmode = Options[1]
-    end,
-})
-
-local Dropdown1 = Tab:CreateDropdown({
-    Name = "Health Value Type",
-    Options = {"Value", "Percentage"},
-    CurrentOption = {"Percentage"},
-    MultipleOptions = false,
-    Flag = "TeamchecggggkMode",
-    Callback = function(Options)
-        getfenv().EspSettings.Names.HealthDataType = Options[1]
     end,
 })
 
