@@ -497,7 +497,7 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
-local Tab = Window:CreateTab1("Aimbot", 4483362458)
+local Tab = Window:CreateTab("Aimbot", 4483362458)
 
 local Label = Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
@@ -579,13 +579,22 @@ local Slider1 = Tab:CreateSlider({
     end,
 })
 
+local Dropdown1 = Tab:CreateDropdown({
+    Name = "AimPart",
+    Options = {"Head", "Humanoid"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "AimPart",
+    Callback = function(Options)
+        _G.AimPart = Options[1]
+    end,
+})
 
+local Tab1 = Window:CreateTab("ESP", 4483362458)
 
-local Tab1 = Window:CreateTab1("ESP", 4483362458)
+local Label = Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Label = Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-local Toggle = Tab1:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Show Box",
     CurrentValue = false,
     Flag = "Show Box",
@@ -594,7 +603,7 @@ local Toggle = Tab1:CreateToggle({
     end,
 })
 
-local Toggle1 = Tab1:CreateToggle({
+local Toggle1 = Tab:CreateToggle({
     Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
@@ -603,7 +612,7 @@ local Toggle1 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle2 = Tab1:CreateToggle({
+local Toggle2 = Tab:CreateToggle({
     Name = "Show Health Bar",
     CurrentValue = false,
     Flag = "healthbarouf",
@@ -612,7 +621,7 @@ local Toggle2 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle3 = Tab1:CreateToggle({
+local Toggle3 = Tab:CreateToggle({
     Name = "Health Bar Filled",
     CurrentValue = false,
     Flag = "healthbarouff",
@@ -621,7 +630,7 @@ local Toggle3 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle4 = Tab1:CreateToggle({
+local Toggle4 = Tab:CreateToggle({
     Name = "Show Tracer",
     CurrentValue = false,
     Flag = "Name",
@@ -630,7 +639,7 @@ local Toggle4 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle4 = Tab1:CreateToggle({
+local Toggle4 = Tab:CreateToggle({
     Name = "Show Name",
     CurrentValue = false,
     Flag = "Name",
@@ -639,7 +648,7 @@ local Toggle4 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle5 = Tab1:CreateToggle({
+local Toggle5 = Tab:CreateToggle({
     Name = "Show Distance",
     CurrentValue = false,
     Flag = "Distance",
@@ -648,7 +657,7 @@ local Toggle5 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle9 = Tab1:CreateToggle({
+local Toggle9 = Tab:CreateToggle({
     Name = "Show Skeleton",
     CurrentValue = false,
     Flag = "Disthhance",
@@ -657,7 +666,7 @@ local Toggle9 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle8 = Tab1:CreateToggle({
+local Toggle8 = Tab:CreateToggle({
     Name = "Show Look Tracer",
     CurrentValue = false,
     Flag = "Disthhhance",
@@ -666,7 +675,7 @@ local Toggle8 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle7 = Tab1:CreateToggle({
+local Toggle7 = Tab:CreateToggle({
     Name = "Show HeadDots",
     CurrentValue = false,
     Flag = "Disthhhhance",
@@ -675,7 +684,7 @@ local Toggle7 = Tab1:CreateToggle({
     end,
 })
 
-local Toggle6 = Tab1:CreateToggle({
+local Toggle6 = Tab:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
@@ -686,9 +695,9 @@ local Toggle6 = Tab1:CreateToggle({
     end,
 })
 
-local Label1 = Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local ColorPicker1 = Tab1:CreateColorPicker({
+local ColorPicker1 = Tab:CreateColorPicker({
     Name = "Team Color",
     Color = Color3.fromRGB(0, 255, 0),
     Flag = "teamcolor",
@@ -697,7 +706,7 @@ local ColorPicker1 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker2 = Tab1:CreateColorPicker({
+local ColorPicker2 = Tab:CreateColorPicker({
     Name = "Enemy Color",
     Color = Color3.fromRGB(255, 0, 0),
     Flag = "enemycolor",
@@ -706,7 +715,7 @@ local ColorPicker2 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker3 = Tab1:CreateColorPicker({
+local ColorPicker3 = Tab:CreateColorPicker({
     Name = "Box Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxColor",
@@ -716,7 +725,7 @@ local ColorPicker3 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker4 = Tab1:CreateColorPicker({
+local ColorPicker4 = Tab:CreateColorPicker({
     Name = "Box Filled Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxFilledColor",
@@ -725,7 +734,7 @@ local ColorPicker4 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker5 = Tab1:CreateColorPicker({
+local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Tracer Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TracerColor",
@@ -734,7 +743,7 @@ local ColorPicker5 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker5 = Tab1:CreateColorPicker({
+local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Skeleton Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TracerColohuggdfr",
@@ -743,7 +752,7 @@ local ColorPicker5 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker5 = Tab1:CreateColorPicker({
+local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Head Dot Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TragfgfgfggkjhgfgcerColor",
@@ -752,7 +761,7 @@ local ColorPicker5 = Tab1:CreateColorPicker({
     end
 })
 
-local ColorPicker5 = Tab1:CreateColorPicker({
+local ColorPicker5 = Tab:CreateColorPicker({
     Name = "Look Tracer Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "jbfbjdbbjdb",
@@ -761,9 +770,9 @@ local ColorPicker5 = Tab1:CreateColorPicker({
     end
 })
 
-local Label2 = Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Slider1 = Tab1:CreateSlider({
+local Slider1 = Tab:CreateSlider({
     Name = "Box Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -775,7 +784,7 @@ local Slider1 = Tab1:CreateSlider({
     end,
 })
 
-local Slider2 = Tab1:CreateSlider({
+local Slider2 = Tab:CreateSlider({
     Name = "Box Filled Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -787,7 +796,7 @@ local Slider2 = Tab1:CreateSlider({
     end,
 })
 
-local Slider3 = Tab1:CreateSlider({
+local Slider3 = Tab:CreateSlider({
     Name = "Health Bar Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -799,7 +808,7 @@ local Slider3 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Tracer Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -811,7 +820,7 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Skeleton Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -823,7 +832,7 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Head Dot Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -835,7 +844,7 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Look Tracer Transparency",
     Range = {0, 1},
     Increment = .05,
@@ -847,9 +856,9 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Label3 = Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Slider5 = Tab1:CreateSlider({
+local Slider5 = Tab:CreateSlider({
     Name = "Box Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -861,7 +870,7 @@ local Slider5 = Tab1:CreateSlider({
     end,
 })
 
-local Slider6 = Tab1:CreateSlider({
+local Slider6 = Tab:CreateSlider({
     Name = "Health Bar Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -873,7 +882,7 @@ local Slider6 = Tab1:CreateSlider({
     end,
 })
 
-local Slider7 = Tab1:CreateSlider({
+local Slider7 = Tab:CreateSlider({
     Name = "Tracer Thickness",
     Range = {0, 10},
     Increment = .05,
@@ -885,7 +894,7 @@ local Slider7 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Skeleton Thickness",
     Range = {0, 1},
     Increment = .05,
@@ -897,7 +906,7 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Head Dot Thickness",
     Range = {0, 1},
     Increment = .05,
@@ -909,7 +918,7 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Slider4 = Tab1:CreateSlider({
+local Slider4 = Tab:CreateSlider({
     Name = "Look Tracer Thickness",
     Range = {0, 1},
     Increment = .05,
@@ -921,9 +930,9 @@ local Slider4 = Tab1:CreateSlider({
     end,
 })
 
-local Label4 = Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+local Label4 = Tab:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-local Dropdown1 = Tab1:CreateDropdown({
+local Dropdown1 = Tab:CreateDropdown({
     Name = "Teamcheck Mode",
     Options = {"colors", "invisible"},
     CurrentOption = {"colors"},
@@ -934,7 +943,7 @@ local Dropdown1 = Tab1:CreateDropdown({
     end,
 })
 
-local Dropdown2 = Tab1:CreateDropdown({
+local Dropdown2 = Tab:CreateDropdown({
     Name = "Health Bar Position",
     Options = {"Left", "Right"},
     CurrentOption = {"Left"},
@@ -945,7 +954,7 @@ local Dropdown2 = Tab1:CreateDropdown({
     end,
 })
 
-local Dropdown3 = Tab1:CreateDropdown({
+local Dropdown3 = Tab:CreateDropdown({
     Name = "Tracer From",
     Options = {"Bottom", "Middle", "Top"},
     CurrentOption = {"Bottom"},
