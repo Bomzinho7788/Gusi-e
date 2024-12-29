@@ -11,45 +11,9 @@ local LegOff = Vector3.new(0, 3, 0)
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
-Teamcheck = false;
+ESP.Teamcheck = _G.temcheck;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
-
-local teamCheckEnabled = _G.temcheck
-
-local function isSameTeam(player1, player2)
-    return player1.Team == player2.Team
-end
-
-local function applyESP(localPlayer, targetPlayer)
-    if teamCheckEnabled then
-        if isSameTeam(localPlayer, targetPlayer) then
-            if targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
-                targetPlayer.Character.Humanoid.HealthDisplay = Enum.HumanoidHealthDisplay.AlwaysOff
-            end
-        else
-            targetPlayer.ESP.ShowName = true
-            targetPlayer.ESP.ShowDistance = true
-        end
-    else
-        targetPlayer.ESP.ShowName = false
-        targetPlayer.ESP.ShowDistance = false
-    end
-end
-
-local function updateESP(localPlayer)
-    for _, targetPlayer in pairs(game:GetService("Players"):GetPlayers()) do
-        if targetPlayer ~= localPlayer then
-            applyESP(localPlayer, targetPlayer)
-        end
-    end
-end
-
-local localPlayer = game.Players.LocalPlayer
-
-updateESP(localPlayer)
-
-
 
 _G.temcheck = false
 _G.temcheckmode = "colors"
