@@ -331,6 +331,7 @@ local Toggle6 = Tab:CreateToggle({
     Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
+        _G.temcheck = Value
     end,
 })
 
