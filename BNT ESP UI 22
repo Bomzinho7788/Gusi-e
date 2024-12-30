@@ -1,365 +1,202 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- Carregar a biblioteca Orion
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim_V5", HidePremium = true, SaveConfig = true, ConfigFolder = "SilentAimSettings"})
 
-local lplr = game.Players.LocalPlayer
-local camera = game:GetService("Workspace").CurrentCamera
-local currentCamera = workspace.CurrentCamera
-local worldToViewportPoint = currentCamera.worldToViewportPoint
+-- Configurar a aba principal
+local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
-local HeadOff = Vector3.new(0, 0.5, 0)
-local LegOff = Vector3.new(0,3,0)
+-- Variáveis de configuração
+local SilentAimEnabled = false
+local FOV = 100
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
 
--- Configurações
-_G.temcheck = false
-_G.temcheckmode = "colors" -- opções: "colors", "invisible"
-_G.teamcolor = Color3.new(0, 1, 0) -- Cor para o time
-_G.enemycolor = Color3.new(1, 0, 0) -- Cor para inimigos
+-- Configurar o círculo de FOV
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
--- Configurações BoxOutline e Box
-_G.boxOutlineColor = Color3.new(0, 0, 0)
-_G.boxOutlineThickness = 3
-_G.boxOutlineTransparency = 1
-_G.boxOutlineVisible = false
-
-_G.boxColor = Color3.new(0, 0, 0)
-_G.boxThickness = 1
-_G.boxTransparency = 1
-_G.boxVisible = false
-
--- Configurações BoxFilled
-_G.boxFilledColor = Color3.new(0, 0, 0)
-_G.boxFilledTransparency = 0.5
-_G.boxFilledVisible = false
-
--- Definir Box, BoxOutline e BoxFilled no início
-local function createDrawingObjects()
-    local BoxOutline = Drawing.new("Square")
-    BoxOutline.Visible = _G.boxOutlineVisible
-    BoxOutline.Color = _G.boxOutlineColor
-    BoxOutline.Thickness = _G.boxOutlineThickness
-    BoxOutline.Transparency = _G.boxOutlineTransparency
-    BoxOutline.Filled = false
-
-    local Box = Drawing.new("Square")
-    Box.Visible = _G.boxVisible
-    Box.Color = _G.boxColor
-    Box.Thickness = _G.boxThickness
-    Box.Transparency = _G.boxTransparency
-    Box.Filled = false
-
-    local BoxFilled = Drawing.new("Square")
-    BoxFilled.Visible = _G.boxFilledVisible
-    BoxFilled.Color = _G.boxFilledColor
-    BoxFilled.Transparency = _G.boxFilledTransparency
-    BoxFilled.Filled = true
-    
-    return BoxOutline, Box, BoxFilled
+-- Função para obter a posição da FOV
+local function getFOVPosition()
+    local camera = workspace.CurrentCamera
+    if FOVPosition == "Center" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    else
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        return Vector2.new(mouse.X, mouse.Y)
+    end
 end
 
-for i, v in pairs(game.Players:GetChildren()) do
-    local BoxOutline, Box, BoxFilled = createDrawingObjects()
-    
-    local function boxesp()
-        game:GetService("RunService").RenderStepped:Connect(function()
-            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
-                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-                
-                local RootPart = v.Character.HumanoidRootPart
-                local Head = v.Character.Head
-                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
-                
-                if onScreen then
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
-                    BoxOutline.Visible = true
-                    
-                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    Box.Visible = true
+-- Função de Silent Aim
+local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
 
-                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = true
-
-                    if _G.temcheckmode == "colors" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Color = _G.teamcolor
-                            BoxFilled.Color = _G.teamcolor
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                        end
-                    elseif _G.temcheckmode == "invisible" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Visible = false
-                            BoxOutline.Visible = false
-                            BoxFilled.Visible = false
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                        end
-                    end
-                    
-                else
-                    BoxOutline.Visible = false
-                    Box.Visible = false
-                    BoxFilled.Visible = false
-                end
-            else
-                BoxOutline.Visible = false
-                Box.Visible = false
-                BoxFilled.Visible = false
-            end
-        end)
+tab1:AddDropdown({
+    Name = "Parte do Corpo",
+    Options = {"Cabeça", "Barriga"},
+    Default = "Barriga",
+    Callback = function(selected)
+        if selected == "Cabeça" then
+            targetPart = "Head"
+        elseif selected == "Barriga" then
+            targetPart = "HumanoidRootPart"
+        end
     end
-    coroutine.wrap(boxesp)()
+})
+
+-- Função para verificar se o jogador está dentro do FOV
+local function isPlayerInFOV(player)
+    local mousePos = getFOVPosition()
+    if player.Character and player.Character:FindFirstChild(targetPart) then
+        local charPart = player.Character:FindFirstChild(targetPart)
+        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+        return distance <= FOV
+    end
+    return false
 end
 
-game.Players.PlayerAdded:Connect(function(v)
-    local BoxOutline, Box, BoxFilled = createDrawingObjects()
-
-    local function boxesp()
-        game:GetService("RunService").RenderStepped:Connect(function()
-            if _G.temcheck and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
-                local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-
-                local RootPart = v.Character.HumanoidRootPart
-                local Head = v.Character.Head
-                local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-                local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-                local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
-
-                if onScreen then
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
-                    BoxOutline.Visible = true
-
-                    Box.Size =  Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    Box.Visible = true
-
-                    BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    BoxFilled.Visible = true
-
-                    if _G.temcheckmode == "colors" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Color = _G.teamcolor
-                            BoxFilled.Color = _G.teamcolor
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                        end
-                    elseif _G.temcheckmode == "invisible" then
-                        if v.TeamColor == lplr.TeamColor then
-                            Box.Visible = false
-                            BoxOutline.Visible = false
-                            BoxFilled.Visible = false
-                        else
-                            Box.Color = _G.enemycolor
-                            BoxFilled.Color = _G.enemycolor
-                        end
-                    end
-                    
-                else
-                    BoxOutline.Visible = false
-                    Box.Visible = false
-                    BoxFilled.Visible = false
-                end
-            else
-                BoxOutline.Visible = false
-                Box.Visible = false
-                BoxFilled.Visible = false
-            end
-        end)
+-- Função para verificar se há parede no caminho entre a câmera e o alvo
+local function isVisible(target)
+    if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
+        return false
     end
-    coroutine.wrap(boxesp)()
+
+    local camera = workspace.CurrentCamera
+    local targetPartPos = target.Character[targetPart].Position
+    local rayOrigin = camera.CFrame.Position
+    local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+    if raycastResult and raycastResult.Instance then
+        return raycastResult.Instance:IsDescendantOf(target.Character)
+    end
+
+    return true
+end
+
+-- Função para pegar o jogador mais próximo dentro do FOV
+local function getClosestPlayerInFOV()
+    local closestPlayer = nil
+    local players = game.Players:GetPlayers()
+    local closestDistance = FOV
+    local mousePos = getFOVPosition()
+
+    for _, player in pairs(players) do
+        if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
+            local charPart = player.Character:FindFirstChild(targetPart)
+            if charPart then
+                local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                if distance < closestDistance and isVisible(player) then
+                    closestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+-- Função para mirar no jogador
+local function aimAt(target)
+    if target and target.Character and target.Character:FindFirstChild(targetPart) then
+        local camera = workspace.CurrentCamera
+        local aimPosition = target.Character[targetPart].Position
+        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if SilentAimEnabled then
+        local target = getClosestPlayerInFOV()
+        if target then
+            aimAt(target)
+        end
+    end
+
+    -- Atualiza a posição do círculo de FOV
+    FOVCircle.Position = getFOVPosition()
+    FOVCircle.Radius = FOV
+    FOVCircle.Visible = FOVVisible
 end)
 
-local Window = Rayfield:CreateWindow({
-    Name = "BNT ESP",
-    Icon = 0,
-    LoadingTitle = "By Bomzinho",
-    LoadingSubtitle = "Loading....",
-    Theme = "Ocean",
-
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false,
- 
-    ConfigurationSaving = {
-       Enabled = true,
-       FolderName = nil,
-       FileName = "ESPP"
-    },
- 
-    Discord = {
-       Enabled = false,
-       Invite = "",
-       RememberJoins = true
-    },
- 
-    KeySystem = true,
-    KeySettings = {
-       Title = "BNT ESP",
-       Subtitle = "Key System",
-       Note = "No method of obtaining the key is provided",
-       FileName = "Key",
-       SaveKey = true,
-       GrabKeyFromSite = false,
-       Key = {"4321", "1234"}
-    }
-})
-
-local Tab1 = Window:CreateTab("Aimbot", 4483362458)
-
-local Tab = Window:CreateTab("ESP", 4483362458)
-
-local Label = Tab:CreateLabel("Geral KeySettings", 4483362458, Color3.fromRGB(255, 255, 255), false)
-
-local Toggle = Tab:CreateToggle({
-    Name = "Show Box",
-    CurrentValue = false,
-    Flag = "Show Box",
-    Callback = function(Value)
-        _G.boxVisible = Value
-    end,
-})
-
-local Toggle1 = Tab:CreateToggle({
-    Name = "Show Box Outline",
-    CurrentValue = false,
-    Flag = "Show BoxOutline",
-    Callback = function(Value)
-        _G.boxOutlineVisible = Value
-    end,
-})
-
-local Toggle2 = Tab:CreateToggle({
-    Name = "Box Filled",
-    CurrentValue = false,
-    Flag = "BoxFilled",
-    Callback = function(Value)
-        _G.boxFilledVisible = Value
-    end,
-})
-
-local Toggle3 = Tab:CreateToggle({
-    Name = "temcheck",
-    CurrentValue = false,
-    Flag = "temcheck",
-    Callback = function(Value)
-        _G.temcheck = Value
-    end,
-})
-
-local Label1 = Tab:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
-
-local ColorPicker = Tab:CreateColorPicker({
-    Name = "Team Color",
-    Color = Color3.fromRGB(0, 255, 0),
-    Flag = "teamcolor",
-    Callback = function(Value)
-        _G.teamcolor = Value
+-- Toggle para ativar/desativar o Silent Aim
+tab1:AddToggle({
+    Name = "Ativar Aimbot",
+    Default = false,
+    Callback = function(value)
+        SilentAimEnabled = value
     end
 })
 
-local ColorPicker1 = Tab:CreateColorPicker({
-    Name = "Enemy Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "enemycolor",
-    Callback = function(Value)
-        _G.enemycolor = Value
+-- Dropdown para selecionar a posição da FOV (Centro ou Posição do Dedo)
+tab1:AddDropdown({
+    Name = "Posição da FOV",
+    Default = "Center",
+    Options = {"Center", "Finger"},
+    Callback = function(option)
+        FOVPosition = option
     end
 })
 
-local ColorPicker2 = Tab:CreateColorPicker({
-    Name = "Box Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxColor",
-    Callback = function(Value)
-        _G.boxColor = Value
+-- Textbox para definir o tamanho da FOV
+tab1:AddTextbox({
+    Name = "Tamanho da FOV (0 - 300)",
+    Default = "100",
+    TextDisappear = true,
+    Callback = function(value)
+        local size = tonumber(value)
+        if size and size >= 0 and size <= 300 then
+            FOV = size
+        else
+            warn("Tamanho inválido! Use um valor entre 0 e 300.")
+        end
     end
 })
 
-local ColorPicker3 = Tab:CreateColorPicker({
-    Name = "Box Outline Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxOutlineColor",
-    Callback = function(Value)
-        _G.boxOutlineColor = Value
+-- Toggle para mostrar/ocultar o círculo de FOV
+tab1:AddToggle({
+    Name = "Mostrar FOV",
+    Default = false,
+    Callback = function(value)
+        FOVVisible = value
     end
 })
 
-local ColorPicker4 = Tab:CreateColorPicker({
-    Name = "Box Filled Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxFilledColor",
-    Callback = function(Value)
-        _G.boxFilledColor = Value
+-- Dropdown para selecionar a cor do FOV
+local colors = {
+    ["Branco"] = Color3.new(1, 1, 1),
+    ["Vermelho"] = Color3.new(1, 0, 0),
+    ["Verde"] = Color3.new(0, 1, 0),
+    ["Azul"] = Color3.new(0, 0, 1),
+    ["Amarelo"] = Color3.new(1, 1, 0),
+    ["Roxo"] = Color3.new(0.5, 0, 1),
+    ["Laranja"] = Color3.new(1, 0.5, 0),
+    ["Ciano"] = Color3.new(0, 1, 1),
+    ["Rosa"] = Color3.new(1, 0.5, 0.8),
+    ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
+}
+
+tab1:AddDropdown({
+    Name = "Selecione a cor do FOV",
+    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza"},
+    Default = "Branco",
+    Callback = function(selected)
+        FOVCircle.Color = colors[selected]
     end
 })
 
-local Label2 = Tab:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
-
-local Slider = Tab:CreateSlider({
-    Name = "Box Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxTransparency",
-    Callback = function(Value)
-        _G.boxTransparency = Value
-    end,
-})
-
-local Slider1 = Tab:CreateSlider({
-    Name = "Box Outline Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxOutlineTransparency",
-    Callback = function(Value)
-        _G.boxOutlineTransparency = Value
-    end,
-})
-
-local Slider2 = Tab:CreateSlider({
-    Name = "Box Filled Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxFilledTransparency",
-    Callback = function(Value)
-        _G.boxFilledTransparency = Value
-    end,
-})
-
-local Label3 = Tab:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(255, 255, 255), false)
-
-local Slider3 = Tab:CreateSlider({
-    Name = "Box Thickness",
-    Range = {0, 10},
-    Increment = .5,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxThickness",
-    Callback = function(Value)
-        _G.boxThickness = Value
-    end,
-})
-
-local Slider4 = Tab:CreateSlider({
-    Name = "Box Outline Thickness",
-    Range = {0, 10},
-    Increment = .5,
-    Suffix = "",
-    CurrentValue = 3,
-    Flag = "boxOutlineThickness",
-    Callback = function(Value)
-        _G.boxOutlineThickness = Value
-    end,
-})
+OrionLib:Init()
