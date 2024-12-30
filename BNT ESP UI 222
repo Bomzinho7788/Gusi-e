@@ -87,14 +87,6 @@ AimbotTab:AddSlider({
     end
 })
 
-AimbotTab:AddColorpicker({
-	Name = "Fov Color",
-	Default = Color3.fromRGB(255, 0, 0),
-	Callback = function(Value)
-		settings.Aimbot_Fov_Color = Value
-	end	  
-})
-
 AimbotTab:AddToggle({
     Name = "Show FOV",
     Default = false,
