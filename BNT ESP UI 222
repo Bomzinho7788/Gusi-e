@@ -14,9 +14,7 @@ local DeleteMob ={
         Keybind = "z"; -- Menu Key Bind
     };
 	Aimbot= {
-        Keybind = "MouseButton2"; -- Change Aim Bot Key Bind Here !!! No Capitals, Unless it is MouseButton1 or MouseButton2
-------------------------------------------------------------------------------------------
-		Enabled = false; -- No Need To Change Anything Here As It Is On The GUI
+		Enabled = false;
 		TeamCheck = false;
 		WallCheck = false;
 		ShowFov = false;
@@ -28,7 +26,7 @@ local DeleteMob ={
 		FovColor = Color3.fromRGB(100,0,100);
 		FovFillTransparency = 1;
 		FovTransparenct = 0;
-        IsAimKeyDown = false;
+        IsAimKeyDown = true;
 	};
 	ESP ={
 		Box = {
@@ -1474,35 +1472,6 @@ PLAYER:GetMouse().KeyDown:Connect(function(KeyPressed) -- What The Fuck
             DeleteMobF.Visible = true
         end
     end
-    if KeyPressed == (DeleteMob.Aimbot.Keybind) and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = true
-    end
-end)
-PLAYER:GetMouse().KeyUp:Connect(function(KeyPressed) 
-    if KeyPressed == (DeleteMob.Aimbot.Keybind) and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = false
-    end
-end)
-
-PLAYER:GetMouse().Button1Down:Connect(function()
-    if DeleteMob.Aimbot.Keybind == "MouseButton1" and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = true
-    end
-end)
-PLAYER:GetMouse().Button1Up:Connect(function()
-    if DeleteMob.Aimbot.Keybind == "MouseButton1" and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = false
-    end
-end)
-PLAYER:GetMouse().Button2Down:Connect(function()
-    if DeleteMob.Aimbot.Keybind == "MouseButton2" and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = true
-    end
-end)
-PLAYER:GetMouse().Button2Up:Connect(function()
-    if DeleteMob.Aimbot.Keybind == "MouseButton2" and DeleteMob.Aimbot.Enabled then
-        DeleteMob.Aimbot.IsAimKeyDown = false
-    end
 end)
 
 -- Made By Mick Gordon
@@ -1906,7 +1875,7 @@ game:GetService('RunService').RenderStepped:connect(function()
 	-- Fov
 	local acc = DeleteMob.Aimbot.Smoothing / 2	
 	local posd = UIS:GetMouseLocation() 
-	FOVFFrame.Position = UDim2.new(0, posd.X, 0, posd.Y - 36)
+	FOVFFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	FOVFFrame.Size = UDim2.new(0, DeleteMob.Aimbot.Fov + acc, 0, DeleteMob.Aimbot.Fov + acc)
 	FOVFFrame.Visible = DeleteMob.Aimbot.ShowFov
 	FOVFFrame.BackgroundColor3 = DeleteMob.Aimbot.FovFillColor
