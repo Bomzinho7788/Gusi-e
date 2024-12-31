@@ -375,7 +375,7 @@ end)
 
 local SilentAimEnabled = false
 local WallCheckEnabled = false
-local FOV = 50
+local FOV = 85
 local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
@@ -603,10 +603,10 @@ Tab:CreateColorPicker({
 
 Tab:CreateSlider({
     Name = "Fov Size",
-    Range = {0, 1},
-    Increment = .05,
+    Range = {0, 650},
+    Increment = .5,
     Suffix = "",
-    CurrentValue = 1,
+    CurrentValue = 85,
     Flag = "Fov Transparency",
     Callback = function(Value)
         FOV = Value
