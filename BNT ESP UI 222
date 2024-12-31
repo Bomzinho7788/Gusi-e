@@ -1,798 +1,1055 @@
-repeat wait() until game:IsLoaded()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-for _, v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
-    v:Disable()
-end
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
 
-for _, v in pairs(getconnections(game:GetService("LogService").MessageOut)) do
-    v:Disable()
-end
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
 
-local Folder = "Project Validus"
-if not isfolder(Folder) then
-    makefolder(Folder)
-end
-
-local plrs = game:GetService("Players")
-local plr = plrs.LocalPlayer
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local ValidTargetParts = {"Head", "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "RightUpperArm", "LeftUpperArm", "RightLowerArm", "LeftLowerArm", "RightHand", "LeftHand", "RightUpperLeg", "LeftUpperLeg", "RightLowerLeg", "LeftLowerLeg", "RightFoot", "LeftFoot"}
-local mouse = plr:GetMouse()
-local Camera = workspace.CurrentCamera
-local FindFirstChild = game.FindFirstChild
-local GetPlayers = plrs.GetPlayers
-local GetPartsObscuringTarget = Camera.GetPartsObscuringTarget
-local Pathfinding = game:GetService("PathfindingService")
-local Util = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robobo2022/Util/main/Load.lua"))()
-local func = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bovanlaarhoven/Project-Validus-v2/main/utils/func.lua"))()
-
-repeat wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and Camera
-
-local Settings = {
-    Camlock = false,
-    Enabled = false,
-    Method = "",
-    TeamCheck = false,
-    TargetPart = "Head",
-    HitChance = 100, 
-    Smoothing = 50,
-    Bot = false,
-    Botmethod = "Tween",
-    ShowPath = false,
-    autoequipe = false,
-    equipeNumber = 1,
-    --Movement
-    Fly = false,
-    Speed = false,
-    SpeedValue = 0,
-    FlyValue = 0,
-    SpeedMethod = "CFrame",
-    FlyMethod = "CFrame",
-
-    --Visuals
-    FovRadius = 100,
-    FovVisable = false,
-    FovTransparency = 0.5,
-    FovTracers = false,
-    FovColor = Color3.new(255, 255, 255),
-    FovTracersColor = Color3.new(255, 255, 255),
-    HealthBar = false,
-    BulletTracers = false,
-    BulletTraceMeterial = "ForceField",
-    BulletTracersColor = Color3.new(255, 0, 0),
+getgenv().EspSettings = {
+	TeamCheck = false,
+	ToggleKey = "RightAlt",
+	RefreshRate = 25,
+	MaximumDistance = 9999999999999999999999,
+	FaceCamera = true,
+	AlignPoints = false,
+    
+	MouseVisibility = {
+		Enabled = false,
+		Radius = 60,
+		Transparency = 0.3,
+		Method = "Hover",
+		HoverRadius = 50,
+		Selected = {
+			Boxes = true,
+			Tracers = true,
+			Names = true,
+			Skeletons = true,
+			HealthBars = true,
+			HeadDots = true,
+			LookTracers = true
+		}
+	},
+	Highlights = {
+		Enabled = false,
+		Players = {},
+		Transparency = 1,
+		Color = Color3.fromRGB(255, 150, 0),
+		AlwaysOnTop = true
+	},
+	NPC = {
+		Color = Color3.fromRGB(150,150,150),
+		Transparency = 1,
+		RainbowColor = false,
+		Overrides = {
+			Boxes = true,
+			Tracers = true,
+			Names = true,
+			Skeletons = true,
+			HealthBars = true,
+			HeadDots = true,
+			LookTracers = true
+		}
+	},
+	Boxes = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1
+	},
+	Tracers = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = "Top",
+		Thickness = 1
+	},
+	Names = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		Font = Drawing.Fonts.UI,
+		Size = 18,
+		ShowDistance = false,
+		ShowHealth = false,
+		UseDisplayName = false,
+		DistanceDataType = "m",
+		HealthDataType = "Percentage"
+	},
+	Skeletons = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1
+	},
+	HealthBars = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(0,255,0),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Origin = "None",
+		OutlineBarOnly = true
+	},
+	HeadDots = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1,
+		Filled = false,
+		Scale = 1
+	},
+	LookTracers = {
+		Enabled = false,
+		Transparency = 1,
+		Color = Color3.fromRGB(255,255,255),
+		UseTeamColor = false,
+		RainbowColor = false,
+		outline = false,
+		OutlineColor = Color3.fromRGB(0,0,0),
+		OutlineThickness = 1,
+		Thickness = 1,
+		Length = 5
+	}
 }
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/UniversalEsp.lua", "UniversalEsp"))()
 
-local Tracer = function(begin, endpos)
-    local tracer = Instance.new("Part")
-    tracer.Anchored = true
-    tracer.CanCollide = false
-    tracer.Material = Settings.BulletTraceMeterial
-    tracer.Color = Settings.BulletTracersColor
-    tracer.Size = Vector3.new(0.1, 0.1, (begin - endpos).Magnitude)
-    tracer.CFrame = CFrame.new(begin, endpos) * CFrame.new(0, 0, -tracer.Size.Z / 2)
-    tracer.Parent = workspace
-    game.Debris:AddItem(tracer, 0.1)
+if _G.teamcheck and _G.teamcheckmode == "colors" and getfenv().EspSettings.TeamCheck then
+    getfenv().EspSettings.Skeletons.UseTeamColor = true
+    getfenv().EspSettings.LookTracersg.UseTeamColor = true
+    getfenv().EspSettings.HeadDots.UseTeamColor = true
+elseif _G.teamcheck and _G.teamcheckmode == "invisible" and getfenv().EspSettings.TeamCheck then
+    getfenv().EspSettings.Skeletons.UseTeamColor = false
+    getfenv().EspSettings.LookTracers.UseTeamColor = false
+    getfenv().EspSettings.HeadDots.UseTeamColor = false
 end
 
-local IsPlayerVisible = function(Player)
-    local PlayerCharacter = Player.Character
-    local LocalPlayerCharacter = plr.Character
-    
-    if not (PlayerCharacter or LocalPlayerCharacter) then return end 
-    
-    local PlayerRoot = FindFirstChild(PlayerCharacter, Settings.TargetPart) or FindFirstChild(PlayerCharacter, "HumanoidRootPart")
-    
-    if not PlayerRoot then return end 
-    
-    local CastPoints, IgnoreList = {PlayerRoot.Position, LocalPlayerCharacter, PlayerCharacter}, {LocalPlayerCharacter, PlayerCharacter}
-    local ObscuringObjects = #GetPartsObscuringTarget(Camera, CastPoints, IgnoreList)
-    
-    return ((ObscuringObjects == 0 and true) or (ObscuringObjects > 0 and false))
+if _G.teamcheck == false and _G.teamcheckmode == "colors" and getfenv().EspSettings.TeamCheck == false and getfenv().EspSettings.Skeletons.UseTeamColor == true and getfenv().EspSettings.LookTracersg.UseTeamColor == true and getfenv().EspSettings.HeadDots.UseTeamColor == true then
+    getfenv().EspSettings.Skeletons.UseTeamColor = false
+    getfenv().EspSettings.LookTracers.UseTeamColor = false
+    getfenv().EspSettings.HeadDots.UseTeamColor = false
 end
 
-local GetClosestPlayer = function()
-    if not Settings.TargetPart then return end
-    local Closest
-    local DistanceToMouse
-    for _,Player in next, GetPlayers(plrs) do
-        if Player == plr then continue end
-        if Settings.TeamCheck and func.TeamCheck(Player) then continue end
-        local Character = Player.Character
-        if not Character then continue end
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
-        if Settings.VisibleCheck and not IsPlayerVisible(Player) then continue end
+ESP.Enabled = true;
+ESP.Teamcheck = false;
+ESP.ShowName = false;
+ESP.ShowDistance = false;
 
-        local HumanoidRootPart = FindFirstChild(Character, "HumanoidRootPart")
-        local Humanoid = FindFirstChild(Character, "Humanoid")
-        if not HumanoidRootPart or not Humanoid or Humanoid and Humanoid.Health <= 0 then continue end
+_G.teamcheck = false
+_G.teamcheckmode = "colors"
+_G.teamcolor = Color3.new(0, 1, 0)
+_G.enemycolor = Color3.new(1, 0, 0)
 
-        local ScreenPosition, OnScreen = func.GetScreenPosition(HumanoidRootPart.Position)
-        if not OnScreen then continue end
+_G.boxColor = Color3.new(0, 0, 0)
+_G.boxThickness = 1
+_G.boxTransparency = 1
+_G.boxVisible = false
 
-        local Distance = (func.GetMousePosition() - ScreenPosition).Magnitude
-        if Distance <= (DistanceToMouse or Settings.FovRadius or 2000) then
-            Closest = ((Settings.TargetPart == "Random" and Character[ValidTargetParts[math.random(1, #ValidTargetParts)]] or Character[Settings.TargetPart]))
-            DistanceToMouse = Distance
-        end
-    end
-    return Closest
-end
+_G.ShowBox = false
 
-local Camlock = function()
-    local Target = GetClosestPlayer()
-    if Settings.Camlock then
-        if Camera then
-            if func.IsAlive(plr) then
-                if Target ~= nil then
-                    local Main = CFrame.new(Camera.CFrame.Position, Target.Position)
-                    Camera.CFrame = Camera.CFrame:Lerp(Main, Settings.Smoothing / 100, Enum.EasingStyle.Elastic, Enum.EasingDirection.InOut)
-                end
-            end
-        end
-    end
-end
-    
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+_G.boxFilledColor = Color3.new(0, 0, 0)
+_G.boxFilledTransparency = 0.5
+_G.boxFilledVisible = false
 
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+_G.HealthBarThickness = 1
+_G.HealthBarVisible = false
+_G.HealthBarTransparency = 1
+_G.HealthBarColor = Color3.new(0, 1, 0)
+_G.HealthBarFilled = true
 
-local Window = Library:CreateWindow({
-    Title = 'Project Validus V2.1',
-    Center = true,
-    AutoShow = true,
-    TabPadding = 8,
-    MenuFadeTime = 0.2
-})
+_G.HealthBarPosition = "Left"
 
-local Tabs = {
-    Combat = Window:AddTab('Combat'),
-    Visuals = Window:AddTab('Visuals'),
-    Misc = Window:AddTab('Misc'),
-    ['UI Settings'] = Window:AddTab('UI Settings'),
-}
+_G.TracerVisible = false
+_G.TracerThickness = 1.5
+_G.TracerTransparency = 1
+_G.TracerColor = Color3.new(0, 0, 0)
 
-local Silent = Tabs.Combat:AddLeftGroupbox('Silent')
-local Fov = Tabs.Visuals:AddLeftTabbox('Fov')
-local FovSettings = Fov:AddTab('Fov')
-local Colors = Fov:AddTab('Colors')
-local Esp = Tabs.Visuals:AddRightGroupbox('Esp')
-local BulletTrace = Tabs.Visuals:AddRightGroupbox('Bullet Tracers')
-local Bot = Tabs.Misc:AddRightGroupbox('Bot')
-local Movement = Tabs.Misc:AddLeftTabbox('Movement')
-local Fly = Movement:AddTab('Fly')
-local Speed = Movement:AddTab('Speed')
+_G.TracerFrom = "Bottom"
 
-Silent:AddLabel('Camlock'):AddKeyPicker('Camlock', {
-    Default = '',
-    SyncToggleState = false,
-    Mode = 'Toggle',
-
-    Text = 'Camlock',
-    NoUI = false,
-    Callback = function(Value)
-        Settings.Camlock = Value
-    end,
-})
-
-Silent:AddLabel('Silent aim'):AddKeyPicker('Silentaim', {
-    Default = 'G',
-    SyncToggleState = false,
-    Mode = 'Toggle',
-
-    Text = 'Silent aim',
-    NoUI = false,
-    Callback = function(Value)
-        Settings.Enabled = Value
-    end,
-})
-
-Silent:AddToggle('TeamCheck', {
-    Text = 'Team Check',
-    Default = false,
-    Tooltip = 'Checkington',
-    Callback = function(Value)
-        Settings.TeamCheck = Value
-    end
-})
-
-Silent:AddToggle('VisibleCheck', {
-    Text = 'Visible Check',
-    Default = false,
-    Tooltip = 'Checkington',
-    Callback = function(Value)
-        Settings.VisibleCheck = Value
-    end
-})
-
-Silent:AddDropdown('HitPart', {
-    Values = {'Random', "Head", "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "RightUpperArm", "LeftUpperArm", "RightLowerArm", "LeftLowerArm", "RightHand", "LeftHand", "RightUpperLeg", "LeftUpperLeg", "RightLowerLeg", "LeftLowerLeg", "RightFoot", "LeftFoot"},
-    Default = 1,
-    Multi = false, 
-    Text = 'HitPart',
-    Tooltip = 'Targetington',
-
-    Callback = function(Value)
-        Settings.HitPart = Value
-    end
-})
-
-Silent:AddDropdown('MyDropdown', {
-    Values = { 'Raycast', 'FindPartOnRay', 'FindPartOnRayWithWhitelist', 'FindPartOnRayWithIgnoreList'},
-    Default = 0,
-    Multi = false, 
-    Text = 'Silent method',
-    Tooltip = 'Methington',
-    Callback = function(Value)
-        Settings.Method = Value
-    end
-})
-
-Silent:AddSlider('hitchance', {
-    Text = 'Hit Chance',
-    Default = 50,
-    Min = 1,
-    Max = 100,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.HitChance = Value
-    end
-})
-
-Silent:AddSlider('Smoothing', {
-    Text = 'Camlock Smoothing',
-    Default = 50,
-    Min = 1,
-    Max = 100,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.Smoothing = Value
-    end
-})
-
-FovSettings:AddToggle('Fov Visible', {
-    Text = 'Enable',
-    Default = false,
-    Tooltip = 'Visible',
-    Callback = function(Value)
-        Settings.FovVisable = Value
-    end
-})
-
-Colors:AddLabel('Fov Color'):AddColorPicker('ColorPicker', {
-    Default = Color3.new(1, 1, 1),
-    Title = 'Fov Color',
-    Transparency = 0,
-
-    Callback = function(Value)
-        Settings.FovColor = Value
-    end
-})
-
-FovSettings:AddToggle('Tracers', {
-    Text = 'Fov Tracers',
-    Default = false,
-    Tooltip = 'Visible',
-    Callback = function(Value)
-        Settings.FovTracers = Value
-    end
-})
-
-Colors:AddLabel('Fov Tracers Color'):AddColorPicker('ColorPicker', {
-    Default = Color3.new(1, 1, 1), 
-    Title = 'Fov Tracers Color', 
-    Transparency = 0, 
-
-    Callback = function(Value)
-        Settings.FovTracersColor = Value
-    end
-})
-
-FovSettings:AddSlider('Radois', {
-    Text = 'Fov Radius',
-    Default = 100,
-    Min = 1,
-    Max = 1000,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.FovRadius = Value
-    end
-})
-
-FovSettings:AddSlider('Trans', {
-    Text = 'Fov Transparency',
-    Default = 0.4,
-    Min = 0.1,
-    Max = 1,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.FovTransparency = Value
-    end
-})
-
-BulletTrace:AddToggle('Bullet Tracers', {
-    Text = 'Enable',
-    Default = false,
-    Tooltip = 'Bullet Tracers',
-    Callback = function(Value)
-        Settings.BulletTracers = Value
-    end
-})
-
-BulletTrace:AddLabel('Bullet Color'):AddColorPicker('ColorPicker', {
-    Default = Color3.new(1, 1, 1),
-    Title = 'Bullet Color',
-    Transparency = 0,
-
-    Callback = function(Value)
-        Settings.BulletTracersColor = Value
-    end
-})
-
-BulletTrace:AddDropdown('Material', {
-    Values = { 'ForceField', 'SmoothPlastic', 'Plastic', 'Neon', 'Glass', 'Grass', 'Wood', 'Slate', 'Concrete', 'CorrodedMetal', 'DiamondPlate', 'Foil', 'Granite', 'Marble', 'Brick', 'Pebble', 'Sand', 'Fabric', 'SmoothPlastic', 'Metal', 'Ice', 'ForceField'},
-    Default = 1, 
-    Multi = false,
-
-    Text = 'Bullet Tracers Material',
-    Tooltip = 'Material',
-
-    Callback = function(Value)
-        Settings.BulletTraceMeterial = Value
-    end
-})
-
-Bot:AddToggle('Bot', {
-    Text = 'Auto Bot',
-    Default = false,
-    Tooltip = 'Auto Finds players',
-    Callback = function(Value)
-        Settings.Bot = Value
-    end
-})
-
-Bot:AddDropdown('bot', {
-    Values = { 'Tween', 'Walking'},
-    Default = 1, 
-    Multi = false,
-
-    Text = 'Bot Method',
-    Tooltip = 'Bot Method',
-
-    Callback = function(Value)
-        Settings.Botmethod = Value
-    end
-})
-
-Bot:AddToggle('Bot', {
-    Text = 'ShowPath',
-    Default = false,
-    Tooltip = 'Shows the path',
-    Callback = function(Value)
-        Settings.ShowPath = Value
-    end
-})
-
-Bot:AddToggle('Bot', {
-    Text = 'Auto Equipe',
-    Default = false,
-    Tooltip = 'equipe tool',
-    Callback = function(Value)
-        Settings.autoequipe = Value
-    end
-})
-
-Bot:AddDropdown('bot', {
-    Values = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'},
-    Default = 1, 
-    Multi = false,
-
-    Text = 'Auto Equipe tool',
-    Tooltip = 'equipe tool',
-
-    Callback = function(Value)
-        Settings.equipeNumber = Value
-    end
-})
-
-Speed:AddToggle('Speed', {
-    Text = 'Speed',
-    Default = false,
-    Tooltip = 'Speedington',
-    Callback = function(Value)
-        Settings.Speed = Value
-    end
-})
-
-Speed:AddDropdown('Method', {
-    Values = { 'CFrame', 'Velocity', 'WalkSpeed', 'MoveDirection'},
-    Default = 1, 
-    Multi = false,
-
-    Text = 'Speed Method',
-    Tooltip = 'Speed Method',
-
-    Callback = function(Value)
-        Settings.SpeedMethod = Value
-    end
-})
-
-Speed:AddSlider('SPeed', {
-    Text = 'Speed Value',
-    Default = 0,
-    Min = 0,
-    Max = 100,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.SpeedValue = Value
-    end
-})
-
-Fly:AddToggle('Speed', {
-    Text = 'Fly',
-    Default = false,
-    Tooltip = 'Flyington',
-    Callback = function(Value)
-        Settings.Fly = Value
-    end
-})
-
-Fly:AddDropdown('Method', {
-    Values = { 'CFrame', 'Velocity'},
-    Default = 1, 
-    Multi = false,
-
-    Text = 'Fly Method',
-    Tooltip = 'Fly Method',
-
-    Callback = function(Value)
-        Settings.FlyMethod = Value
-    end
-})
-
-Fly:AddSlider('SPeed', {
-    Text = 'fly Value',
-    Default = 0,
-    Min = 0,
-    Max = 100,
-    Rounding = 1,
-    Compact = false,
-    Callback = function(Value)
-        Settings.FlyValue = Value
-    end
-})
-
-Esp:AddToggle('Healthbar', {
-    Text = 'Health Bar',
-    Default = false,
-    Tooltip = 'Healthbar',
-    Callback = function(Value)
-        Settings.HealthBar = Value
-    end
-})
-
-local Fly = function()
-    if Settings.Fly then
-        if Settings.FlyMethod == "Velocity" then
-            local forward = (UserInputService:IsKeyDown(Enum.KeyCode.W) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.S) and 1 or 0)
-            local right = (UserInputService:IsKeyDown(Enum.KeyCode.D) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.A) and 1 or 0)
-            local up = (UserInputService:IsKeyDown(Enum.KeyCode.Space) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) and 1 or 0)
-            local direction = (Camera.CFrame * CFrame.new(right * 5, up * 5, forward * 5)).lookVector
-            plr.Character.HumanoidRootPart.Velocity = direction * Settings.FlyValue
-        elseif Settings.FlyMethod == "CFrame" then
-            local forward = (UserInputService:IsKeyDown(Enum.KeyCode.W) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.S) and 1 or 0)
-            local right = (UserInputService:IsKeyDown(Enum.KeyCode.D) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.A) and 1 or 0)
-            local up = (UserInputService:IsKeyDown(Enum.KeyCode.Space) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) and 1 or 0)
-            local direction = (Camera.CFrame * CFrame.new(right * 5, up * 5, forward * 5)).lookVector
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + direction * Settings.FlyValue/100
-        end
+local function getTracerFromPosition()
+    if _G.TracerFrom == "Bottom" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+    elseif _G.TracerFrom == "Middle" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif _G.TracerFrom == "Top" then
+        return Vector2.new(camera.ViewportSize.X / 2, 0)
     end
 end
 
-local Speed = function()
-    if Settings.Speed then
-        if Settings.SpeedMethod == "WalkSpeed" then
-            plr.Character.Humanoid.WalkSpeed = Settings.SpeedValue
-        elseif Settings.SpeedMethod == "MoveDirection" then
-            plr.Character:TranslateBy(plr.Character.Humanoid.MoveDirection * Settings.SpeedValue/100)
-        elseif Settings.SpeedMethod == "Velocity" then
-            plr.Character.HumanoidRootPart.Velocity = plr.Character.HumanoidRootPart.Velocity + plr.Character.Humanoid.MoveDirection * Settings.SpeedValue
-        elseif Settings.SpeedMethod == "CFrame" then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.Humanoid.MoveDirection * Settings.SpeedValue/100
-        end
-    end
+local function createDrawingObjects()
+    local Box = Drawing.new("Square")
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Filled = false
+    Box.Visible = _G.boxVisible
+
+    local BoxFilled = Drawing.new("Square")
+    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Filled = true
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    local Tracer = Drawing.new("Line")
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
+    return Box, BoxFilled, HealthBar, Tracer
 end
 
-local ClosestPathFind = nil
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Visible = _G.boxVisible
 
-local ClosestPathfinding = function()
-    local Closest = nil
-    local Distance = math.huge
-    for _,v in ipairs(plrs:GetPlayers()) do
-        if v ~= plr and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
-            local hrp = v.Character:FindFirstChild("HumanoidRootPart")
-            local lhrp = plr.Character:FindFirstChild("HumanoidRootPart")
-            if hrp and lhrp then
-                local magnitude = (hrp.Position - lhrp.Position).Magnitude
-                if magnitude < Distance then
-                    Closest = hrp
-                    Distance = magnitude
-                end
-            end
-        end
-    end
-    return Closest
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Visible = _G.boxFilledVisible
+
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
 end
 
-local Walking = function()
-    if not Settings.Bot then
-        return
+local function getHealthValues(player)
+    local maxHealth, health
+    if player:FindFirstChild("NRPBS") then
+        maxHealth = player.NRPBS["MaxHealth"].Value
+        health = player.NRPBS["Health"].Value
+    else
+        maxHealth = player.Character.Humanoid.MaxHealth
+        health = player.Character.Humanoid.Health
     end
-
-    local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-
-    if not hrp then
-        return
-    end
-
-    if not ClosestPathFind then
-        ClosestPathFind = ClosestPathfinding()
-    end
-
-    if Settings.ShowPath then
-        Util.PathFind.ShowPath(ClosestPathFind.CFrame)
-    elseif not Settings.ShowPath then
-        Util.PathFind.RemovePath()
-    end
-
-    if Settings.Botmethod == "Walking" then
-        Util.PathFind.MoveCharacter(ClosestPathFind.CFrame)
-    end
-    if Settings.Botmethod == "Tween" then
-        local duration = (ClosestPathFind.Position - hrp.Position).Magnitude * 0.1
-        Util.CTween:go(ClosestPathFind.CFrame, duration)
-    end
+    return maxHealth, health
 end
 
-local OldNamecall
-OldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(...)
-    local Method = getnamecallmethod()
-    local Args = {...}
-    local self = Args[1]
-    local chance = func.HitChance(Settings.HitChance)
-    if Settings.Enabled and self == workspace and not checkcaller() then
-        if Method == "FindPartOnRayWithIgnoreList" and Settings.Method == Method then
-            local A_Ray = Args[2]
-            local HitPart = GetClosestPlayer()
-            if HitPart then
-                local Origin = A_Ray.Origin
-                local Direction = func.Direction(Origin, HitPart.Position)
-                Args[2] = Ray.new(Origin, Direction)
-                return OldNamecall(unpack(Args))
-            end
-        elseif Method == "FindPartOnRayWithWhitelist" and Settings.Method == Method then
-            local A_Ray = Args[2]
-            local HitPart = GetClosestPlayer()
-            if HitPart then
-                local Origin = A_Ray.Origin
-                local Direction = func.Direction(Origin, HitPart.Position)
-                Args[2] = Ray.new(Origin, Direction)
-                return OldNamecall(unpack(Args))
-            end
-        elseif (Method == "FindPartOnRay" or Method == "findPartOnRay") and Settings.Method == Method then
-            local A_Ray = Args[2]
-            local HitPart = GetClosestPlayer()
-            if HitPart then
-                local Origin = A_Ray.Origin
-                local Direction = func.Direction(Origin, HitPart.Position)
-                Args[2] = Ray.new(Origin, Direction)
-                return OldNamecall(unpack(Args))
-            end
-        elseif Method == "Raycast" and Settings.Method == Method then
-            local A_Origin = Args[2]
-            local HitPart = GetClosestPlayer()  
-            if HitPart then
-                Args[3] = func.Direction(A_Origin, HitPart.Position)
-                return OldNamecall(unpack(Args))
-            end
-        end
+local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
+    local offset = isOutline and 6 or 4
+    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
+
+    if _G.HealthBarPosition == "Left" then
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
+    elseif _G.HealthBarPosition == "Right" then
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
     end
-    return OldNamecall(...)
-end))  
 
-local healthBars = {}
-
-local function createSquare(color, size, outlineColor)
-    local square = Drawing.new("Square")
-    square.Visible = false
-    square.Center = true
-    square.Outline = true
-    square.OutlineColor = outlineColor or Color3.fromRGB(0, 0, 0)
-    square.Font = 1
-    square.Size = size or Vector2.new(4, 40)
-    square.Color = color or Color3.fromRGB(0, 255, 0)
-    return square
+    HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
-local updateHealthBars = function()
-    local cameraCFrame = Camera.CFrame
-    for _, v in pairs(plrs:GetChildren()) do
-        if v.Name ~= plr.Name then
-            local healthBar = healthBars[v]
-            if not healthBar then
-                healthBar = createSquare(Color3.fromRGB(0, 255, 0), Vector2.new(4, 40), Color3.fromRGB(0, 0, 0))
-                healthBars[v] = healthBar
-            end
+local function setupPlayerBox(v)
+    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
 
-            if Settings.HealthBar and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 and v.Character:FindFirstChild("HumanoidRootPart") then
-                local humanoidRootPart = v.Character:FindFirstChild("HumanoidRootPart")
-                local pos, vis = Camera.WorldToViewportPoint(Camera, humanoidRootPart.Position + Vector3.new(2.5, 0, 0))
-                if vis then
-                    local healthPercent = v.Character.Humanoid.Health / v.Character.Humanoid.MaxHealth
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
 
-                    local distance = (cameraCFrame.Position - humanoidRootPart.Position).Magnitude
-                    local scale = math.clamp(1 / (distance * 0.02), 0.5, 2.5)
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
+            local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
-                    local healthBarSize = Vector2.new(4 * scale, 40 * scale * healthPercent)
+            local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
+            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
 
-                    healthBar.Visible = true
-                    healthBar.Position = Vector2.new(pos.X, pos.Y) - Vector2.new(0, healthBarSize.Y / 2)
+            if onScreen then
+                local maxHealth, health = getHealthValues(v)
 
-                    if healthPercent > 0.5 then
-                        healthBar.Color = Color3.fromRGB((1 - healthPercent) * 510, 255, 0)
-                    else
-                        healthBar.Color = Color3.fromRGB(255, healthPercent * 510, 0)
+                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                Box.Visible = _G.boxVisible
+
+                BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                BoxFilled.Visible = _G.boxFilledVisible
+
+                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+                updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
+                HealthBar.Visible = _G.HealthBarVisible
+
+                -- Atualizando a posição do Tracer
+                Tracer.From = getTracerFromPosition()
+                Tracer.To = Vector2.new(Vector.X, Vector.Y)
+
+                if _G.teamcheck == true then
+                    if _G.teamcheckmode == "colors" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                            Tracer.Color = _G.teamcolor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
+                    elseif _G.teamcheckmode == "invisible" then
+                        if v.TeamColor == lplr.TeamColor then
+                            Box.Visible = false
+                            BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                            Tracer.Visible = false
+                            Box.Color = _G.boxColor
+                            BoxFilled.Color = _G.boxFilledColor
+                            Tracer.Color = _G.TracerColor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                        end
                     end
-
-                    healthBar.Size = healthBarSize
-                else
-                    healthBar.Visible = false
                 end
             else
-                healthBar.Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+                HealthBar.Visible = false
+                Tracer.Visible = false
+                Box.Color = _G.boxColor
+                BoxFilled.Color = _G.boxFilledColor
+                Tracer.Color = _G.TracerColor
             end
-        end
-    end
-end
-
-plrs.PlayerAdded:Connect(function(player)
-    healthBars[player] = createSquare(Color3.fromRGB(0, 255, 0), Vector2.new(4, 40), Color3.fromRGB(0, 0, 0))
-end)
-
-plrs.PlayerRemoving:Connect(function(player)
-    local healthBar = healthBars[player]
-    if healthBar then
-        healthBar.Visible = false
-        healthBars[player] = nil
-        healthBar:Remove()
-    end
-end)
-
-RunService.RenderStepped:Connect(updateHealthBars)
-
-local Fov = Drawing.new("Circle")
-local Tracers = Drawing.new("Line")
-
-local Fov = function()
-    if Settings.FovVisable then
-        Fov.Visible = true
-        Fov.Color = Settings.FovColor
-        Fov.Radius = Settings.FovRadius
-        Fov.Transparency = Settings.FovTransparency
-        Fov.Position = Vector2.new(mouse.X, mouse.Y)
-    else
-        Fov.Visible = false
-    end
-end
-
-local Tracers = function()
-    if Settings.FovTracers then
-        local Closest = GetClosestPlayer()
-        Tracers.Visible = true
-        Tracers.Color = Settings.FovTracersColor
-        Tracers.Thickness = 1
-        Tracers.From = Vector2.new(mouse.X, mouse.Y - 56)
-        if Closest then
-            Tracers.To = Vector2.new(Camera:WorldToViewportPoint(Closest.Position).X, Camera:WorldToViewportPoint(Closest.Position).Y)
         else
-            Tracers.Visible = false
+            Box.Visible = false
+            BoxFilled.Visible = false
+            HealthBar.Visible = false
+            Tracer.Visible = false
         end
+    end)
+end
+
+for _, player in pairs(game.Players:GetChildren()) do
+    setupPlayerBox(player)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    setupPlayerBox(player)
+end)
+
+local SilentAimEnabled = false
+local WallCheckEnabled = false
+local FOV = 85
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
+local TeamCheckEnabled = false
+local targetPart = "Head"
+
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+
+local function getFOVPosition()
+    local camera = workspace.CurrentCamera
+    if FOVPosition == "Center" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     else
-        Tracers.Visible = false
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        return Vector2.new(mouse.X, mouse.Y)
     end
 end
 
-local Autoequipe = function()
-    if Settings.autoequipe then
-        local tool = plr.Backpack:GetChildren()[Settings.equipeNumber]
-        if tool then
-            plr.Character.Humanoid:EquipTool(tool)
+local function isPlayerInFOV(player)
+    local mousePos = getFOVPosition()
+    if player.Character and player.Character:FindFirstChild(targetPart) then
+        local charPart = player.Character:FindFirstChild(targetPart)
+        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+        return distance <= FOV
+    end
+    return false
+end
+
+local function isVisible(target)
+    if WallCheckEnabled then
+        if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
+            return false
+        end
+
+        local camera = workspace.CurrentCamera
+        local targetPartPos = target.Character[targetPart].Position
+        local rayOrigin = camera.CFrame.Position
+        local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+        local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+        if raycastResult and raycastResult.Instance then
+            return raycastResult.Instance:IsDescendantOf(target.Character)
         end
     end
+    return true
 end
 
-UserInputService.InputBegan:Connect(function(input)
-    if Settings.BulletTracers then
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local gun = func.GetGun(plr)
-            if gun then
-                Tracer(gun.Handle.Position, Camera.CFrame.Position + Camera.CFrame.LookVector * 1000)
+local function isInFrontOfCamera(player)
+    if player.Character and player.Character:FindFirstChild(targetPart) then
+        local camera = workspace.CurrentCamera
+        local targetPartPos = player.Character[targetPart].Position
+        local cameraDirection = camera.CFrame.LookVector
+        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
+
+        local dotProduct = cameraDirection:Dot(directionToPlayer)
+        return dotProduct > 0
+    end
+    return false
+end
+
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local players = game.Players:GetPlayers()
+    local closestDistance = math.huge
+    local mousePos = getFOVPosition()
+
+    for _, player in pairs(players) do
+        if player ~= game.Players.LocalPlayer and isVisible(player) then
+            if TeamCheckEnabled and player.Team == game.Players.LocalPlayer.Team then
+                continue
+            end
+
+            if isPlayerInFOV(player) and isInFrontOfCamera(player) then
+                local charPart = player.Character:FindFirstChild(targetPart)
+                if charPart then
+                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        closestPlayer = player
+                    end
+                end
             end
         end
     end
+
+    return closestPlayer
+end
+
+local function aimAt(target)
+    if target and target.Character and target.Character:FindFirstChild(targetPart) then
+        local camera = workspace.CurrentCamera
+        local aimPosition = target.Character[targetPart].Position
+        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if SilentAimEnabled then
+        local target = getClosestPlayer()
+        if target then
+            aimAt(target)
+        end
+    end
+
+    FOVCircle.Position = getFOVPosition()
+    FOVCircle.Radius = FOV
+    FOVCircle.Visible = FOVVisible
 end)
 
-RunService.Heartbeat:Connect(function()
-    updateHealthBars()
-    Walking()
-    Autoequipe()
-    Camlock()
-    Fov()
-    Tracers()
-    Speed()
-    Fly()
-end)
+local Window = Rayfield:CreateWindow({
+    Name = "SX_HUB",
+    Icon = 0,
+    LoadingTitle = "By : Bomzinho/SX_Mods",
+    LoadingSubtitle = "Loading...",
+    Theme = {
+        TextColor = Color3.fromRGB(255, 255, 255), -- Branco para os textos
 
-Library:OnUnload(function()
-    Library.Unloaded = true
-end)
+        Background = Color3.fromRGB(100, 10, 10), -- Fundo vinho escuro
+        Topbar = Color3.fromRGB(120, 20, 20), -- Topbar vinho claro
+        Shadow = Color3.fromRGB(80, 5, 5), -- Sombra vinho mais escuro
 
-Library:SetWatermark(('Project Validus V2 | User: ' .. plr.Name .. ' | Version: 2.1'))
+        NotificationBackground = Color3.fromRGB(90, 10, 10), -- Fundo da notificação
+        NotificationActionsBackground = Color3.fromRGB(140, 20, 20), -- Fundo das ações da notificação
 
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-local MyButton = MenuGroup:AddButton({
-    Text = 'Unload',
-    Func = function()
-        Library:Unload()
+        TabBackground = Color3.fromRGB(100, 15, 15), -- Fundo das abas
+        TabStroke = Color3.fromRGB(150, 30, 30), -- Contorno das abas
+        TabBackgroundSelected = Color3.fromRGB(120, 20, 20), -- Fundo da aba selecionada
+        TabTextColor = Color3.fromRGB(255, 255, 255), -- Branco para textos das abas
+        SelectedTabTextColor = Color3.fromRGB(255, 255, 255), -- Branco para texto da aba selecionada
+
+        ElementBackground = Color3.fromRGB(110, 15, 15), -- Fundo dos elementos
+        ElementBackgroundHover = Color3.fromRGB(130, 20, 20), -- Fundo dos elementos ao passar o mouse
+        SecondaryElementBackground = Color3.fromRGB(90, 10, 10), -- Fundo secundário dos elementos
+        ElementStroke = Color3.fromRGB(150, 30, 30), -- Contorno dos elementos
+        SecondaryElementStroke = Color3.fromRGB(140, 20, 20), -- Contorno secundário dos elementos
+            
+        SliderBackground = Color3.fromRGB(100, 10, 10), -- Fundo do slider
+        SliderProgress = Color3.fromRGB(140, 20, 20), -- Progresso do slider
+        SliderStroke = Color3.fromRGB(150, 30, 30), -- Contorno do slider
+
+        ToggleBackground = Color3.fromRGB(60, 10, 10), -- Fundo do toggle
+        ToggleEnabled = Color3.fromRGB(120, 20, 20), -- Fundo ativado
+        ToggleDisabled = Color3.fromRGB(80, 10, 10), -- Fundo desativado
+        ToggleEnabledStroke = Color3.fromRGB(150, 30, 30), -- Contorno ativado
+        ToggleDisabledStroke = Color3.fromRGB(90, 10, 10), -- Contorno desativado
+        ToggleEnabledOuterStroke = Color3.fromRGB(150, 30, 30), -- Contorno externo ativado
+        ToggleDisabledOuterStroke = Color3.fromRGB(70, 10, 10), -- Contorno externo desativado
+
+        DropdownSelected = Color3.fromRGB(120, 20, 20), -- Fundo do dropdown selecionado
+        DropdownUnselected = Color3.fromRGB(90, 10, 10), -- Fundo do dropdown não selecionado
+
+        InputBackground = Color3.fromRGB(100, 10, 10), -- Fundo do input
+        InputStroke = Color3.fromRGB(140, 20, 20), -- Contorno do input
+        PlaceholderColor = Color3.fromRGB(178, 178, 178) -- Cor do placeholder
+    },
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "ESPP"
+    },
+
+    Discord = {
+        Enabled = true,
+        Invite = "https://discord.gg/82GKZDKs",
+        RememberJoins = true
+    },
+
+    KeySystem = false,
+    KeySettings = {
+        Title = "SX_HUB",
+        Subtitle = "Key System",
+        Note = "Join Discord : https://discord.gg/82GKZDKs",
+        FileName = "Key",
+        SaveKey = False,
+        GrabKeyFromSite = false,
+        Key = {"SXHUBTEST"}
+    }
+})
+
+local Tab = Window:CreateTab("Aimbot")
+
+Tab:CreateToggle({
+    Name = "Enable Aimbot",
+    CurrentValue = false,
+    Flag = "EnableAimbot",
+    Callback = function(Value)
+        SilentAimEnabled = Value
     end,
-    DoubleClick = true,
-    Tooltip = 'Unload Script'
 })
 
-MenuGroup:AddButton({
-    Text = 'Rejoin',
-    Func = function()
-        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+Tab:CreateToggle({
+    Name = "Enable WallCheck",
+    CurrentValue = false,
+    Flag = "Enable WallCheck",
+    Callback = function(Value)
+        WallCheckEnabled = Value
     end,
-    DoubleClick = true,
-    Tooltip = 'Rejoin game'
 })
 
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
-Library.ToggleKeybind = Options.MenuKeybind
-MenuGroup:AddToggle('keybindframe', {
-    Text = 'Keybind Frame',
-    Default = false,
-    Tooltip = 'Toggles KeybindFrame',
+Tab:CreateToggle({
+    Name = "Enable TeamCheck",
+    CurrentValue = false,
+    Flag = "Enable TeamCheck",
+    Callback = function(Value)
+        TeamCheckEnabled = Value
+    end,
 })
 
-Toggles.keybindframe:OnChanged(function()
-    Library.KeybindFrame.Visible = Toggles.keybindframe.Value
-end)
-
-MenuGroup:AddToggle('Watermark', {
-    Text = 'Watermark',
-    Default = false,
-    Tooltip = 'Toggles Watermark',
+Tab:CreateDropdown({
+    Name = "Aim Part",
+    Options = {"Head", "HumanoidRootPart"},
+    CurrentOption = {"Head"},
+    MultipleOptions = false,
+    Flag = "Aim Part",
+    Callback = function(Options)
+        targetPart = Options[1]
+    end,
 })
 
-Toggles.Watermark:OnChanged(function()
-    Library:SetWatermarkVisibility(Toggles.Watermark.Value)
-end)
+Tab:CreateToggle({
+    Name = "Show Fov",
+    CurrentValue = false,
+    Flag = "Show Fov",
+    Callback = function(Value)
+        FOVVisible = Value
+    end,
+})
 
-Library.ToggleKeybind = Options.MenuKeybind
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-SaveManager:IgnoreThemeSettings() 
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' }) 
-ThemeManager:SetFolder(Folder)
-SaveManager:SetFolder(Folder..'/Games')
-SaveManager:BuildConfigSection(Tabs['UI Settings']) 
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
+Tab:CreateToggle({
+    Name = "Fov Filled",
+    CurrentValue = false,
+    Flag = "Fov Filled",
+    Callback = function(Value)
+        FOVCircle.Filled = Value
+    end,
+})
+
+Tab:CreateColorPicker({
+    Name = "Fov Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Fovcolor",
+    Callback = function(Value)
+        FOVCircle.Color = Value
+    end
+})
+
+Tab:CreateSlider({
+    Name = "Fov Size",
+    Range = {0, 650},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 85,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOV = Value
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Fov Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOVCircle.Transparency = Value
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Fov Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Thickness",
+    Callback = function(Value)
+        FOVCircle.Thickness = Value
+    end,
+})
+
+local Tab1 = Window:CreateTab("ESP")
+
+Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateToggle({
+    Name = "Show Box",
+    CurrentValue = false,
+    Flag = "Show Box",
+    Callback = function(Value)
+     _G.boxVisible = Value
+    end,
+})
+     
+
+Tab1:CreateToggle({
+    Name = "Box Filled",
+    CurrentValue = false,
+    Flag = "BoxFilled",
+    Callback = function(Value)
+        _G.boxFilledVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Health Bar",
+    CurrentValue = false,
+    Flag = "healthbarouf",
+    Callback = function(Value)
+        _G.HealthBarVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Health Bar Filled",
+    CurrentValue = false,
+    Flag = "healthbarouff",
+    Callback = function(Value)
+        _G.HealthBarFilled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Tracer",
+    CurrentValue = false,
+    Flag = "Show Tracer",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Name",
+    CurrentValue = false,
+    Flag = "Show Name",
+    Callback = function(Value)
+        ESP.ShowName = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Distance",
+    CurrentValue = false,
+    Flag = "Show Distance",
+    Callback = function(Value)
+        ESP.ShowDistance = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Skeleton",
+    CurrentValue = false,
+    Flag = "Show Skeleton",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Look Tracer",
+    CurrentValue = false,
+    Flag = "Show Look Tracer",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Head Dot",
+    CurrentValue = false,
+    Flag = "Show Head Dot",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Enabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "TeamCheck",
+    CurrentValue = false,
+    Flag = "TeamCheck",
+    Callback = function(Value)
+        _G.teamcheck = Value
+        ESP.Teamcheck = Value
+        getfenv().EspSettings.TeamCheck = Value
+    end,
+})
+
+Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateColorPicker({
+    Name = "Team Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Team Color",
+    Callback = function(Value)
+        _G.teamcolor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Enemy Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "Enemy Color",
+    Callback = function(Value)
+        _G.enemycolor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Box Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Box Color",
+    Callback = function(Value)
+        _G.boxColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Box Filled Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Box Filled Color",
+    Callback = function(Value)
+        _G.boxFilledColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Tracer Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Tracer Color",
+    Callback = function(Value)
+        _G.TracerColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Skeleton Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Seleton Color",
+    Callback = function(Value)
+       getfenv().EspSettings.Skeletons.Color = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Head Dot Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Head Dot Color",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Color = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Look Tracer Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Look Tracer Color",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Color = Value
+    end
+})
+
+Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Box Transparency",
+    Callback = function(Value)
+        _G.boxTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Box Filled Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Box Filled Transparency",
+    Callback = function(Value)
+        _G.boxFilledTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Health Bar Transparency",
+    Callback = function(Value)
+        _G.HealthBarTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Tracer Transparency",
+    Callback = function(Value)
+        _G.TracerTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeleton Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Skeleton Transparency",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Transparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Head Dot Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Head Dot Transarency",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Transparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Look Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Look Tracer Transparency",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Transparency = Value
+    end,
+})
+
+Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Box Thickness",
+    Callback = function(Value)
+        _G.boxThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Health Bar Thickness",
+    Callback = function(Value)
+        _G.HealthBarThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Tracer Thickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeleton Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Skeleton Transparency",
+    Callback = function(Value)
+        getfenv().EspSettings.Skeletons.Thickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Head Dot Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Head Dot Transparency",
+    Callback = function(Value)
+        getfenv().EspSettings.HeadDots.Thickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Look Tracer Thickness",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Look Tracer Transparency",
+    Callback = function(Value)
+        getfenv().EspSettings.LookTracers.Thickness = Value
+    end,
+})
+
+Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"colors", "invisible"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "Teamcheck Mode",
+    Callback = function(Options)
+        _G.teamcheckmode = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Health Bar Position",
+    Options = {"Left", "Right"},
+    CurrentOption = {"Left"},
+    MultipleOptions = false,
+    Flag = "Health Bar Position",
+    Callback = function(Options)
+        _G.HealthBarPosition = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Tracer From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "Tracer From",
+    Callback = function(Options)
+        _G.TracerFrom = Options[1]
+    end,
+})
+
+Rayfield:LoadConfiguration()
