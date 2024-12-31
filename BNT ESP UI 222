@@ -564,13 +564,13 @@ local Window = Rayfield:CreateWindow({
 
     KeySystem = true,
     KeySettings = {
-        Title = "BNT Universal Aimbot",
+        Title = "SX_HUB",
         Subtitle = "Key System",
         Note = "Join Discord : https://discord.gg/82GKZDKs",
         FileName = "Key",
         SaveKey = False,
         GrabKeyFromSite = false,
-        Key = {"BTNTest"}
+        Key = {"SXHUBTEST"}
     }
 })
 
