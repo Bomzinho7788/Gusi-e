@@ -500,6 +500,30 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Visible = FOVVisible
 end)
 
+local player = game.Players.LocalPlayer
+
+player.Character.HumanoidRootPart.CFrame = CFrame.new(1254.09656, 137.906067, -172.128204)
+
+_G.HeadSize = 20
+_G.Enabled = false
+_G.HitBoxTransparency = 0.5
+_G.HitBoxColor = Color3.new(0, 0, 255)
+_G.HitBoxCanCollide = true
+
+if _G.Enabled == true then
+    for i,v in next, game:GetService('Players'):GetPlayers() do
+        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+            pcall(function()
+                v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
+                v.Character.HumanoidRootPart.Transparency = _G.HitBoxTransparency
+                v.Character.HumanoidRootPart.BrickColor = _G.HitBoxColor
+                v.Character.HumanoidRootPart.Material = "Neon"
+                v.Character.HumanoidRootPart.CanCollide = _G.HitBoxCanCollide
+            end)
+        end
+    end
+end
+
 local Window = Rayfield:CreateWindow({
     Name = "SX_HUB",
     Icon = 0,
@@ -1049,6 +1073,59 @@ Tab1:CreateDropdown({
     Flag = "Tracer From",
     Callback = function(Options)
         _G.TracerFrom = Options[1]
+    end,
+})
+
+local Tab2 = Window:CreateTab("Others")
+
+Tab2:CreateToggle({
+    Name = "Enable Hit Box Expand",
+    CurrentValue = false,
+    Flag = "Enable Hit Box Expand",
+    Callback = function(Value)
+        _G.Enabled = Value
+    end,
+})
+
+Tab2:CreateToggle({
+    Name = "Hit Box Can Collide",
+    CurrentValue = true,
+    Flag = "Hit Box Can Collide",
+    Callback = function(Value)
+        _G.HitBoxCanCollide = Value
+    end,
+})
+
+Tab2:CreateColorPicker({
+    Name = "Hit Box Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "Hit Box Color",
+    Callback = function(Value)
+        _G.HitBoxColor = Value
+    end
+})
+
+Tab2:CreateSlider({
+    Name = "Hit Box Size",
+    Range = {1, 80},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = 25,
+    Flag = "Hit Box Size",
+    Callback = function(Value)
+        _G.HeadSize = Value
+    end,
+})
+
+Tab2:CreateSlider({
+    Name = "Hit Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Hit Box Transparency",
+    Callback = function(Value)
+        _G.HitBoxTransparency = Value
     end,
 })
 
