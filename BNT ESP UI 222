@@ -29,7 +29,7 @@ local function getFOVPosition()
         return Vector2.new(mouse.X, mouse.Y)
     end
 end
-FOV
+
 local function isPlayerInFOV(player)
     local mousePos = getFOVPosition()
     if player.Character and player.Character:FindFirstChild(targetPart) then
