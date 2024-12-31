@@ -2,8 +2,7 @@ local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
 local userInputService = game:GetService("UserInputService")
-local tool = plr:WaitForChild("Backpack"):WaitForChild("YourToolName")
-
+local tool = nil
 local isToolEquipped = false
 
 function notBehindWall(target)
@@ -55,7 +54,7 @@ end
 userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        if isToolEquipped then
+        if isToolEquipped and tool then
             local targetPos = input.Position
             local target = getPlayerClosestToClickPosition(targetPos)
             
@@ -74,10 +73,20 @@ userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     end
 end)
 
-tool.Equipped:Connect(function()
-    isToolEquipped = true
-end)
+plr.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    character:WaitForChild("HumanoidRootPart")
+    
+    character:WaitForChild("Backpack").ChildAdded:Connect(function(item)
+        if item:IsA("Tool") then
+            tool = item
+            tool.Equipped:Connect(function()
+                isToolEquipped = true
+            end)
 
-tool.Unequipped:Connect(function()
-    isToolEquipped = false
+            tool.Unequipped:Connect(function()
+                isToolEquipped = false
+            end)
+        end
+    end)
 end)
