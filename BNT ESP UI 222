@@ -502,8 +502,6 @@ end)
 
 local player = game.Players.LocalPlayer
 
-player.Character.HumanoidRootPart.CFrame = CFrame.new(1254.09656, 137.906067, -172.128204)
-
 _G.HeadSize = 20
 _G.Enabled = false
 _G.HitBoxTransparency = 0.5
