@@ -775,4 +775,104 @@ Tab1:CreateDropdown({
     end,
 })
 
+_G.HeadSize = 50
+_G.Disabled = true
+_G.htry = 0.6
+_G.Color = Color3.new(1, 0, 1)
+_G.TeamCheck = true
+_G.HitboxPart = "HumanoidRootPart"
+
+local function mesmoTime(jogador1, jogador2)
+    if jogador1.Team == jogador2.Team then
+        return true
+    end
+    return false
+end
+
+game:GetService('RunService').RenderStepped:Connect(function()
+    if _G.Disabled then
+        for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
+            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+                if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
+                    pcall(function()
+                        if v.Character then
+                            local hitboxPart = v.Character:FindFirstChild(_G.HitboxPart)
+                            if hitboxPart then
+                                hitboxPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                hitboxPart.Transparency = _G.htry
+                                hitboxPart.BrickColor = _G.Color
+                                hitboxPart.Material = Enum.Material.Neon
+                                hitboxPart.CanCollide = false
+                            end
+                        end
+                    end)
+                end
+            end
+        end
+    end
+end)
+
+local Tab3 = Window:CreateTab("Aimbot")
+
+Tab3:CreateToggle({
+    Name = "Enable Hit Box Mod",
+    CurrentValue = false,
+    Flag = "Show Fov",
+    Callback = function(Value)
+        _G.Disabled = Value
+    end,
+})
+
+Tab3:CreateToggle({
+    Name = "Hit Box Team Check",
+    CurrentValue = false,
+    Flag = "Show Fovv",
+    Callback = function(Value)
+        _G.TeamCheck = Value
+    end,
+})
+
+Tab3:CreateColorPicker({
+    Name = "Fov Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Fovcolor",
+    Callback = function(Value)
+        _G.Color = Value
+    end
+})
+
+Tab3:CreateSlider({
+    Name = "Hit Box Size Multiplier",
+    Range = {0, 40},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Transparencyy",
+    Callback = function(Value)
+        _G.HeadSize = Value
+    end,
+})
+
+Tab3:CreateSlider({
+    Name = "Hit Box Transparency",
+    Range = {0, 1},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 85,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        _G.htry = Value
+    end,
+})
+
+Tab3:CreateDropdown({
+    Name = "Select Hitbox Part",
+    Options = {"Head","HumanoidRootPart"},
+    CurrentOption = _G.HitboxPart,
+    Flag = "HitboxPart",
+    Callback = function(Value)
+        _G.HitboxPart = Value
+    end,
+})
+
 Rayfield:LoadConfiguration()
