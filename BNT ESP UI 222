@@ -500,24 +500,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Visible = FOVVisible
 end)
 
-local player = game.Players.LocalPlayer
-
-_G.HeadSize = 20
-_G.Enabled = false
-_G.HitBoxTransparency = 0.5
-_G.HitBoxColor = Color3.new(0, 0, 255)
-_G.HitBoxCanCollide = true
-
-if _G.Enabled == true then
-    for i,v in next, game:GetService('Players'):GetPlayers() do
-        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-            pcall(function()
-                v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
-                v.Character.HumanoidRootPart.Transparency = _G.HitBoxTransparency
-                v.Character.HumanoidRootPart.BrickColor = _G.HitBoxColor
-                v.Character.HumanoidRootPart.Material = "Neon"
-                v.Character.HumanoidRootPart.CanCollide = _G.HitBoxCanCollide
-            end)
+local function ExpandHeadSize(multiplier, targetPlayer)
+    local character = targetPlayer.Character
+    if character then
+        local head = character:FindFirstChild("Head")
+        if head then
+            local originalSize = head.Size
+            head.Size = originalSize * multiplier
+            head.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, originalSize.Y / 2, 0)
+            head.CanCollide = false
         end
     end
 end
@@ -1076,54 +1067,40 @@ Tab1:CreateDropdown({
 
 local Tab2 = Window:CreateTab("Others")
 
-Tab2:CreateToggle({
-    Name = "Enable Hit Box Expand",
-    CurrentValue = false,
-    Flag = "Enable Hit Box Expand",
-    Callback = function(Value)
-        _G.Enabled = Value
-    end,
-})
-
-Tab2:CreateToggle({
-    Name = "Hit Box Can Collide",
-    CurrentValue = true,
-    Flag = "Hit Box Can Collide",
-    Callback = function(Value)
-        _G.HitBoxCanCollide = Value
-    end,
-})
-
-Tab2:CreateColorPicker({
-    Name = "Hit Box Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "Hit Box Color",
-    Callback = function(Value)
-        _G.HitBoxColor = Value
+Tab2:CreateButton({
+    Name = "Reset Head Size",
+    Default = 1,
+    Flag = "Reset Head Size",
+    Callback = function()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then  -- Exclui o jogador local
+                local character = player.Character
+                if character then
+                    local head = character:FindFirstChild("Head")
+                    if head then
+                        head.Size = Vector3.new(2, 2, 1)
+                        head.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, head.Size.Y / 2, 0)
+                        head.CanCollide = false
+                    end
+                end
+            end
+        end
     end
 })
 
 Tab2:CreateSlider({
-    Name = "Hit Box Size",
-    Range = {1, 80},
+    Name = "Head X Size",
+    Range = {1, 5},
     Increment = 1,
     Suffix = "",
     CurrentValue = 25,
     Flag = "Hit Box Size",
-    Callback = function(Value)
-        _G.HeadSize = Value
-    end,
-})
-
-Tab2:CreateSlider({
-    Name = "Hit Box Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "Hit Box Transparency",
-    Callback = function(Value)
-        _G.HitBoxTransparency = Value
+    Callback = function(value)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                ExpandHeadSize(value, player)
+            end
+        end
     end,
 })
 
