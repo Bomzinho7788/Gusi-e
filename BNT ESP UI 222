@@ -517,20 +517,20 @@ local Window = Rayfield:CreateWindow({
     },
 
     Discord = {
-        Enabled = false,
-        Invite = "",
+        Enabled = true,
+        Invite = "https://discord.gg/82GKZDKs",
         RememberJoins = true
     },
 
     KeySystem = true,
     KeySettings = {
-        Title = "BNT ESP",
+        Title = "BNT Universal Aimbot",
         Subtitle = "Key System",
-        Note = "No method of obtaining the key is provided",
+        Note = "Join Discord : https://discord.gg/82GKZDKs",
         FileName = "Key",
-        SaveKey = true,
+        SaveKey = False,
         GrabKeyFromSite = false,
-        Key = {"4321", "1234"}
+        Key = {"BTNTest"}
     }
 })
 
