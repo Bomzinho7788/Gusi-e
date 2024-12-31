@@ -186,7 +186,6 @@ tab1:AddTextbox({
     end
 })
 
--- Toggle para mostrar/ocultar o círculo de FOV
 tab1:AddToggle({
     Name = "Show FOV",
     Default = false,
@@ -195,10 +194,9 @@ tab1:AddToggle({
     end
 })
 
--- Color Picker para selecionar a cor do FOV
 tab1:AddColorPicker({
     Name = "FOV Color",
-    Default = Color3..new(255, 255, 255),
+    Default = Color3.new(255, 255, 255),
     Callback = function(color)
         FOVCircle.Color = color
     end
