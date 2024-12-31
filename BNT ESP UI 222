@@ -782,6 +782,7 @@ _G.Color = Color3.new(1, 0, 1)
 _G.ccld = false
 _G.TeamCheck = false
 
+-- Função para verificar se dois jogadores estão no mesmo time
 local function mesmoTime(jogador1, jogador2)
     if jogador1.Team == jogador2.Team then
         return true
@@ -789,24 +790,30 @@ local function mesmoTime(jogador1, jogador2)
     return false
 end
 
-game:GetService('RunService').RenderStepped:Connect(function()
-    if _G.Disabled then
-        for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
-            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-                if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
-                    pcall(function()
-                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                            local humanoidRootPart = v.Character.HumanoidRootPart
-                            humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                            humanoidRootPart.Transparency = _G.htry
-                            humanoidRootPart.BrickColor = _G.Color
-                            humanoidRootPart.Material = "Neon"
-                            humanoidRootPart.CanCollide = false
-                        end
-                    end)
-                end
+-- Função para atualizar as propriedades da hitbox
+local function atualizarHitbox()
+    for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
+        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+            if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
+                pcall(function()
+                    if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                        local humanoidRootPart = v.Character.HumanoidRootPart
+                        humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                        humanoidRootPart.Transparency = _G.htry
+                        humanoidRootPart.BrickColor = _G.Color
+                        humanoidRootPart.Material = "Neon"
+                        humanoidRootPart.CanCollide = _G.ccld
+                    end
+                end)
             end
         end
+    end
+end
+
+-- Função chamada a cada quadro (RenderStepped)
+game:GetService('RunService').RenderStepped:Connect(function()
+    if not _G.Disabled then
+        atualizarHitbox()  -- Chama a função para atualizar a hitbox
     end
 end)
 
@@ -841,22 +848,22 @@ Tab3:CreateColorPicker({
 
 Tab3:CreateSlider({
     Name = "Hit Box Size Multiplier",
-    Range = {0, 40},
+    Range = {0, 400},
     Increment = .5,
     Suffix = "",
     CurrentValue = 1,
     Flag = "Fov Transparencyy",
     Callback = function(Value)
-        HeadSize = Value
+        _G.HeadSize = Value
     end,
 })
 
 Tab3:CreateSlider({
     Name = "Hit Box Transparency",
     Range = {0, 1},
-    Increment = .5,
+    Increment = .05,
     Suffix = "",
-    CurrentValue = 85,
+    CurrentValue = .8,
     Flag = "Fov Transparency",
     Callback = function(Value)
         _G.htry = Value
