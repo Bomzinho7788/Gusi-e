@@ -775,11 +775,10 @@ Tab1:CreateDropdown({
     end,
 })
 
-_G.HeadSize = 50
+_G.HeadSize = 1
 _G.Disabled = false
 _G.htry = 0.6
-_G.Color = Color3.new(1, 0, 1)
-_G.ccld = false
+_G.Color = Color3.new(255, 0, 0)
 _G.TeamCheck = false
 
 -- Função para verificar se dois jogadores estão no mesmo time
@@ -796,13 +795,24 @@ local function atualizarHitbox()
         if v.Name ~= game:GetService('Players').LocalPlayer.Name then
             if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
                 pcall(function()
-                    if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                        local humanoidRootPart = v.Character.HumanoidRootPart
-                        humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                        humanoidRootPart.Transparency = _G.htry
-                        humanoidRootPart.BrickColor = _G.Color
-                        humanoidRootPart.Material = "Neon"
-                        humanoidRootPart.CanCollide = _G.ccld
+                    if _G.Disabled == true then
+                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                            humanoidRootPart.Transparency = _G.htry
+                            humanoidRootPart.BrickColor = _G.Color
+                            humanoidRootPart.Material = "Neon"
+                            humanoidRootPart.CanCollide = false
+                        end
+                    elseif _G.Disabled == false then
+                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            humanoidRootPart.Size = Vector3.new(2, 2, 2)
+                            humanoidRootPart.Transparency = _G.htry
+                            humanoidRootPart.BrickColor = _G.Color
+                            humanoidRootPart.Material = "Neon"
+                            humanoidRootPart.CanCollide = false
+                        end
                     end
                 end)
             end
@@ -812,9 +822,7 @@ end
 
 -- Função chamada a cada quadro (RenderStepped)
 game:GetService('RunService').RenderStepped:Connect(function()
-    if not _G.Disabled then
-        atualizarHitbox()  -- Chama a função para atualizar a hitbox
-    end
+    atualizarHitbox()
 end)
 
 local Tab3 = Window:CreateTab("Others")
@@ -822,7 +830,7 @@ local Tab3 = Window:CreateTab("Others")
 Tab3:CreateToggle({
     Name = "Enable Hit Box Mod",
     CurrentValue = false,
-    Flag = "Show Fov",
+    Flag = "Shocw Fov",
     Callback = function(Value)
         _G.Disabled = Value
     end,
@@ -848,7 +856,7 @@ Tab3:CreateColorPicker({
 
 Tab3:CreateSlider({
     Name = "Hit Box Size Multiplier",
-    Range = {0, 400},
+    Range = {0, 40},
     Increment = .5,
     Suffix = "",
     CurrentValue = 1,
