@@ -7,7 +7,7 @@ local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", 
 
 -- Variáveis de configuração
 local SilentAimEnabled = false
-local WallCheckEnabled = true  -- Ativado por padrão
+local WallCheckEnabled = false
 local FOV = 100
 local FOVVisible = false
 local FOVPosition = "Center"
@@ -88,22 +88,25 @@ local function isVisible(target)
 end
 
 -- Função para pegar o jogador mais próximo dentro do FOV
-local function getClosestPlayerInFOV()
+local function getClosestPlayer()
     local closestPlayer = nil
     local players = game.Players:GetPlayers()
-    local closestDistance = FOV
+    local closestDistance = math.huge  -- Inicializar com uma distância muito alta
     local mousePos = getFOVPosition()
 
     for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
+        if player ~= game.Players.LocalPlayer and isVisible(player) then
             local charPart = player.Character:FindFirstChild(targetPart)
             if charPart then
                 local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
                 local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
 
-                if distance < closestDistance and isVisible(player) then
-                    closestDistance = distance
-                    closestPlayer = player
+                -- Verificar se o jogador está dentro do FOV
+                if isPlayerInFOV(player) then
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        closestPlayer = player
+                    end
                 end
             end
         end
@@ -123,7 +126,7 @@ end
 
 game:GetService("RunService").RenderStepped:Connect(function()
     if SilentAimEnabled then
-        local target = getClosestPlayerInFOV()
+        local target = getClosestPlayer()
         if target then
             aimAt(target)
         end
@@ -147,7 +150,7 @@ tab1:AddToggle({
 -- Toggle para ativar/desativar o WallCheck
 tab1:AddToggle({
     Name = "Ativar WallCheck",
-    Default = true,
+    Default = false,
     Callback = function(value)
         WallCheckEnabled = value
     end
