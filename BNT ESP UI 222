@@ -194,7 +194,7 @@ UI:Button("Hitbox Expander", "Click Once only !", function()
     getgenv().Hitbox = {
         Settings = {
             ['hitpart'] = 'Head',
-            ['hitsize'] = 5,
+            ['hitsize'] = 40,
             ['transparency'] = 0.60,
             ['color'] =  BrickColor.new("Really blue")
         }
