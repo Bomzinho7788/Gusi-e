@@ -776,48 +776,11 @@ Tab1:CreateDropdown({
 })
 
 _G.HeadSize = 50
-_G.Disabled = true
-_G.htry = 0.6
-_G.Color = Color3.new(1, 0, 1)
-_G.TeamCheck = true
-_G.HitboxPart = "HumanoidRootPart"
-
-local function mesmoTime(jogador1, jogador2)
-    if jogador1.Team == jogador2.Team then
-        return true
-    end
-    return false
-end
-
-game:GetService('RunService').RenderStepped:Connect(function()
-    if _G.Disabled then
-        for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
-            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-                if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
-                    pcall(function()
-                        if v.Character then
-                            local hitboxPart = v.Character:FindFirstChild(_G.HitboxPart)
-                            if hitboxPart then
-                                hitboxPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                                hitboxPart.Transparency = _G.htry
-                                hitboxPart.BrickColor = _G.Color
-                                hitboxPart.Material = Enum.Material.Neon
-                                hitboxPart.CanCollide = false
-                            end
-                        end
-                    end)
-                end
-            end
-        end
-    end
-end)
-
-_G.HeadSize = 20
-_G.Disabled = true
+_G.Disabled = false
 _G.htry = 0.6
 _G.Color = Color3.new(1, 0, 1)
 _G.ccld = false
-_G.TeamCheck = true
+_G.TeamCheck = false
 
 local function mesmoTime(jogador1, jogador2)
     if jogador1.Team == jogador2.Team then
@@ -832,15 +795,13 @@ game:GetService('RunService').RenderStepped:Connect(function()
             if v.Name ~= game:GetService('Players').LocalPlayer.Name then
                 if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
                     pcall(function()
-                        if v.Character then
-                            local humanoidRootPart = v.Character:FindFirstChild("HumanoidRootPart")
-                            if humanoidRootPart then
-                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                                humanoidRootPart.Transparency = _G.htry
-                                humanoidRootPart.BrickColor = _G.Color
-                                humanoidRootPart.Material = Enum.Material.Neon
-                                humanoidRootPart.CanCollide = _G.ccld
-                            end
+                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                            humanoidRootPart.Transparency = _G.htry
+                            humanoidRootPart.BrickColor = _G.Color
+                            humanoidRootPart.Material = Enum.Material.Neon
+                            humanoidRootPart.CanCollide = false
                         end
                     end)
                 end
@@ -886,7 +847,7 @@ Tab3:CreateSlider({
     CurrentValue = 1,
     Flag = "Fov Transparencyy",
     Callback = function(Value)
-        _G.HeadSize = Value
+        HeadSize = Value
     end,
 })
 
