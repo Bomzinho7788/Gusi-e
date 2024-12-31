@@ -541,7 +541,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "EnableAimbot",
     Callback = function(Value)
-     SilentAimEnabled = Value
+        SilentAimEnabled = Value
     end,
 })
 
@@ -550,7 +550,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Enable WallCheck",
     Callback = function(Value)
-     SilentAimEnabled = Value
+        WallCheckEnabled = Value
     end,
 })
 
