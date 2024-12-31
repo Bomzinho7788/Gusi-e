@@ -1,21 +1,17 @@
--- Carregar a biblioteca Orion
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 local Window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim_V5", HidePremium = true, SaveConfig = true, ConfigFolder = "SilentAimSettings"})
 
--- Configurar a aba principal
 local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
--- Variáveis de configuração
 local SilentAimEnabled = false
-local WallCheckEnabled = true  -- Ativado por padrão
+local WallCheckEnabled = false
 local FOV = 100
 local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
-local TeamCheckEnabled = true  -- Ativado por padrão
-local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
+local TeamCheckEnabled = false
+local targetPart = "Head"
 
--- Configurar o círculo de FOV
 FOVCircle.Radius = FOV
 FOVCircle.Thickness = 1
 FOVCircle.Color = Color3.new(1, 1, 1)
@@ -24,7 +20,6 @@ FOVCircle.Visible = FOVVisible
 FOVCircle.Filled = false
 FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
--- Função para obter a posição da FOV
 local function getFOVPosition()
     local camera = workspace.CurrentCamera
     if FOVPosition == "Center" then
@@ -34,8 +29,7 @@ local function getFOVPosition()
         return Vector2.new(mouse.X, mouse.Y)
     end
 end
-
--- Função para verificar se o jogador está dentro do FOV
+FOV
 local function isPlayerInFOV(player)
     local mousePos = getFOVPosition()
     if player.Character and player.Character:FindFirstChild(targetPart) then
@@ -48,7 +42,6 @@ local function isPlayerInFOV(player)
     return false
 end
 
--- Função para verificar se há parede no caminho entre a câmera e o alvo
 local function isVisible(target)
     if WallCheckEnabled then
         if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
@@ -73,36 +66,31 @@ local function isVisible(target)
     return true
 end
 
--- Função para verificar se o jogador está à frente da câmera
 local function isInFrontOfCamera(player)
     if player.Character and player.Character:FindFirstChild(targetPart) then
         local camera = workspace.CurrentCamera
         local targetPartPos = player.Character[targetPart].Position
-        local cameraDirection = camera.CFrame.LookVector -- Direção para onde a câmera está olhando
-        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit -- Vetor da câmera até o jogador
+        local cameraDirection = camera.CFrame.LookVector
+        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
 
-        -- Verifica se o vetor direção do jogador está na mesma direção que a câmera
         local dotProduct = cameraDirection:Dot(directionToPlayer)
-        return dotProduct > 0 -- Se o valor do produto escalar for positivo, significa que o jogador está na frente
+        return dotProduct > 0
     end
     return false
 end
 
--- Função para pegar o jogador mais próximo dentro do FOV
 local function getClosestPlayer()
     local closestPlayer = nil
     local players = game.Players:GetPlayers()
-    local closestDistance = math.huge  -- Inicializar com uma distância muito alta
+    local closestDistance = math.huge
     local mousePos = getFOVPosition()
 
     for _, player in pairs(players) do
         if player ~= game.Players.LocalPlayer and isVisible(player) then
             if TeamCheckEnabled and player.Team == game.Players.LocalPlayer.Team then
-                -- Se TeamCheck estiver ativado, ignorar jogadores da mesma equipe
                 continue
             end
 
-            -- Verificar se o jogador está dentro do FOV e se está na frente da câmera
             if isPlayerInFOV(player) and isInFrontOfCamera(player) then
                 local charPart = player.Character:FindFirstChild(targetPart)
                 if charPart then
@@ -121,7 +109,6 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- Função para mirar no jogador
 local function aimAt(target)
     if target and target.Character and target.Character:FindFirstChild(targetPart) then
         local camera = workspace.CurrentCamera
@@ -138,13 +125,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 
-    -- Atualiza a posição do círculo de FOV
     FOVCircle.Position = getFOVPosition()
     FOVCircle.Radius = FOV
     FOVCircle.Visible = FOVVisible
 end)
 
--- Toggle para ativar/desativar o Silent Aim
 tab1:AddToggle({
     Name = "Enable Aimbot",
     Default = false,
@@ -153,7 +138,6 @@ tab1:AddToggle({
     end
 })
 
--- Toggle para ativar/desativar o TeamCheck
 tab1:AddToggle({
     Name = "Enable Team Check",
     Default = true,
@@ -162,7 +146,6 @@ tab1:AddToggle({
     end
 })
 
--- Toggle para ativar/desativar o WallCheck
 tab1:AddToggle({
     Name = "Enable Wall Check",
     Default = true,
@@ -171,7 +154,15 @@ tab1:AddToggle({
     end
 })
 
--- Dropdown para selecionar a posição da FOV (Center ou Finger)
+tab1:AddDropdown({
+    Name = "Body Part",
+    Default = "Head",
+    Options = {"Head", "HumanoidRootPart"},
+    Callback = function(selected)
+        targetPart = selected
+    end
+})
+
 tab1:AddDropdown({
     Name = "FOV Position",
     Default = "Center",
@@ -181,17 +172,16 @@ tab1:AddDropdown({
     end
 })
 
--- Textbox para definir o tamanho da FOV
 tab1:AddTextbox({
-    Name = "FOV Size (0 - 300)",
+    Name = "FOV Size (0 - 1000)",
     Default = "100",
     TextDisappear = true,
     Callback = function(value)
         local size = tonumber(value)
-        if size and size >= 0 and size <= 300 then
+        if size and size >= 0 and size <= 1000 then
             FOV = size
         else
-            warn("Invalid size! Use a value between 0 and 300.")
+            warn("Invalid size! Use a value between 0 and 1000.")
         end
     end
 })
@@ -208,7 +198,7 @@ tab1:AddToggle({
 -- Color Picker para selecionar a cor do FOV
 tab1:AddColorPicker({
     Name = "FOV Color",
-    Default = Color3.fromRGB(255, 255, 255),
+    Default = Color3..new(255, 255, 255),
     Callback = function(color)
         FOVCircle.Color = color
     end
