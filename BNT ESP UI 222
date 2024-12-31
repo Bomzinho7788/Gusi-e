@@ -812,7 +812,44 @@ game:GetService('RunService').RenderStepped:Connect(function()
     end
 end)
 
-local Tab3 = Window:CreateTab("Aimbot")
+_G.HeadSize = 20
+_G.Disabled = true
+_G.htry = 0.6
+_G.Color = Color3.new(1, 0, 1)
+_G.ccld = false
+_G.TeamCheck = true
+
+local function mesmoTime(jogador1, jogador2)
+    if jogador1.Team == jogador2.Team then
+        return true
+    end
+    return false
+end
+
+game:GetService('RunService').RenderStepped:Connect(function()
+    if _G.Disabled then
+        for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
+            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+                if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
+                    pcall(function()
+                        if v.Character then
+                            local humanoidRootPart = v.Character:FindFirstChild("HumanoidRootPart")
+                            if humanoidRootPart then
+                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                humanoidRootPart.Transparency = _G.htry
+                                humanoidRootPart.BrickColor = _G.Color
+                                humanoidRootPart.Material = Enum.Material.Neon
+                                humanoidRootPart.CanCollide = _G.ccld
+                            end
+                        end
+                    end)
+                end
+            end
+        end
+    end
+end)
+
+local Tab3 = Window:CreateTab("Others")
 
 Tab3:CreateToggle({
     Name = "Enable Hit Box Mod",
@@ -862,16 +899,6 @@ Tab3:CreateSlider({
     Flag = "Fov Transparency",
     Callback = function(Value)
         _G.htry = Value
-    end,
-})
-
-Tab3:CreateDropdown({
-    Name = "Select Hitbox Part",
-    Options = {"Head","HumanoidRootPart"},
-    CurrentOption = _G.HitboxPart,
-    Flag = "HitboxPart",
-    Callback = function(Value)
-        _G.HitboxPart = Value
     end,
 })
 
