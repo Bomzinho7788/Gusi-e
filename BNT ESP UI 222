@@ -5,7 +5,7 @@ local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", 
 
 local SilentAimEnabled = false
 local WallCheckEnabled = false
-local FOV = 100
+local FOV = 50
 local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
@@ -174,7 +174,7 @@ tab1:AddDropdown({
 
 tab1:AddTextbox({
     Name = "FOV Size (0 - 1000)",
-    Default = "100",
+    Default = "50",
     TextDisappear = true,
     Callback = function(value)
         local size = tonumber(value)
