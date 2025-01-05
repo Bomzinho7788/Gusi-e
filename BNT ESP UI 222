@@ -224,7 +224,7 @@ end)
 
 local SilentAimEnabled = false
 local WallCheckEnabled = false
-local FOV = 85
+local FOV = 75
 local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
@@ -243,7 +243,7 @@ local function getFOVPosition()
     local camera = workspace.CurrentCamera
     if FOVPosition == "Center" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    else
+    elseif FOVPosition == "Mouse" then
         local mouse = game.Players.LocalPlayer:GetMouse()
         return Vector2.new(mouse.X, mouse.Y)
     end
@@ -355,45 +355,45 @@ local Window = Rayfield:CreateWindow({
     LoadingTitle = "By : Bomzinho/SX_Mods",
     LoadingSubtitle = "Loading...",
     Theme = {
-        TextColor = Color3.fromRGB(255, 255, 255), -- Branco para os textos
+        TextColor = Color3.fromRGB(255, 255, 255),
 
-        Background = Color3.fromRGB(100, 10, 10), -- Fundo vinho escuro
-        Topbar = Color3.fromRGB(120, 20, 20), -- Topbar vinho claro
-        Shadow = Color3.fromRGB(80, 5, 5), -- Sombra vinho mais escuro
+        Background = Color3.fromRGB(100, 10, 10),
+        Topbar = Color3.fromRGB(120, 20, 20),
+        Shadow = Color3.fromRGB(80, 5, 5),
 
-        NotificationBackground = Color3.fromRGB(90, 10, 10), -- Fundo da notificação
-        NotificationActionsBackground = Color3.fromRGB(140, 20, 20), -- Fundo das ações da notificação
+        NotificationBackground = Color3.fromRGB(90, 10, 10),
+        NotificationActionsBackground = Color3.fromRGB(140, 20, 20),
 
-        TabBackground = Color3.fromRGB(100, 15, 15), -- Fundo das abas
-        TabStroke = Color3.fromRGB(150, 30, 30), -- Contorno das abas
-        TabBackgroundSelected = Color3.fromRGB(120, 20, 20), -- Fundo da aba selecionada
-        TabTextColor = Color3.fromRGB(255, 255, 255), -- Branco para textos das abas
-        SelectedTabTextColor = Color3.fromRGB(255, 255, 255), -- Branco para texto da aba selecionada
+        TabBackground = Color3.fromRGB(100, 15, 15),
+        TabStroke = Color3.fromRGB(150, 30, 30),
+        TabBackgroundSelected = Color3.fromRGB(120, 20, 20),
+        TabTextColor = Color3.fromRGB(255, 255, 255),
+        SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
 
-        ElementBackground = Color3.fromRGB(110, 15, 15), -- Fundo dos elementos
-        ElementBackgroundHover = Color3.fromRGB(130, 20, 20), -- Fundo dos elementos ao passar o mouse
-        SecondaryElementBackground = Color3.fromRGB(90, 10, 10), -- Fundo secundário dos elementos
-        ElementStroke = Color3.fromRGB(150, 30, 30), -- Contorno dos elementos
-        SecondaryElementStroke = Color3.fromRGB(140, 20, 20), -- Contorno secundário dos elementos
+        ElementBackground = Color3.fromRGB(110, 15, 15),
+        ElementBackgroundHover = Color3.fromRGB(130, 20, 20),
+        SecondaryElementBackground = Color3.fromRGB(90, 10, 10),
+        ElementStroke = Color3.fromRGB(150, 30, 30),
+        SecondaryElementStroke = Color3.fromRGB(140, 20, 20),
             
-        SliderBackground = Color3.fromRGB(100, 10, 10), -- Fundo do slider
-        SliderProgress = Color3.fromRGB(140, 20, 20), -- Progresso do slider
-        SliderStroke = Color3.fromRGB(150, 30, 30), -- Contorno do slider
+        SliderBackground = Color3.fromRGB(100, 10, 10),
+        SliderProgress = Color3.fromRGB(140, 20, 20),
+        SliderStroke = Color3.fromRGB(150, 30, 30),
 
-        ToggleBackground = Color3.fromRGB(60, 10, 10), -- Fundo do toggle
-        ToggleEnabled = Color3.fromRGB(120, 20, 20), -- Fundo ativado
-        ToggleDisabled = Color3.fromRGB(80, 10, 10), -- Fundo desativado
-        ToggleEnabledStroke = Color3.fromRGB(150, 30, 30), -- Contorno ativado
-        ToggleDisabledStroke = Color3.fromRGB(90, 10, 10), -- Contorno desativado
-        ToggleEnabledOuterStroke = Color3.fromRGB(150, 30, 30), -- Contorno externo ativado
-        ToggleDisabledOuterStroke = Color3.fromRGB(70, 10, 10), -- Contorno externo desativado
+        ToggleBackground = Color3.fromRGB(60, 10, 10),
+        ToggleEnabled = Color3.fromRGB(120, 20, 20),
+        ToggleDisabled = Color3.fromRGB(80, 10, 10),
+        ToggleEnabledStroke = Color3.fromRGB(150, 30, 30),
+        ToggleDisabledStroke = Color3.fromRGB(90, 10, 10),
+        ToggleEnabledOuterStroke = Color3.fromRGB(150, 30, 30),
+        ToggleDisabledOuterStroke = Color3.fromRGB(70, 10, 10),
 
-        DropdownSelected = Color3.fromRGB(120, 20, 20), -- Fundo do dropdown selecionado
-        DropdownUnselected = Color3.fromRGB(90, 10, 10), -- Fundo do dropdown não selecionado
+        DropdownSelected = Color3.fromRGB(120, 20, 20),
+        DropdownUnselected = Color3.fromRGB(90, 10, 10),
 
-        InputBackground = Color3.fromRGB(100, 10, 10), -- Fundo do input
-        InputStroke = Color3.fromRGB(140, 20, 20), -- Contorno do input
-        PlaceholderColor = Color3.fromRGB(178, 178, 178) -- Cor do placeholder
+        InputBackground = Color3.fromRGB(100, 10, 10),
+        InputStroke = Color3.fromRGB(140, 20, 20),
+        PlaceholderColor = Color3.fromRGB(178, 178, 178)
     },
 
     DisableRayfieldPrompts = false,
@@ -408,16 +408,16 @@ local Window = Rayfield:CreateWindow({
     Discord = {
         Enabled = true,
         Invite = "https://discord.gg/82GKZDKs",
-        RememberJoins = true
+        RememberJoins = false
     },
 
-    KeySystem = false,
+    KeySystem = true,
     KeySettings = {
         Title = "SX_HUB",
         Subtitle = "Key System",
         Note = "Join Discord : https://discord.gg/82GKZDKs",
         FileName = "Key",
-        SaveKey = False,
+        SaveKey = false,
         GrabKeyFromSite = false,
         Key = {"SXHUBTEST"}
     }
@@ -460,6 +460,17 @@ Tab:CreateDropdown({
     Flag = "Aim Part",
     Callback = function(Options)
         targetPart = Options[1]
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "Fov Position",
+    Options = {"Center", "Mouse"},
+    CurrentOption = {"Center"},
+    MultipleOptions = false,
+    Flag = "Fov Pos",
+    Callback = function(Options)
+        FOVPosition = Options[1]
     end,
 })
 
