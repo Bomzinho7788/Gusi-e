@@ -436,7 +436,7 @@ local Window = Rayfield:CreateWindow({
         FileName = "Key",
         SaveKey = false,
         GrabKeyFromSite = false,
-        Key = {"SXHUBTEST"}
+        Key = {"1"}
     }
 })
 
