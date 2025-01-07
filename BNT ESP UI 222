@@ -158,10 +158,18 @@ local function setupPlayerBox(v)
 
         if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+            print("HumanoidRootPart encontrado para o jogador: ", v.Name)
 
             local RootPart = v.Character.HumanoidRootPart
             local Head = v.Character:FindFirstChild("Head")
-            if not RootPart or not Head then return end -- Adicionando verificação de segurança
+            if not RootPart then
+                print("Erro: RootPart é nil para o jogador: ", v.Name)
+                return
+            end
+            if not Head then
+                print("Erro: Head é nil para o jogador: ", v.Name)
+                return
+            end
 
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
             local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
@@ -169,6 +177,10 @@ local function setupPlayerBox(v)
 
             if onScreen then
                 local maxHealth, health = getHealthValues(v)
+                if not maxHealth or not health then
+                    print("Erro: maxHealth ou health é nil para o jogador: ", v.Name)
+                    return
+                end
 
                 Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
@@ -228,6 +240,7 @@ local function setupPlayerBox(v)
             BoxFilled.Visible = false
             HealthBar.Visible = false
             Tracer.Visible = false
+            print("Erro: Alguma condição falhou para o jogador: ", v.Name)
         end
     end)
 end
