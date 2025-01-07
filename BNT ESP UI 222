@@ -11,6 +11,9 @@ local LegOff = Vector3.new(0, 3, 0)
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
 ESP.Enabled = true;
+ESP.ShowBox = false;
+ESP.BoxType = "Corner Box Esp";
+ESP.BoxColor = Color3.new(0,0,0)
 ESP.Teamcheck = false;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
@@ -25,7 +28,7 @@ _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
 
-_G.ShowBox = false
+_G.BoxType = "2D Box"
 
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
@@ -45,6 +48,19 @@ _G.TracerTransparency = 1
 _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
+
+local function BoxType()
+    if _G.BoxType == "2D Box" then
+        _G.boxVisible = true
+        ESP.ShowBox = false
+    elseif _G.BoxType == "Corner Box" then
+        _G.boxVisible = false
+        ESP.ShowBox = true
+    else
+        _G.boxVisible = false
+        ESP.ShowBox = false
+    end
+end
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
@@ -221,6 +237,31 @@ end
 game.Players.PlayerAdded:Connect(function(player)
     setupPlayerBox(player)
 end)
+
+local function TeamCheck(v)
+    If _G.teamcheck then
+        If _G.teamcheckmode == "colors" then
+            If v.TeamColor == lplr.TeamColor Then
+                ESP.BoxColor = _G.TeamColor
+            else
+                ESP.BoxColor = _G.enemycolor
+            end
+        elseif _G.teamcheckmode == "invisible" then
+            if v.TeamColor == lplr.TeamColor then
+                ESP.ShowBox = false
+                ESP.ShowName = false
+                ESP.ShowDistance = false
+            else
+                ESP.ShowBox = true
+                ESP.ShowName = true
+                ESP.ShowDistance = true
+                ESP.BoxColor = ESP.BoxColor
+            else
+                ESP.BoxColor = _G.enemycolor
+            end
+        end
+    end
+end
 
 local SilentAimEnabled = false
 local WallCheckEnabled = false
@@ -611,8 +652,7 @@ Tab1:CreateToggle({
     Flag = "TeamCheck",
     Callback = function(Value)
         _G.teamcheck = Value
-        ESP.Teamcheck = Value
-        getfenv().EspSettings.TeamCheck = Value
+        TeamCheck()
     end,
 })
 
@@ -642,6 +682,7 @@ Tab1:CreateColorPicker({
     Flag = "Box Color",
     Callback = function(Value)
         _G.boxColor = Value
+        ESP.BoxColor = Value
     end
 })
 
@@ -786,6 +827,18 @@ Tab1:CreateDropdown({
     end,
 })
 
+Tab1:CreateDropdown({
+    Name = "Box Type",
+    Options = {"2D Box", "Corner Box"},
+    CurrentOption = {"2D Box"},
+    MultipleOptions = false,
+    Flag = "Box Type",
+    Callback = function(Value)
+        _G.BoxType = Value
+        BoxType()
+    end,
+})
+
 _G.HeadSize = 1
 _G.Disabled = false
 _G.htry = 0.6
@@ -889,4 +942,4 @@ Tab3:CreateSlider({
     end,
 })
 
-Rayfield:LoadConfiguration()
+Rayfield:LoadConfiguration()p
