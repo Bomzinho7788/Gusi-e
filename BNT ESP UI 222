@@ -142,10 +142,10 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     elseif _G.HealthBarPosition == "Right" then
         HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
         HealthBar.Size = Vector2.new(2, healthBarSize)
-    elseif _G.HealthBarPosition == "Top" then
-        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y - offset)
-        HealthBar.Size = Vector2.new(Box.Size.X, 2)
     elseif _G.HealthBarPosition == "Bottom" then
+        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y - healthBarSize - offset)
+        HealthBar.Size = Vector2.new(Box.Size.X, 2)
+    elseif _G.HealthBarPosition == "Top" then
         HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y + offset - 2)
         HealthBar.Size = Vector2.new(Box.Size.X, 2)
     end
