@@ -28,8 +28,6 @@ _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
 
-_G.BoxType = "2D Box"
-
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
 _G.boxFilledVisible = false
@@ -587,11 +585,20 @@ local Tab1 = Window:CreateTab("ESP")
 Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 Tab1:CreateToggle({
-    Name = "Show Box",
+    Name = "Show 2D Box",
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
      _G.boxVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Corner Box",
+    CurrentValue = false,
+    Flag = "Show Corner Box",
+    Callback = function(Value)
+     ESP.ShowBox = Value
     end,
 })
      
@@ -828,18 +835,6 @@ Tab1:CreateDropdown({
     Flag = "Tracer From",
     Callback = function(Options)
         _G.TracerFrom = Options[1]
-    end,
-})
-
-Tab1:CreateDropdown({
-    Name = "Box Type",
-    Options = {"2D Box", "Corner Box"},
-    CurrentOption = {"2D Box"},
-    MultipleOptions = false,
-    Flag = "Box Type",
-    Callback = function(Value)
-        _G.BoxType = Value
-        BoxType()
     end,
 })
 
