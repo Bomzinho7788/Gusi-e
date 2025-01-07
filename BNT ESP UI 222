@@ -160,7 +160,9 @@ local function setupPlayerBox(v)
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
 
             local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
+            local Head = v.Character:FindFirstChild("Head")
+            if not RootPart or not Head then return end -- Adicionando verificação de segurança
+
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
             local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
             local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
