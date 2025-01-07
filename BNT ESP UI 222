@@ -125,18 +125,6 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
 
 end
 
-local function getHealthValues(player)
-    local maxHealth, health
-    if player:FindFirstChild("NRPBS") then
-        maxHealth = player.NRPBS["MaxHealth"].Value
-        health = player.NRPBS["Health"].Value
-    else
-        maxHealth = player.Character.Humanoid.MaxHealth
-        health = player.Character.Humanoid.Health
-    end
-    return maxHealth, health
-end
-
 local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
     local offset = isOutline and 6 or 4
     local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
@@ -148,6 +136,24 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     end
 
     HealthBar.Size = Vector2.new(2, healthBarSize)
+end
+
+local function getHealthValues(player)
+    local maxHealth, health
+    if player:FindFirstChild("NRPBS") then
+        if player.NRPBS:FindFirstChild("MaxHealth") and player.NRPBS:FindFirstChild("Health") then
+            maxHealth = player.NRPBS["MaxHealth"].Value
+            health = player.NRPBS["Health"].Value
+        else
+            print("Erro: MaxHealth ou Health não encontrado em NRPBS para o jogador: ", player.Name)
+        end
+    elseif player.Character and player.Character:FindFirstChild("Humanoid") then
+        maxHealth = player.Character.Humanoid.MaxHealth
+        health = player.Character.Humanoid.Health
+    else
+        print("Erro: NRPBS ou Humanoid não encontrado para o jogador: ", player.Name)
+    end
+    return maxHealth, health
 end
 
 local function setupPlayerBox(v)
