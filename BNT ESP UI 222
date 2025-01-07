@@ -239,9 +239,9 @@ game.Players.PlayerAdded:Connect(function(player)
 end)
 
 local function TeamCheck(v)
-    If _G.teamcheck then
-        If _G.teamcheckmode == "colors" then
-            If v.TeamColor == lplr.TeamColor Then
+    if _G.teamcheck then
+        if _G.teamcheckmode == "colors" then
+            if v.TeamColor == lplr.TeamColor then
                 ESP.BoxColor = _G.TeamColor
             else
                 ESP.BoxColor = _G.enemycolor
@@ -255,8 +255,6 @@ local function TeamCheck(v)
                 ESP.ShowBox = true
                 ESP.ShowName = true
                 ESP.ShowDistance = true
-                ESP.BoxColor = ESP.BoxColor
-            else
                 ESP.BoxColor = _G.enemycolor
             end
         end
