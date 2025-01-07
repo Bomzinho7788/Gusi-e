@@ -128,12 +128,16 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
     local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
 
     if _G.HealthBarPosition == "Left" then
-        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y + (1 / healthBarSize))
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
     elseif _G.HealthBarPosition == "Right" then
-        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y + (1 / healthBarSize))
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+    elseif _G.HealthBarPosition == "Top" then
+        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y - offset)
+        HealthBar.Size = Vector2.new(Box.Size.X, healthBarSize)
+    elseif _G.HealthBarPosition == "Bottom" then
+        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y + offset - 2)
+        HealthBar.Size = Vector2.new(Box.Size.X, healthBarSize)
     end
-
-    HealthBar.Size = Vector2.new(2, healthBarSize)
 end
 
 local function getHealthValues(player)
@@ -832,7 +836,7 @@ Tab1:CreateDropdown({
 
 Tab1:CreateDropdown({
     Name = "Health Bar Position",
-    Options = {"Left", "Right"},
+    Options = {"Left", "Right", "Top", "Bottom"},
     CurrentOption = {"Left"},
     MultipleOptions = false,
     Flag = "Health Bar Position",
