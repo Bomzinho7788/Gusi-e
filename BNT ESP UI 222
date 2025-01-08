@@ -60,16 +60,14 @@ end
 local function getTracerToPosition(character)
     local headPosition, legPosition, middlePosition
 
-    if character:FindFirstChild("Humanoid") then
-        if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-            headPosition = character:FindFirstChild("Head").Position
-            legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2
-            middlePosition = character:FindFirstChild("HumanoidRootPart").Position
-        elseif character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-            headPosition = character:FindFirstChild("Head").Position
-            legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
-            middlePosition = character:FindFirstChild("HumanoidRootPart").Position
-        end
+    if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
+         headPosition = character:FindFirstChild("Head").Position
+         legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2
+         middlePosition = character:FindFirstChild("HumanoidRootPart").Position
+    elseif character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+         headPosition = character:FindFirstChild("Head").Position
+         legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
+         middlePosition = character:FindFirstChild("HumanoidRootPart").Position
     end
 
     if _G.TracerFrom == "Bottom" then
