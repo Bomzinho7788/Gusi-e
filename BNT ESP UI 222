@@ -60,15 +60,9 @@ end
 local function getTracerToPosition(character)
     local headPosition, legPosition, middlePosition
 
-    if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-         headPosition = character:FindFirstChild("Head").Position
-         legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2
-         middlePosition = character:FindFirstChild("HumanoidRootPart").Position
-    elseif character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-         headPosition = character:FindFirstChild("Head").Position
-         legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
-         middlePosition = character:FindFirstChild("HumanoidRootPart").Position
-    end
+    headPosition = character:FindFirstChild("Head").Position or headPosition = character:FindFirstChild("Head").Position
+    legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2 or legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
+    middlePosition = character:FindFirstChild("HumanoidRootPart").Position or middlePosition = character:FindFirstChild("HumanoidRootPart").Position
 
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, legPosition.Y - 2.5)
