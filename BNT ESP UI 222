@@ -57,22 +57,6 @@ local function BoxType()
     end
 end
 
-local function getTracerToPosition(character)
-    local headPosition, legPosition, middlePosition
-
-    headPosition = character:FindFirstChild("Head").Position or headPosition = character:FindFirstChild("Head").Position
-    legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2 or legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
-    middlePosition = character:FindFirstChild("HumanoidRootPart").Position or middlePosition = character:FindFirstChild("HumanoidRootPart").Position
-
-    if _G.TracerFrom == "Bottom" then
-        return Vector2.new(camera.ViewportSize.X / 2, legPosition.Y - 2.5)
-    elseif _G.TracerFrom == "Middle" then
-        return Vector2.new(camera.ViewportSize.X / 2, middlePosition.Y)
-    elseif _G.TracerFrom == "Top" then
-        return Vector2.new(camera.ViewportSize.X / 2, headPosition.Y)
-    end
-end
-
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -200,7 +184,7 @@ local function setupPlayerBox(v)
 
                 -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
-                Tracer.To = getTracerToPosition()
+                Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
                 if _G.teamcheck == true then
                     if _G.teamcheckmode == "colors" then
