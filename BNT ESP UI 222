@@ -57,6 +57,30 @@ local function BoxType()
     end
 end
 
+local function getTracerToPosition(character)
+    local headPosition, legPosition, middlePosition
+
+    if character:IsA("Model") and character:FindFirstChild("Humanoid") then
+        if character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
+            headPosition = character:FindFirstChild("Head").Position
+            legPosition = (character:FindFirstChild("Left Leg").Position + character:FindFirstChild("Right Leg").Position) / 2
+            middlePosition = character:FindFirstChild("HumanoidRootPart").Position
+        elseif character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+            headPosition = character:FindFirstChild("Head").Position
+            legPosition = (character:FindFirstChild("LeftLowerLeg").Position + character:FindFirstChild("RightLowerLeg").Position) / 2
+            middlePosition = character:FindFirstChild("HumanoidRootPart").Position
+        end
+    end
+
+    if _G.TracerFrom == "Bottom" then
+        return Vector2.new(camera.ViewportSize.X / 2, legPosition.Y - 2.5)
+    elseif _G.TracerFrom == "Middle" then
+        return Vector2.new(camera.ViewportSize.X / 2, middlePosition.Y)
+    elseif _G.TracerFrom == "Top" then
+        return Vector2.new(camera.ViewportSize.X / 2, headPosition.Y)
+    end
+end
+
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -184,7 +208,7 @@ local function setupPlayerBox(v)
 
                 -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
-                Tracer.To = Vector2.new(Vector.X, Vector.Y)
+                Tracer.To = getTracerToPosition()
 
                 if _G.teamcheck == true then
                     if _G.teamcheckmode == "colors" then
