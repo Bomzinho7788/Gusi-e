@@ -1,4 +1,4 @@
-local function Lib:CreateWindow(options)
+local function CreateWindow(options)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = options.Name or "Window"
     screenGui.ResetOnSpawn = false
@@ -143,7 +143,7 @@ local function Lib:CreateWindow(options)
     return window
 end
 
-function Lib:CreateTab(window, tabPanel, tabName)
+function CreateTab(window, tabPanel, tabName)
     local tabFrame = Instance.new("ScrollingFrame")
     tabFrame.Size = UDim2.new(1, -110, 1, -40)
     tabFrame.Position = UDim2.new(0, 110, 0, 40)
@@ -188,7 +188,7 @@ function Lib:CreateTab(window, tabPanel, tabName)
     return tabFrame
 end
 
-function Lib:CreateToggle(tabFrame, options)
+function CreateToggle(tabFrame, options)
     local toggleButton = Instance.new("TextButton")
     toggleButton.Size = UDim2.new(1, 0, 0, 30)
     toggleButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -210,7 +210,7 @@ function Lib:CreateToggle(tabFrame, options)
     toggleButton.Parent = tabFrame
 end
 
-function Lib:CreateButton(tabFrame, options)
+function CreateButton(tabFrame, options)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, 0, 0, 30)
     button.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -227,7 +227,7 @@ function Lib:CreateButton(tabFrame, options)
     button.Parent = tabFrame
 end
 
-function Lib:CreateTextBox(tabFrame, options)
+function CreateTextBox(tabFrame, options)
     local textBox = Instance.new("TextBox")
     textBox.Size = UDim2.new(1, 0, 0, 30)
     textBox.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -245,23 +245,27 @@ function Lib:CreateTextBox(tabFrame, options)
     textBox.Parent = tabFrame
 end
 
-function Lib:CreateSlider(tabFrame, options)
+function CreateSlider(tabFrame, options)
     local sliderFrame = Instance.new("Frame")
-    sliderFrame.Size = UDim2.new(1, 0, 0, 30)
-    sliderFrame.BackgroundTransparency = 1
+    sliderFrame.Size = UDim2.new(1, 0, 0, 50) -- Ajustei a altura para acomodar o nome em cima
+    sliderFrame.BackgroundTransparency = 0
     sliderFrame.Parent = tabFrame
 
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao sliderFrame
+    frameCorner.Parent = sliderFrame
+
     local sliderLabel = Instance.new("TextLabel")
-    sliderLabel.Size = UDim2.new(0, 70, 1, 0) -- Ajuste o tamanho para garantir que o texto não se sobreponha
+    sliderLabel.Size = UDim2.new(0, 100, 0, 20) -- Ajustei o tamanho e altura do rótulo
     sliderLabel.Position = UDim2.new(0, 0, 0, 0)
     sliderLabel.BackgroundTransparency = 1
     sliderLabel.TextColor3 = Color3.new(1, 1, 1)
     sliderLabel.Text = options.Name or "Slider"
-    sliderLabel.TextSize = 9
+    sliderLabel.TextSize = 13 -- Aumentei o tamanho da fonte
     sliderLabel.Parent = sliderFrame
 
     local valueLabel = Instance.new("TextLabel")
-    valueLabel.Size = UDim2.new(0, 50, 1, 0) -- Ajuste o tamanho para garantir que o texto não se sobreponha
+    valueLabel.Size = UDim2.new(0, 50, 0, 20) -- Ajustei o tamanho e altura do rótulo do valor
     valueLabel.Position = UDim2.new(1, -50, 0, 0)
     valueLabel.BackgroundTransparency = 1
     valueLabel.TextColor3 = Color3.new(1, 1, 1)
@@ -270,20 +274,36 @@ function Lib:CreateSlider(tabFrame, options)
     valueLabel.Parent = sliderFrame
 
     local slider = Instance.new("Frame")
-    slider.Size = UDim2.new(1, -120, 0, 20) -- Ajuste o tamanho para garantir que o texto não se sobreponha
-    slider.Position = UDim2.new(0, 70, 0.5, -10)
+    slider.Size = UDim2.new(1, -120, 0, 10) -- Ajustei a altura do slider
+    slider.Position = UDim2.new(0, 70, 0.5, -5) -- Centralizei o slider verticalmente
     slider.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    slider.BorderSizePixel = 0 -- Removi a borda do slider
     slider.Parent = sliderFrame
 
+    local sliderCorner = Instance.new("UICorner")
+    sliderCorner.CornerRadius = UDim.new(0, 7) -- Ajustei o raio do arredondamento do slider
+    sliderCorner.Parent = slider
+
     local sliderButton = Instance.new("TextButton")
-    sliderButton.Size = UDim2.new(0, 20, 1, 0)
-    sliderButton.Position = UDim2.new((options.Default or 0) / (options.Max or 100), -10, 0, 0)
+    sliderButton.Size = UDim2.new(0, 20, 1, 20) -- Ajustei o tamanho e arredondei os cantos
+    sliderButton.Position = UDim2.new((options.Default or 0) / (options.Max or 100), -10, 0.5, -10) -- Centralizei o botão verticalmente
     sliderButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
     sliderButton.Text = ""
+    sliderButton.BorderSizePixel = 0 -- Removi a borda do botão
     sliderButton.Parent = slider
+    sliderButton.ClipsDescendants = true -- Adiciona um ícone no botão
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 7) -- Ajustei o raio do arredondamento do botão
+    buttonCorner.Parent = sliderButton
+
+    local icon = Instance.new("ImageLabel", sliderButton)
+    icon.Size = UDim2.new(1, 0, 1, 0)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://000000" -- Substitua pelo ID do ícone que você deseja
 
     local function updateValue(input)
-        local pos = UDim2.new(math.clamp(input.Position.X - slider.AbsolutePosition.X, 0, slider.AbsoluteSize.X) / slider.AbsoluteSize.X, -10, 0, 0)
+        local pos = UDim2.new(math.clamp(input.Position.X - slider.AbsolutePosition.X, 0, slider.AbsoluteSize.X) / slider.AbsoluteSize.X, -10, 0.5, -10) -- Certifiquei-me de que a posição Y permanece centralizada
         sliderButton.Position = pos
         local value = math.floor((pos.X.Scale * (options.Max or 100)) + 0.5)
         valueLabel.Text = tostring(value)
@@ -293,7 +313,7 @@ function Lib:CreateSlider(tabFrame, options)
     end
 
     local function onInputBegan(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch então
             local moveConnection
             local releaseConnection
 
@@ -307,7 +327,7 @@ function Lib:CreateSlider(tabFrame, options)
             end)
 
             releaseConnection = input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
+                if input.UserInputState == Enum.UserInputState.End então
                     moveConnection:Disconnect()
                     releaseConnection:Disconnect()
                 end
@@ -317,13 +337,144 @@ function Lib:CreateSlider(tabFrame, options)
 
     sliderButton.InputBegan:Connect(onInputBegan)
     sliderButton.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement ou input.UserInputType == Enum.UserInputType.Touch então
             updateValue(input)
         end
     end)
 end
 
-function Lib:CreateLabel(tabFrame, options)
+function CreateColorPicker(tabFrame, options)
+    local colorPickerFrame = Instance.new("Frame")
+    colorPickerFrame.Size = UDim2.new(1, 0, 0, 50)
+    colorPickerFrame.BackgroundTransparency = 0
+    colorPickerFrame.Parent = tabFrame
+
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao colorPickerFrame
+    frameCorner.Parent = colorPickerFrame
+
+    local colorButton = Instance.new("TextButton")
+    colorButton.Size = UDim2.new(0, 100, 0, 30)
+    colorButton.Position = UDim2.new(0, 0, 0, 0)
+    colorButton.BackgroundColor3 = Color3.new(1, 1, 1)
+    colorButton.Text = "Select Color"
+    colorButton.Parent = colorPickerFrame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao colorButton
+    buttonCorner.Parent = colorButton
+
+    local colorPicker = Instance.new("Frame")
+    colorPicker.Size = UDim2.new(1, 0, 0, 100)
+    colorPicker.Position = UDim2.new(0, 0, 1, 0)
+    colorPicker.Visible = false
+    colorPicker.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    colorPicker.Parent = colorPickerFrame
+
+    local pickerCorner = Instance.new("UICorner")
+    pickerCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao colorPicker
+    pickerCorner.Parent = colorPicker
+
+    local redBox = Instance.new("TextBox")
+    redBox.Size = UDim2.new(0, 40, 0, 30)
+    redBox.Position = UDim2.new(0, 10, 0, 10)
+    redBox.BackgroundColor3 = Color3.new(1, 0, 0)
+    redBox.Text = "Red"
+    redBox.Parent = colorPicker
+
+    local redBoxCorner = Instance.new("UICorner")
+    redBoxCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao redBox
+    redBoxCorner.Parent = redBox
+
+    local greenBox = Instance.new("TextBox")
+    greenBox.Size = UDim2.new(0, 40, 0, 30)
+    greenBox.Position = UDim2.new(0, 60, 0, 10)
+    greenBox.BackgroundColor3 = Color3.new(0, 1, 0)
+    greenBox.Text = "Green"
+    greenBox.Parent = colorPicker
+
+    local greenBoxCorner = Instance.new("UICorner")
+    greenBoxCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao greenBox
+    greenBoxCorner.Parent = greenBox
+
+    local blueBox = Instance.new("TextBox")
+    blueBox.Size = UDim2.new(0, 40, 0, 30)
+    blueBox.Position = UDim2.new(0, 110, 0, 10)
+    blueBox.BackgroundColor3 = Color3.new(0, 0, 1)
+    blueBox.Text = "Blue"
+    blueBox.Parent = colorPicker
+
+    local blueBoxCorner = Instance.new("UICorner")
+    blueBoxCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao blueBox
+    blueBoxCorner.Parent = blueBox
+
+    local colorPalette = Instance.new("ImageLabel")
+    colorPalette.Size = UDim2.new(0, 100, 0, 60)
+    colorPalette.Position = UDim2.new(0, 160, 0, 10)
+    colorPalette.Image = "rbxassetid://000000" -- Substitua pelo ID da imagem da paleta de cores
+    colorPalette.Parent = colorPicker
+
+    local paletteCorner = Instance.new("UICorner")
+    paletteCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao colorPalette
+    paletteCorner.Parent = colorPalette
+
+    local toneSlider = Instance.new("TextButton")
+    toneSlider.Size = UDim2.new(0, 20, 0, 60)
+    toneSlider.Position = UDim2.new(0, 270, 0, 10)
+    toneSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+    toneSlider.Text = ""
+    toneSlider.Parent = colorPicker
+
+    local toneSliderCorner = Instance.new("UICorner")
+    toneSliderCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao toneSlider
+    toneSliderCorner.Parent = toneSlider
+
+    local toneBar = Instance.new("Frame")
+    toneBar.Size = UDim2.new(0, 10, 0, 60)
+    toneBar.Position = UDim2.new(0, 280, 0, 10)
+    toneBar.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    toneBar.Parent = colorPicker
+
+    local toneBarCorner = Instance.new("UICorner")
+    toneBarCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao toneBar
+    toneBarCorner.Parent = toneBar
+
+    local function toggleColorPicker()
+        colorPicker.Visible = not colorPicker.Visible
+    end
+
+    local function updateColor()
+        local r = tonumber(redBox.Text) or 0
+        local g = tonumber(greenBox.Text) or 0
+        local b = tonumber(blueBox.Text) or 0
+        colorButton.BackgroundColor3 = Color3.fromRGB(r, g, b)
+    end
+
+    colorButton.MouseButton1Click:Connect(toggleColorPicker)
+    redBox.FocusLost:Connect(updateColor)
+    greenBox.FocusLost:Connect(updateColor)
+    blueBox.FocusLost:Connect(updateColor)
+
+    colorPalette.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local color = colorPalette.ImageColor3 -- Implemente a lógica para obter a cor da paleta
+            redBox.Text = tostring(math.floor(color.R * 255))
+            greenBox.Text = tostring(math.floor(color.G * 255))
+            blueBox.Text = tostring(math.floor(color.B * 255))
+            updateColor()
+        end
+    end)
+
+    toneSlider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local tone = input.Position.Y / toneBar.AbsoluteSize.Y
+            -- Implemente a lógica para ajustar o tom da cor
+            updateColor()
+        end
+    end)
+end
+
+function CreateLabel(tabFrame, options)
     local framela = Instance.new("Frame")
     framela.Size = UDim2.new(1, 0, 0, 30)
     framela.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -339,7 +490,7 @@ function Lib:CreateLabel(tabFrame, options)
     labelcr.Parent = framela
 end
 
-function Lib:CreateWarnLabel(tabFrame, options)
+function CreateWarnLabel(tabFrame, options)
     local framewar = Instance.new("Frame")
     framewar.Size = UDim2.new(1, 0, 0, 30)
     framewar.BackgroundColor3 = Color3.new(0.5, 0.2, 0.2) -- Cor de fundo específica para o warn label
@@ -355,7 +506,7 @@ function Lib:CreateWarnLabel(tabFrame, options)
     labelwar.Parent = framewar
 end
 
-function Lib:CreateDropdown(tabFrame, options)
+function CreateDropdown(tabFrame, options)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = options.Size or UDim2.new(1, 0, 0, 30)
     dropdownFrame.Position = options.Position or UDim2.new(0, 0, 0, 0)
@@ -456,4 +607,148 @@ function Lib:CreateDropdown(tabFrame, options)
     return dropdownFrame
 end
 
+local myWindow = CreateWindow({Name = "Test"})
 local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
+
+local tab1 = CreateTab(myWindow, tabPanel, "Tab 1")
+
+CreateToggle(tab1, {
+    Name = "Toggle 1 tab 1",
+    Default = false,
+    Callback = function(Value)
+        print("Tab 1 Toggle Value:", Value)
+    end
+})
+
+CreateButton(tab1, {
+    Name = "Botão 1",
+    Callback = function()
+        print("Botão 1 foi clicado!")
+    end
+})
+
+CreateSlider(tab1, {
+    Name = "Volume 1",
+    Default = 0,
+    Max = 100,
+    Callback = function(Value)
+        print("Volume 1 :", Value)
+    end
+})
+
+CreateColorPicker(tab1, {
+    Name = "ColorPicker1",
+    Default = Color3.new(1, 1, 1)
+    Callback = function(color)
+        print("Selected Color In RBG Values = ", color)
+    end
+})
+
+CreateLabel(tab1, {
+    Text = "Label 1",
+})
+
+CreateWarnLabel(tab1, {
+    Text = "Warning Label 1",
+})
+
+CreateTextBox(tab1, {
+    PlaceholderText = "Digite algo...1",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("Texto digitado1:", text)
+        end
+    end
+})
+
+CreateDropdown(tab1, {
+    MultiSelect = true,
+    Items = {"Opção 1", "Opção 2", "Opção 3"},
+    Callback = function(selectedItem)
+        print("Selecionado 1:", selectedItem)
+    end
+})
+
+CreateToggle(tab1, {
+    Name = "Toggle 2 tab 1",
+    Default = false,
+    Callback = function(Value)
+        print("Tab 1 Toggle Value:", Value)
+    end
+})
+
+local tab2 = CreateTab(myWindow, tabPanel, "Tab 2")
+
+CreateToggle(tab2, {
+    Name = "Toggle 1 tab 2",
+    Default = false,
+    Callback = function(Value)
+        print("Tab 2 Toggle Value:", Value)
+    end
+})
+
+CreateButton(tab2, {
+    Name = "Botão 2",
+    Callback = function()
+        print("Botão 2 foi clicado!")
+    end
+})
+
+CreateSlider(tab2, {
+    Name = "Volume 2",
+    Default = 0,
+    Max = 1000,
+    Callback = function(Value)
+        print("Volume 2 :", Value)
+    end
+})
+
+CreateLabel(tab2, {
+    Text = "Label 2",
+})
+
+CreateWarnLabel(tab2, {
+    Text = "Warning Label 2",
+})
+
+CreateColorPicker(tab2, {
+    Name = "ColorPicker2",
+    Default = Color3.new(1, 1, 1)
+    Callback = function(color)
+        print("Selected Color In RBG Values = ", color)
+    end
+})
+
+CreateTextBox(tab2, {
+    PlaceholderText = "Digite algo...2",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("Texto digitado2:", text)
+        end
+    end
+})
+
+CreateDropdown(tab2, {
+    MultiSelect = true,
+    Items = {"Opção 1", "Opção 2", "Opção 3"},
+    Callback = function(selectedItem)
+        print("Selecionado 2:", selectedItem)
+    end
+})
+
+CreateToggle(tab2, {
+    Name = "Toggle 2 tab 2",
+    Default = false,
+    Callback = function(Value)
+        print("Tab 2 Toggle Value:", Value)
+    end
+})
+
+
+-- Mostra a primeira aba por padrão
+for _, tab in ipairs(myWindow:GetChildren()) do
+    if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
+        tab.Visible = false
+    end
+end
+tab1.Visible = true
