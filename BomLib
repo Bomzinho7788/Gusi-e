@@ -457,13 +457,3 @@ function CreateDropdown(tabFrame, options)
 end
 
 local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
-
--- Criando a janela e as abas junto com os botões de acesso
-
--- Mostra a primeira aba por padrão
-for _, tab in ipairs(myWindow:GetChildren()) do
-    if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
-        tab.Visible = false
-    end
-end
-tab1.Visible = true
