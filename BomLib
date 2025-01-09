@@ -1,0 +1,469 @@
+local function CreateWindow(options)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = options.Name or "Window"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = game:GetService("CoreGui")
+
+    local window = Instance.new("Frame")
+    window.Size = UDim2.new(0, 520, 0, 300)
+    window.Position = UDim2.new(0.5, -260, 0.5, -150)
+    window.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    window.BorderSizePixel = 0
+    window.BackgroundTransparency = 0
+    window.Parent = screenGui
+    window.Active = true
+    window.Draggable = true
+    window.Visible = true
+
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, 0, 0, 40)
+    topBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    topBar.BorderSizePixel = 0
+    topBar.Parent = window
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -80, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.Text = options.Name or "Window"
+    titleLabel.TextSize = 18
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = topBar
+
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+    closeButton.TextColor3 = Color3.new(1, 1, 1)
+    closeButton.Text = "X"
+    closeButton.Parent = topBar
+
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    minimizeButton.Position = UDim2.new(1, -70, 0, 5)
+    minimizeButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+    minimizeButton.Text = "-"
+    minimizeButton.Parent = topBar
+
+    local tabPanel = Instance.new("ScrollingFrame")
+    tabPanel.Size = UDim2.new(0, 110, 0, 260)
+    tabPanel.Position = UDim2.new(0, 0, 0, 40)
+    tabPanel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    tabPanel.BorderSizePixel = 0
+    tabPanel.CanvasSize = UDim2.new(0, 0, 1, 0)
+    tabPanel.ScrollBarThickness = 6
+    tabPanel.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+    tabPanel.Parent = window
+    tabPanel.Visible = true
+
+    local tabListLayout = Instance.new("UIListLayout")
+    tabListLayout.Parent = tabPanel
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.Padding = UDim.new(0, 10)
+
+    local tabPadding = Instance.new("UIPadding")
+    tabPadding.PaddingTop = UDim.new(0, 10)
+    tabPadding.PaddingBottom = UDim.new(0, 10)
+    tabPadding.PaddingLeft = UDim.new(0, 10)
+    tabPadding.PaddingRight = UDim.new(0, 10)
+    tabPadding.Parent = tabPanel
+
+    local mainFrame = Instance.new("ScrollingFrame")
+    mainFrame.Size = UDim2.new(0, 410, 0, 260)
+    mainFrame.Position = UDim2.new(0, 110, 0, 40)
+    mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.CanvasSize = UDim2.new(0, 0, 0, 1000)
+    mainFrame.ScrollBarThickness = 6
+    mainFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+    mainFrame.Parent = window
+
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Parent = mainFrame
+    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout.Padding = UDim.new(0, 10)
+
+    local uiPadding = Instance.new("UIPadding")
+    uiPadding.PaddingTop = UDim.new(0, 10)
+    uiPadding.PaddingBottom = UDim.new(0, 10)
+    uiPadding.PaddingLeft = UDim.new(0, 10)
+    uiPadding.PaddingRight = UDim.new(0, 10)
+    uiPadding.Parent = mainFrame
+
+    -- Funções de Minimização/Maximização
+    local isMinimized = false
+
+    local function animateFrameSize(targetSize, mainFramTargetSize, topBarTargetSize, tabPanelTargetSize)
+        local tweenService = game:GetService("TweenService")
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    
+        local frameTween = tweenService:Create(window, tweenInfo, {Size = targetSize})
+        local frameTabTween = tweenService:Create(mainFrame, tweenInfo, {Size = mainFramTargetSize})
+        local topBarTween = tweenService:Create(topBar, tweenInfo, {Size = topBarTargetSize})
+        local tabPanelTween = tweenService:Create(tabPanel, tweenInfo, {Size = tabPanelTargetSize})
+    
+        frameTween:Play()
+        frameTabTween:Play()
+        topBarTween:Play()
+        tabPanelTween:Play()
+    
+        frameTween.Completed:Wait()
+        frameTabTween.Completed:Wait()
+        topBarTween.Completed:Wait()
+        tabPanelTween.Completed:Wait()
+    end
+
+    minimizeButton.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        if isMinimized then
+            animateFrameSize(UDim2.new(0, 520, 0, 40), UDim2.new(0, 410, 0, 0), UDim2.new(0, 520, 0, 40), UDim2.new(0, 110, 0, 0))
+        else
+            animateFrameSize(UDim2.new(0, 520, 0, 300), UDim2.new(0, 410, 0, 260), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 260))
+        end
+    end)
+
+    local function ensureTabPanelVisible()
+        if not tabPanel.Visible and not isMinimized then
+            while not isMinimized and not tabPanel.Visible do
+                wait(0)
+                tabPanel.Visible = true
+            end
+        end
+    end
+
+    tabPanel:GetPropertyChangedSignal("Visible"):Connect(ensureTabPanelVisible)
+    minimizeButton.MouseButton1Click:Connect(ensureTabPanelVisible)
+
+    return window
+end
+
+function CreateTab(window, tabPanel, tabName)
+    local tabFrame = Instance.new("ScrollingFrame")
+    tabFrame.Size = UDim2.new(1, -110, 1, -40)
+    tabFrame.Position = UDim2.new(0, 110, 0, 40)
+    tabFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    tabFrame.BorderSizePixel = 0
+    tabFrame.CanvasSize = UDim2.new(0, 0, 0, 999)
+    tabFrame.ScrollBarThickness = 6
+    tabFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)    
+    tabFrame.ClipsDescendants = true
+    tabFrame.Visible = false
+    tabFrame.Parent = window
+
+    local tabListLayout = Instance.new("UIListLayout")
+    tabListLayout.Parent = tabFrame
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.Padding = UDim.new(0, 10)
+
+    local tabPadding = Instance.new("UIPadding")
+    tabPadding.PaddingTop = UDim.new(0, 10)
+    tabPadding.PaddingBottom = UDim.new(0, 10)  
+    tabPadding.PaddingLeft = UDim.new(0, 10)
+    tabPadding.PaddingRight = UDim.new(0, 10)
+    tabPadding.Parent = tabFrame
+
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(1, 0, 0, 30)
+    tabButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    tabButton.TextColor3 = Color3.new(1, 1, 1)
+    tabButton.Text = tabName
+    tabButton.TextSize = 14
+    tabButton.Parent = tabPanel
+
+    tabButton.MouseButton1Click:Connect(function()
+        for _, tab in ipairs(window:GetChildren()) do
+            if tab:IsA("ScrollingFrame") and tab.Parent == window then
+                tab.Visible = false
+            end
+        end
+        tabFrame.Visible = true
+    end)
+
+    return tabFrame
+end
+
+function CreateToggle(tabFrame, options)
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(1, 0, 0, 30)
+    toggleButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    toggleButton.TextColor3 = Color3.new(1, 1, 1)
+    toggleButton.Text = options.Name or "Toggle"
+    toggleButton.TextSize = 14
+
+    local isToggled = options.Default or false
+    toggleButton.Text = isToggled and (options.Name .. ": On") or (options.Name .. ": Off")
+
+    toggleButton.MouseButton1Click:Connect(function()
+        isToggled = not isToggled
+        toggleButton.Text = isToggled and (options.Name .. ": On") or (options.Name .. ": Off")
+        if options.Callback then
+            options.Callback(isToggled)
+        end
+    end)
+
+    toggleButton.Parent = tabFrame
+end
+
+function CreateButton(tabFrame, options)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 30)
+    button.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Text = options.Name or "Button"
+    button.TextSize = 14
+    
+    if options.Callback then
+        button.MouseButton1Click:Connect(function()
+            options.Callback()
+        end)
+    end
+
+    button.Parent = tabFrame
+end
+
+function CreateTextBox(tabFrame, options)
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(1, 0, 0, 30)
+    textBox.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    textBox.TextColor3 = Color3.new(1, 1, 1)
+    textBox.PlaceholderText = options.PlaceholderText or "Enter text here"
+    textBox.Text = options.Text or ""
+    textBox.TextSize = 14
+
+    if options.Callback then
+        textBox.FocusLost:Connect(function(enterPressed)
+            options.Callback(textBox.Text, enterPressed)
+        end)
+    end
+
+    textBox.Parent = tabFrame
+end
+
+function CreateSlider(tabFrame, options)
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.Size = UDim2.new(1, 0, 0, 30)
+    sliderFrame.BackgroundTransparency = 1
+    sliderFrame.Parent = tabFrame
+
+    local sliderLabel = Instance.new("TextLabel")
+    sliderLabel.Size = UDim2.new(0, 70, 1, 0) -- Ajuste o tamanho para garantir que o texto não se sobreponha
+    sliderLabel.Position = UDim2.new(0, 0, 0, 0)
+    sliderLabel.BackgroundTransparency = 1
+    sliderLabel.TextColor3 = Color3.new(1, 1, 1)
+    sliderLabel.Text = options.Name or "Slider"
+    sliderLabel.TextSize = 9
+    sliderLabel.Parent = sliderFrame
+
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Size = UDim2.new(0, 50, 1, 0) -- Ajuste o tamanho para garantir que o texto não se sobreponha
+    valueLabel.Position = UDim2.new(1, -50, 0, 0)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.TextColor3 = Color3.new(1, 1, 1)
+    valueLabel.Text = tostring(options.Default or 0)
+    valueLabel.TextSize = 13
+    valueLabel.Parent = sliderFrame
+
+    local slider = Instance.new("Frame")
+    slider.Size = UDim2.new(1, -120, 0, 20) -- Ajuste o tamanho para garantir que o texto não se sobreponha
+    slider.Position = UDim2.new(0, 70, 0.5, -10)
+    slider.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    slider.Parent = sliderFrame
+
+    local sliderButton = Instance.new("TextButton")
+    sliderButton.Size = UDim2.new(0, 20, 1, 0)
+    sliderButton.Position = UDim2.new((options.Default or 0) / (options.Max or 100), -10, 0, 0)
+    sliderButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+    sliderButton.Text = ""
+    sliderButton.Parent = slider
+
+    local function updateValue(input)
+        local pos = UDim2.new(math.clamp(input.Position.X - slider.AbsolutePosition.X, 0, slider.AbsoluteSize.X) / slider.AbsoluteSize.X, -10, 0, 0)
+        sliderButton.Position = pos
+        local value = math.floor((pos.X.Scale * (options.Max or 100)) + 0.5)
+        valueLabel.Text = tostring(value)
+        if options.Callback then
+            options.Callback(value)
+        end
+    end
+
+    local function onInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            local moveConnection
+            local releaseConnection
+
+            moveConnection = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    moveConnection:Disconnect()
+                    releaseConnection:Disconnect()
+                else
+                    updateValue(input)
+                end
+            end)
+
+            releaseConnection = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    moveConnection:Disconnect()
+                    releaseConnection:Disconnect()
+                end
+            end)
+        end
+    end
+
+    sliderButton.InputBegan:Connect(onInputBegan)
+    sliderButton.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            updateValue(input)
+        end
+    end)
+end
+
+function CreateLabel(tabFrame, options)
+    local framela = Instance.new("Frame")
+    framela.Size = UDim2.new(1, 0, 0, 30)
+    framela.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    framela.Parent = tabFrame
+
+    local labelcr = Instance.new("TextLabel")
+    labelcr.Size = UDim2.new(1, -10, 1, -10)
+    labelcr.Position = UDim2.new(0, 5, 0, 5)
+    labelcr.BackgroundTransparency = 1
+    labelcr.TextColor3 = options.TextColor3 or Color3.new(1, 1, 1)
+    labelcr.Text = options.Text or "Label"
+    labelcr.TextSize = options.TextSize or 14
+    labelcr.Parent = framela
+end
+
+function CreateWarnLabel(tabFrame, options)
+    local framewar = Instance.new("Frame")
+    framewar.Size = UDim2.new(1, 0, 0, 30)
+    framewar.BackgroundColor3 = Color3.new(0.5, 0.2, 0.2) -- Cor de fundo específica para o warn label
+    framewar.Parent = tabFrame
+
+    local labelwar = Instance.new("TextLabel")
+    labelwar.Size = UDim2.new(1, -10, 1, -10)
+    labelwar.Position = UDim2.new(0, 5, 0, 5)
+    labelwar.BackgroundTransparency = 1
+    labelwar.TextColor3 = Color3.new(1, 0, 0) -- Cor do texto específica para o warn label
+    labelwar.Text = options.Text or "Warning Label"
+    labelwar.TextSize = options.TextSize or 14
+    labelwar.Parent = framewar
+end
+
+function CreateDropdown(tabFrame, options)
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Size = options.Size or UDim2.new(1, 0, 0, 30)
+    dropdownFrame.Position = options.Position or UDim2.new(0, 0, 0, 0)
+    dropdownFrame.BackgroundColor3 = options.BackgroundColor3 or Color3.new(0.3, 0.3, 0.3)
+    dropdownFrame.ClipsDescendants = false
+    dropdownFrame.Parent = tabFrame
+
+    local selectedText = Instance.new("TextLabel")
+    selectedText.Size = UDim2.new(1, -30, 1, 0)
+    selectedText.Position = UDim2.new(0, 5, 0, 0)
+    selectedText.BackgroundTransparency = 1
+    selectedText.TextColor3 = options.TextColor3 or Color3.new(1, 1, 1)
+    selectedText.Text = "Select"
+    selectedText.TextSize = options.TextSize or 14
+    selectedText.TextXAlignment = Enum.TextXAlignment.Left
+    selectedText.Parent = dropdownFrame
+
+    local dropdownButton = Instance.new("TextButton")
+    dropdownButton.Size = UDim2.new(0, 30, 1, 0)
+    dropdownButton.Position = UDim2.new(1, -30, 0, 0)
+    dropdownButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    dropdownButton.Text = "▼"
+    dropdownButton.TextColor3 = Color3.new(1, 1, 1)
+    dropdownButton.TextSize = options.TextSize or 14
+    dropdownButton.Parent = dropdownFrame
+
+    local itemsFrame = Instance.new("ScrollingFrame")
+    itemsFrame.Size = UDim2.new(1, 0, 0, #options.Items * 30)
+    itemsFrame.Position = UDim2.new(0, 0, 0, 30)
+    itemsFrame.BackgroundColor3 = options.BackgroundColor3 or Color3.new(0.3, 0.3, 0.3)
+    itemsFrame.Visible = false
+    itemsFrame.Parent = dropdownFrame
+    itemsFrame.CanvasSize = UDim2.new(0, 0, 0, 999)
+    itemsFrame.ZIndex = 2
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.Parent = itemsFrame
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local uiPadding = Instance.new("UIPadding")
+    uiPadding.PaddingTop = UDim.new(0, 5)
+    uiPadding.PaddingBottom = UDim.new(0, 5)
+    uiPadding.PaddingLeft = UDim.new(0, 5)
+    uiPadding.PaddingRight = UDim.new(0, 5)
+    uiPadding.Parent = itemsFrame
+
+    local selectedItems = {}
+
+    for _, item in ipairs(options.Items) do
+        local itemButton = Instance.new("TextButton")
+        itemButton.Size = UDim2.new(1, 0, 0, 30)
+        itemButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
+        itemButton.TextColor3 = Color3.new(1, 1, 1)
+        itemButton.Text = item
+        itemButton.TextSize = options.TextSize or 14
+        itemButton.Parent = itemsFrame
+        itemButton.ZIndex = 2
+
+        if options.MultiSelect then
+            selectedItems[item] = false
+
+            itemButton.MouseButton1Click:Connect(function()
+                selectedItems[item] = not selectedItems[item]
+                if selectedItems[item] then
+                    itemButton.BackgroundColor3 = Color3.new(0.6, 0.6, 0.6)
+                else
+                    itemButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
+                end
+
+                local selectedItemsText = {}
+                for k, v in pairs(selectedItems) do
+                    if v then
+                        table.insert(selectedItemsText, k)
+                    end
+                end
+
+                selectedText.Text = table.concat(selectedItemsText, ", ")
+
+                if options.Callback then
+                    options.Callback(selectedItems)
+                end
+            end)
+        else
+            itemButton.MouseButton1Click:Connect(function()
+                selectedText.Text = item
+                itemsFrame.Visible = false
+                if options.Callback then
+                    options.Callback(item)
+                end
+            end)
+        end
+    end
+
+    dropdownButton.MouseButton1Click:Connect(function()
+        itemsFrame.Visible = not itemsFrame.Visible
+    end)
+
+    return dropdownFrame
+end
+
+local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
+
+-- Criando a janela e as abas junto com os botões de acesso
+
+-- Mostra a primeira aba por padrão
+for _, tab in ipairs(myWindow:GetChildren()) do
+    if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
+        tab.Visible = false
+    end
+end
+tab1.Visible = true
