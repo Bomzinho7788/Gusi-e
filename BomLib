@@ -313,7 +313,7 @@ function CreateSlider(tabFrame, options)
     end
 
     local function onInputBegan(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch então
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             local moveConnection
             local releaseConnection
 
@@ -327,7 +327,7 @@ function CreateSlider(tabFrame, options)
             end)
 
             releaseConnection = input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End então
+                if input.UserInputState == Enum.UserInputState.End then
                     moveConnection:Disconnect()
                     releaseConnection:Disconnect()
                 end
@@ -337,7 +337,7 @@ function CreateSlider(tabFrame, options)
 
     sliderButton.InputBegan:Connect(onInputBegan)
     sliderButton.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement ou input.UserInputType == Enum.UserInputType.Touch então
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             updateValue(input)
         end
     end)
@@ -370,6 +370,7 @@ function CreateColorPicker(tabFrame, options)
     colorPicker.Visible = false
     colorPicker.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
     colorPicker.Parent = colorPickerFrame
+    colorPickerFrame.ZIndex = 10
 
     local pickerCorner = Instance.new("UICorner")
     pickerCorner.CornerRadius = UDim.new(0, 5) -- Adicionado arredondamento ao colorPicker
@@ -638,7 +639,7 @@ CreateSlider(tab1, {
 
 CreateColorPicker(tab1, {
     Name = "ColorPicker1",
-    Default = Color3.new(1, 1, 1)
+    Default = Color3.new(1, 1, 1),
     Callback = function(color)
         print("Selected Color In RBG Values = ", color)
     end
@@ -713,7 +714,7 @@ CreateWarnLabel(tab2, {
 
 CreateColorPicker(tab2, {
     Name = "ColorPicker2",
-    Default = Color3.new(1, 1, 1)
+    Default = Color3.new(1, 1, 1),
     Callback = function(color)
         print("Selected Color In RBG Values = ", color)
     end
