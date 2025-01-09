@@ -1,4 +1,4 @@
-local function CreateWindow(options)
+local function Lib:CreateWindow(options)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = options.Name or "Window"
     screenGui.ResetOnSpawn = false
@@ -143,7 +143,7 @@ local function CreateWindow(options)
     return window
 end
 
-function CreateTab(window, tabPanel, tabName)
+function Lib:CreateTab(window, tabPanel, tabName)
     local tabFrame = Instance.new("ScrollingFrame")
     tabFrame.Size = UDim2.new(1, -110, 1, -40)
     tabFrame.Position = UDim2.new(0, 110, 0, 40)
@@ -188,7 +188,7 @@ function CreateTab(window, tabPanel, tabName)
     return tabFrame
 end
 
-function CreateToggle(tabFrame, options)
+function Lib:CreateToggle(tabFrame, options)
     local toggleButton = Instance.new("TextButton")
     toggleButton.Size = UDim2.new(1, 0, 0, 30)
     toggleButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -210,7 +210,7 @@ function CreateToggle(tabFrame, options)
     toggleButton.Parent = tabFrame
 end
 
-function CreateButton(tabFrame, options)
+function Lib:CreateButton(tabFrame, options)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, 0, 0, 30)
     button.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -227,7 +227,7 @@ function CreateButton(tabFrame, options)
     button.Parent = tabFrame
 end
 
-function CreateTextBox(tabFrame, options)
+function Lib:CreateTextBox(tabFrame, options)
     local textBox = Instance.new("TextBox")
     textBox.Size = UDim2.new(1, 0, 0, 30)
     textBox.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -245,7 +245,7 @@ function CreateTextBox(tabFrame, options)
     textBox.Parent = tabFrame
 end
 
-function CreateSlider(tabFrame, options)
+function Lib:CreateSlider(tabFrame, options)
     local sliderFrame = Instance.new("Frame")
     sliderFrame.Size = UDim2.new(1, 0, 0, 30)
     sliderFrame.BackgroundTransparency = 1
@@ -323,7 +323,7 @@ function CreateSlider(tabFrame, options)
     end)
 end
 
-function CreateLabel(tabFrame, options)
+function Lib:CreateLabel(tabFrame, options)
     local framela = Instance.new("Frame")
     framela.Size = UDim2.new(1, 0, 0, 30)
     framela.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -339,7 +339,7 @@ function CreateLabel(tabFrame, options)
     labelcr.Parent = framela
 end
 
-function CreateWarnLabel(tabFrame, options)
+function Lib:CreateWarnLabel(tabFrame, options)
     local framewar = Instance.new("Frame")
     framewar.Size = UDim2.new(1, 0, 0, 30)
     framewar.BackgroundColor3 = Color3.new(0.5, 0.2, 0.2) -- Cor de fundo específica para o warn label
@@ -355,7 +355,7 @@ function CreateWarnLabel(tabFrame, options)
     labelwar.Parent = framewar
 end
 
-function CreateDropdown(tabFrame, options)
+function Lib:CreateDropdown(tabFrame, options)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = options.Size or UDim2.new(1, 0, 0, 30)
     dropdownFrame.Position = options.Position or UDim2.new(0, 0, 0, 0)
@@ -455,3 +455,5 @@ function CreateDropdown(tabFrame, options)
 
     return dropdownFrame
 end
+
+local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
