@@ -455,5 +455,3 @@ function CreateDropdown(tabFrame, options)
 
     return dropdownFrame
 end
-
-local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
