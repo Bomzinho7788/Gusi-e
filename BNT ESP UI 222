@@ -455,6 +455,7 @@ Tab:CreateSlider({
     Flag = "Fov Transparency",
     Callback = function(Value)
         FOVCircle.Radius = Value
+        Fov = Value
     end,
 })
 
