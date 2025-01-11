@@ -38,6 +38,9 @@ _G.HealthBarFilled = true
 
 _G.HealthBarPosition = "Left"
 
+local chamsEnabled = false
+local selectedColor = Color3.new(1, 0, 0)
+
 _G.TracerVisible = false
 _G.TracerThickness = 1.5
 _G.TracerTransparency = 1
@@ -354,6 +357,26 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Visible = FOVVisible
 end)
 
+-- Function to toggle Chams on or off
+local function toggleChams(Value)
+    chamsEnabled = Value
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            for _, part in pairs(player.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    if chamsEnabled then
+                        part.Color = isRGB and getRGBColor() or selectedColor
+                        part.Material = Enum.Material.Neon
+                    else
+                        part.Material = Enum.Material.Plastic
+                    end
+                end
+            end
+        end
+    end
+end
+
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
     Icon = 0,
@@ -543,6 +566,15 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
+    Name = "Enable Chams",
+    CurrentValue = false,
+    Flag = "Namtte",
+    Callback = function(Value)
+        chamsEnabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
     Name = "Show Name",
     CurrentValue = false,
     Flag = "Name",
@@ -607,6 +639,15 @@ Tab1:CreateColorPicker({
     Flag = "boxFilledColor",
     Callback = function(Value)
         _G.boxFilledColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Chams Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilbybtgrvledColor",
+    Callback = function(Value)
+        selectedColor = Value
     end
 })
 
