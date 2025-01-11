@@ -2,7 +2,7 @@ local function CreateWindow(options)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = options.Name or "Window"
     screenGui.ResetOnSpawn = false
-    screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+    screenGui.Parent = game:GetServicee("CoreGui")
 
     local window = Instance.new("Frame")
     window.Size = UDim2.new(0, 520, 0, 300)
