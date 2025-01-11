@@ -8,7 +8,7 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20UI"))();
 
 ESP.Enabled = true;
 ESP.ShowName = false;
@@ -455,7 +455,7 @@ Tab:CreateSlider({
     Flag = "Fov Transparency",
     Callback = function(Value)
         FOVCircle.Radius = Value
-        Fov = Value
+        FOV = Value
     end,
 })
 
@@ -544,15 +544,6 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Enable Chams",
-    CurrentValue = false,
-    Flag = "Namtte",
-    Callback = function(Value)
-        e.chams = Value
-    end,
-})
-
-Tab1:CreateToggle({
     Name = "Show Name",
     CurrentValue = false,
     Flag = "Name",
@@ -617,15 +608,6 @@ Tab1:CreateColorPicker({
     Flag = "boxFilledColor",
     Callback = function(Value)
         _G.boxFilledColor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Glow Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxFilbybtgrvledColor",
-    Callback = function(Value)
-        e.Chams_Glow_Color = Value
     end
 })
 
