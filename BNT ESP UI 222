@@ -1,16 +1,3 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-local lplr = game.Players.LocalPlayer
-local camera = game:GetService("Workspace").CurrentCamera
-local currentCamera = workspace.CurrentCamera
-local worldToViewportPoint = currentCamera.worldToViewportPoint
-
-local HeadOff = Vector3.new(0, 0.5, 0)
-local LegOff = Vector3.new(0, 3, 0)
-
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
-
-ESP.Enabled = true;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
 
@@ -44,6 +31,35 @@ _G.TracerTransparency = 1
 _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
+
+local SilentAimEnabled = false
+local WallCheckEnabled = false
+local FOV = 75
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
+local TeamCheckEnabled = false
+_G.targetPart = "Head"
+
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
+
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
+
+ESP.Enabled = true;
+
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
@@ -227,21 +243,7 @@ game.Players.PlayerAdded:Connect(function(player)
     setupPlayerBox(player)
 end)
 
-local SilentAimEnabled = false
-local WallCheckEnabled = false
-local FOV = 75
-local FOVVisible = false
-local FOVPosition = "Center"
-local FOVCircle = Drawing.new("Circle")
-local TeamCheckEnabled = false
-_G.targetPart = "Head"
 
-FOVCircle.Radius = FOV
-FOVCircle.Thickness = 1
-FOVCircle.Color = Color3.new(1, 1, 1)
-FOVCircle.Transparency = 1
-FOVCircle.Visible = FOVVisible
-FOVCircle.Filled = false
 FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
 local function getFOVPosition()
@@ -353,381 +355,3 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Radius = FOV
     FOVCircle.Visible = FOVVisible
 end)
-
-local Window = Rayfield:CreateWindow({
-    Name = "Aimbot + Esp",
-    Icon = 0,
-    LoadingTitle = "By Bomzinho",
-    LoadingSubtitle = "Loading....",
-    Theme = "Amethyst",
-
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false,
-
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil,
-        FileName = "ESPP"
-    },
-
-    Discord = {
-        Enabled = false,
-        Invite = "",
-        RememberJoins = true
-    },
-
-    KeySystem = true,
-    KeySettings = {
-        Title = "Aimbot + Esp",
-        Subtitle = "Key System",
-        Note = "No method of obtaining the key is provided",
-        FileName = "Key",
-        SaveKey = false,
-        GrabKeyFromSite = false,
-        Key = {"uh67ki"}
-    }
-})
-
-local Tab = Window:CreateTab("Aimbot", 4483362458)
-
-Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab:CreateToggle({
-    Name = "Enable Aimbot",
-    CurrentValue = false,
-    Flag = "Enable Aimbot",
-    Callback = function(Value)
-        SilentAimEnabled = Value
-    end,
-})
-
-Tab:CreateToggle({
-    Name = "Enable WallCheck",
-    CurrentValue = false,
-    Flag = "Enable WallCheck",
-    Callback = function(Value)
-        WallCheckEnabled = Value
-    end,
-})
-
-Tab:CreateToggle({
-    Name = "Enable TeamCheck",
-    CurrentValue = false,
-    Flag = "Enable TeamCheck",
-    Callback = function(Value)
-        TeamCheckEnabled = Value
-    end,
-})
-
-Tab:CreateToggle({
-    Name = "Show Fov",
-    CurrentValue = false,
-    Flag = "Show Fov",
-    Callback = function(Value)
-        FOVVisible = Value
-    end,
-})
-
-Tab:CreateToggle({
-    Name = "Fov Filled",
-    CurrentValue = false,
-    Flag = "Fov Filled",
-    Callback = function(Value)
-        FOVCircle.Filled = Value
-    end,
-})
-
-Tab:CreateColorPicker({
-    Name = "Fov Color",
-    Color = Color3.fromRGB(0, 255, 0),
-    Flag = "Fov Color",
-    Callback = function(Value)
-        FOVCircle.Color = Value
-    end
-})
-
-Tab:CreateSlider({
-    Name = "Fov Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "Fov Transparency",
-    Callback = function(Value)
-        FOVCircle.Transparency = Value
-    end,
-})
-
-Tab:CreateSlider({
-    Name = "Fov Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "Fov Thickness",
-    Callback = function(Value)
-        FOVCircle.Thickness = Value
-    end,
-})
-
-Tab:CreateDropdown({
-    Name = "AimPart",
-    Options = {"Head", "Humanoid"},
-    CurrentOption = {"colors"},
-    MultipleOptions = false,
-    Flag = "AimPart",
-    Callback = function(Options)
-        _G.targetPart = Options[1]
-    end,
-})
-
-local Tab1 = Window:CreateTab("ESP", 4483362458)
-
-Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab1:CreateToggle({
-    Name = "Show Box",
-    CurrentValue = false,
-    Flag = "Show Box",
-    Callback = function(Value)
-        _G.boxVisible = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Box Filled",
-    CurrentValue = false,
-    Flag = "BoxFilled",
-    Callback = function(Value)
-        _G.boxFilledVisible = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Health Bar",
-    CurrentValue = false,
-    Flag = "healthbarouf",
-    Callback = function(Value)
-        _G.HealthBarVisible = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Health Bar Filled",
-    CurrentValue = false,
-    Flag = "healthbarouff",
-    Callback = function(Value)
-        _G.HealthBarFilled = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Tracer",
-    CurrentValue = false,
-    Flag = "Name",
-    Callback = function(Value)
-        _G.TracerVisible = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Name",
-    CurrentValue = false,
-    Flag = "Name",
-    Callback = function(Value)
-        ESP.ShowName = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Distance",
-    CurrentValue = false,
-    Flag = "Distance",
-    Callback = function(Value)
-        ESP.ShowDistance = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Teamcheck",
-    CurrentValue = false,
-    Flag = "teamcheck",
-    Callback = function(Value)
-        _G.teamcheck = Value
-        ESP.Teamcheck = Value
-        getfenv().EspSettings.TeamCheck = Value
-    end,
-})
-
-Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab1:CreateColorPicker({
-    Name = "Team Color",
-    Color = Color3.fromRGB(0, 255, 0),
-    Flag = "teamcolor",
-    Callback = function(Value)
-        _G.teamcolor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Enemy Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "enemycolor",
-    Callback = function(Value)
-        _G.enemycolor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Box Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxColor",
-    Callback = function(Value)
-        _G.boxColor = Value
-        ESP.BoxColor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Box Filled Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "boxFilledColor",
-    Callback = function(Value)
-        _G.boxFilledColor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Tracer Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "TracerColor",
-    Callback = function(Value)
-        _G.TracerColor = Value
-    end
-})
-
-Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab1:CreateSlider({
-    Name = "Box Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxTransparency",
-    Callback = function(Value)
-        _G.boxTransparency = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Box Filled Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxFilledTransparency",
-    Callback = function(Value)
-        _G.boxFilledTransparency = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Health Bar Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarTransparency",
-    Callback = function(Value)
-        _G.HealthBarTransparency = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Tracer Transparency",
-    Range = {0, 1},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "TracerTransparency",
-    Callback = function(Value)
-        _G.TracerTransparency = Value
-    end,
-})
-
-Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab1:CreateSlider({
-    Name = "Box Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "boxThickness",
-    Callback = function(Value)
-        _G.boxThickness = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Health Bar Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "HealthBarThickness",
-    Callback = function(Value)
-        _G.HealthBarThickness = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Tracer Thickness",
-    Range = {0, 10},
-    Increment = .05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "TracerThickness",
-    Callback = function(Value)
-        _G.TracerThickness = Value
-    end,
-})
-
-Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
-
-Tab1:CreateDropdown({
-    Name = "Teamcheck Mode",
-    Options = {"colors", "invisible"},
-    CurrentOption = {"colors"},
-    MultipleOptions = false,
-    Flag = "TeamcheckMode",
-    Callback = function(Options)
-        _G.temcheckmode = Options[1]
-    end,
-})
-
-Tab1:CreateDropdown({
-    Name = "Health Bar Position",
-    Options = {"Left", "Right", "Top", Bottom},
-    CurrentOption = {"Left"},
-    MultipleOptions = false,
-    Flag = "HealthBarPosition",
-    Callback = function(Options)
-        _G.HealthBarPosition = Options[1]
-    end,
-})
-
-Tab1:CreateDropdown({
-    Name = "Tracer From",
-    Options = {"Bottom", "Middle", "Top"},
-    CurrentOption = {"Bottom"},
-    MultipleOptions = false,
-    Flag = "TracerFrom",
-    Callback = function(Options)
-        _G.TracerFrom = Options[1]
-    end,
-})
-
-Rayfield:LoadConfiguration()
