@@ -938,7 +938,7 @@ function CreateDropdown(tabFrame, config)
 	UIStroke_1.Color = Color3.new(0, 0, 0)
 	UIStroke_1.Thickness = 1
 	UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	
+
 	UIStroke_2.Parent = Title
 	UIStroke_2.Color = Color3.new(0, 0, 0)
 	UIStroke_2.Thickness = 1
@@ -973,7 +973,7 @@ function CreateDropdown(tabFrame, config)
 	Icon.Position = UDim2.new(1, 0, 0, -2)
 	Icon.Size = UDim2.new(0, 30, 0, 30)
 	Icon.Image = "rbxassetid://126874138470311"
-	
+
 	local UIStroke_Option = Instance.new("UIStroke")
 	UIStroke_Option.Parent = ScrollingFrame
 	UIStroke_Option.Color = Color3.new(0, 0, 0)
@@ -1178,3 +1178,17 @@ function CreateDropdown(tabFrame, config)
 
 	Icon.MouseButton1Click:Connect(toggleDropdown)
 end
+
+
+return { 
+	CreateWindow = CreateWindow,
+	CreateTab = CreateTab,
+	CreateInfoLabel = CreateInfoLabel,
+	CreateLabel = CreateLabel,
+	CreateWarnLabel = CreateWarnLabel,
+	CreateButton = CreateButton,
+	CreateToggle = CreateToggle,
+	CreateTextBox = CreateTextBox,
+	CreateSlider = CreateSlider,
+	CreateDropdown = CreateDropdown
+}
