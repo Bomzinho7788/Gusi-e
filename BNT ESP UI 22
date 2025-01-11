@@ -8,3 +8,15 @@ local tab1 = library.CreateTab(myWindow, tabPanel, {
 	Name = "Tab 1",
 	Icon = "rbxassetid://76530199889334"
 })
+
+local tab2 = library.CreateTab(myWindow, tabPanel, {
+	Name = "Tab 2",
+	Icon = "rbxassetid://76530199889334"
+})
+
+for _, tab in ipairs(myWindow:GetChildren()) do
+	if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
+		tab.Visible = false
+	end
+end
+tab1.Visible = true
