@@ -38,9 +38,6 @@ _G.HealthBarFilled = true
 
 _G.HealthBarPosition = "Left"
 
-local chamsEnabled = false
-local selectedColor = Color3.new(1, 0, 0)
-
 _G.TracerVisible = false
 _G.TracerThickness = 1.5
 _G.TracerTransparency = 1
@@ -357,25 +354,39 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Visible = FOVVisible
 end)
 
--- Function to toggle Chams on or off
+local chamsEnabled = false
+local selectedColor = Color3.fromRGB(255, 0, 0)
+
+local function getRGBColor()
+    -- Implementação do seu método para retornar uma cor RGB se necessário
+    return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
+end
+
 local function toggleChams(Value)
     chamsEnabled = Value
+    updateChams()  -- Chama a função de atualização imediatamente após ativar/desativar os chams
+end
 
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            for _, part in pairs(player.Character:GetChildren()) do
-                if part:IsA("BasePart") then
-                    if chamsEnabled then
-                        part.Color = isRGB and getRGBColor() or selectedColor
-                        part.Material = Enum.Material.Neon
-                    else
-                        part.Material = Enum.Material.Plastic
+local function updateChams()
+    while chamsEnabled do
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                for _, part in pairs(player.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        if chamsEnabled then
+                            part.BrickColor = BrickColor.new(selectedColor)
+                            part.Material = Enum.Material.Neon
+                        else
+                            part.Material = Enum.Material.Plastic
+                        end
                     end
                 end
             end
         end
+        wait(0)  -- Aguarda o próximo frame para continuar a execução
     end
 end
+
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
