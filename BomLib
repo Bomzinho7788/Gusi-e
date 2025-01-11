@@ -1,1180 +1,213 @@
 local function CreateWindow(options)
-	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = options.Name or "Window"
-	screenGui.ResetOnSpawn = false
-	screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = options.Name or "Window"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = game.Players.LocalPlayer.PlayerGui
 
-	local window = Instance.new("Frame")
-	window.Size = UDim2.new(0, 520, 0, 300)
-	window.Position = UDim2.new(-0.5, -260, 0.5, -150) -- Começa fora da tela à esquerda
-	window.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-	window.BorderSizePixel = 0
-	window.BackgroundTransparency = 0
-	window.Parent = screenGui
-	window.Active = true
-	window.Draggable = true
-	window.Visible = true
-	window.ClipsDescendants = true
+    local window = Instance.new("Frame")
+    window.Size = UDim2.new(0, 520, 0, 300)
+    window.Position = UDim2.new(-0.5, -260, 0.5, -150) -- Começa fora da tela à esquerda
+    window.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    window.BorderSizePixel = 0
+    window.BackgroundTransparency = 0
+    window.Parent = screenGui
+    window.Active = true
+    window.Draggable = true
+    window.Visible = true
+    window.ClipsDescendants = true
 
-	local u = Instance.new("UICorner")
-	u.CornerRadius = UDim.new(0, 8)
-	u.Parent = window
+    local u = Instance.new("UICorner")
+    u.CornerRadius = UDim.new(0, 8)
+    u.Parent = window
 
-	local s = Instance.new("UIStroke")
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	s.Color = Color3.new(0, 0, 0)
-	s.Thickness = 1
-	s.Parent = window
+    local s = Instance.new("UIStroke")
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    s.Color = Color3.new(0, 0, 0)
+    s.Thickness = 1
+    s.Parent = window
 
-	local topBar = Instance.new("Frame")
-	topBar.Size = UDim2.new(1, 0, 0, 40)
-	topBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-	topBar.BorderSizePixel = 0
-	topBar.Parent = window
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, 0, 0, 40)
+    topBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    topBar.BorderSizePixel = 0
+    topBar.Parent = window
 
-	local uu = Instance.new("UICorner")
-	uu.CornerRadius = UDim.new(0, 8)
-	uu.Parent = topBar
+    local uu = Instance.new("UICorner")
+    uu.CornerRadius = UDim.new(0, 8)
+    uu.Parent = topBar
 
-	local Frame = Instance.new("Frame")
-	Frame.BackgroundColor3 = Color3.new(0.14902, 0.14902, 0.14902)
-	Frame.Position = UDim2.new(0, 0, 0, 35)
-	Frame.Size = UDim2.new(1, 0, 0, 8)
-	Frame.Parent = topBar
-	Frame.BackgroundTransparency = 1
+    local Frame = Instance.new("Frame")
+    Frame.BackgroundColor3 = Color3.new(0.14902, 0.14902, 0.14902)
+    Frame.Position = UDim2.new(0, 0, 0, 35)
+    Frame.Size = UDim2.new(1, 0, 0, 8)
+    Frame.Parent = topBar
+    Frame.BackgroundTransparency = 1
 
-	local titleLabel = Instance.new("TextLabel")
-	titleLabel.Size = UDim2.new(1, -80, 1, 0)
-	titleLabel.Position = UDim2.new(0, 10, 0, 0)
-	titleLabel.BackgroundTransparency = 1
-	titleLabel.TextColor3 = Color3.new(1, 1, 1)
-	titleLabel.Text = options.Name or "Window"
-	titleLabel.TextSize = 18
-	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-	titleLabel.Parent = topBar
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -80, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.Text = options.Name or "Window"
+    titleLabel.TextSize = 18
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = topBar
 
-	local closeButton = Instance.new("TextButton")
-	closeButton.Size = UDim2.new(0, 30, 0, 30)
-	closeButton.Position = UDim2.new(1, -35, 0, 5)
-	closeButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
-	closeButton.TextColor3 = Color3.new(1, 1, 1)
-	closeButton.Text = "X"
-	closeButton.Parent = topBar
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+    closeButton.TextColor3 = Color3.new(1, 1, 1)
+    closeButton.Text = "X"
+    closeButton.Parent = topBar
 
-	closeButton.MouseButton1Click:Connect(function()
-		local tweenService = game:GetService("TweenService")
-		local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)}) -- Desliza para fora da tela à direita
+    closeButton.MouseButton1Click:Connect(function()
+        local tweenService = game:GetService("TweenService")
+        local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)}) -- Desliza para fora da tela à direita
 
-		closeTween:Play()
-		closeTween.Completed:Connect(function()
-			screenGui:Destroy()
-		end)
-	end)
+        closeTween:Play()
+        closeTween.Completed:Connect(function()
+            screenGui:Destroy()
+        end)
+    end)
 
-	local u7 = Instance.new("UICorner")
-	u7.CornerRadius = UDim.new(0, 8)
-	u7.Parent = closeButton
+    local u7 = Instance.new("UICorner")
+    u7.CornerRadius = UDim.new(0, 8)
+    u7.Parent = closeButton
 
-	local ss2 = Instance.new("UIStroke")
-	ss2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss2.Color = Color3.new(0, 0, 0)
-	ss2.Thickness = 1
-	ss2.Parent = closeButton
+    local ss2 = Instance.new("UIStroke")
+    ss2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    ss2.Color = Color3.new(0, 0, 0)
+    ss2.Thickness = 1
+    ss2.Parent = closeButton
 
-	local ss3 = Instance.new("UIStroke")
-	ss3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	ss3.Color = Color3.new(0, 0, 0)
-	ss3.Thickness = 1
-	ss3.Parent = closeButton
+    local ss3 = Instance.new("UIStroke")
+    ss3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    ss3.Color = Color3.new(0, 0, 0)
+    ss3.Thickness = 1
+    ss3.Parent = closeButton
 
-	local minimizeButton = Instance.new("TextButton")
-	minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-	minimizeButton.Position = UDim2.new(1, -70, 0, 5)
-	minimizeButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-	minimizeButton.TextColor3 = Color3.new(1, 1, 1)
-	minimizeButton.Text = "-"
-	minimizeButton.Parent = topBar
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    minimizeButton.Position = UDim2.new(1, -70, 0, 5)
+    minimizeButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+    minimizeButton.Text = "-"
+    minimizeButton.Parent = topBar
 
-	local u77 = Instance.new("UICorner")
-	u77.CornerRadius = UDim.new(0, 8)
-	u77.Parent = minimizeButton
+    local u77 = Instance.new("UICorner")
+    u77.CornerRadius = UDim.new(0, 8)
+    u77.Parent = minimizeButton
 
-	local sss2 = Instance.new("UIStroke")
-	sss2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	sss2.Color = Color3.new(0, 0, 0)
-	sss2.Thickness = 1
-	sss2.Parent = minimizeButton
+    local sss2 = Instance.new("UIStroke")
+    sss2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    sss2.Color = Color3.new(0, 0, 0)
+    sss2.Thickness = 1
+    sss2.Parent = minimizeButton
 
-	local sss3 = Instance.new("UIStroke")
-	sss3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	sss3.Color = Color3.new(0, 0, 0)
-	sss3.Thickness = 1
-	sss3.Parent = minimizeButton
+    local sss3 = Instance.new("UIStroke")
+    sss3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    sss3.Color = Color3.new(0, 0, 0)
+    sss3.Thickness = 1
+    sss3.Parent = minimizeButton
 
-	local tabPanel = Instance.new("ScrollingFrame")
-	tabPanel.Size = UDim2.new(0, 110, 0, 250)
-	tabPanel.Position = UDim2.new(0, 0, 0, 40)
-	tabPanel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-	tabPanel.BorderSizePixel = 0
-	tabPanel.CanvasSize = UDim2.new(0, 0, 1, 0)
-	tabPanel.ScrollBarThickness = 6
-	tabPanel.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
-	tabPanel.Parent = window
-	tabPanel.Visible = true
+    local tabPanel = Instance.new("ScrollingFrame")
+    tabPanel.Size = UDim2.new(0, 110, 0, 250)
+    tabPanel.Position = UDim2.new(0, 0, 0, 40)
+    tabPanel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    tabPanel.BorderSizePixel = 0
+    tabPanel.CanvasSize = UDim2.new(0, 0, 1, 0)
+    tabPanel.ScrollBarThickness = 6
+    tabPanel.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+    tabPanel.Parent = window
+    tabPanel.Visible = true
 
-	local tabListLayout = Instance.new("UIListLayout")
-	tabListLayout.Parent = tabPanel
-	tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	tabListLayout.Padding = UDim.new(0, 10)
+    local tabListLayout = Instance.new("UIListLayout")
+    tabListLayout.Parent = tabPanel
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.Padding = UDim.new(0, 10)
 
-	local tabPadding = Instance.new("UIPadding")
-	tabPadding.PaddingTop = UDim.new(0, 10)
-	tabPadding.PaddingBottom = UDim.new(0, 10)
-	tabPadding.PaddingLeft = UDim.new(0, 10)
-	tabPadding.PaddingRight = UDim.new(0, 10)
-	tabPadding.Parent = tabPanel
+    local tabPadding = Instance.new("UIPadding")
+    tabPadding.PaddingTop = UDim.new(0, 10)
+    tabPadding.PaddingBottom = UDim.new(0, 10)
+    tabPadding.PaddingLeft = UDim.new(0, 10)
+    tabPadding.PaddingRight = UDim.new(0, 10)
+    tabPadding.Parent = tabPanel
 
-	local mainFrame = Instance.new("ScrollingFrame")
-	mainFrame.Size = UDim2.new(1, -110, 0, 250)
-	mainFrame.Position = UDim2.new(0, 110, 0, 40)
-	mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-	mainFrame.BorderSizePixel = 0
-	mainFrame.CanvasSize = UDim2.new(0, 0, 0, 1000)
-	mainFrame.ScrollBarThickness = 6
-	mainFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
-	mainFrame.Parent = window
+    local mainFrame = Instance.new("ScrollingFrame")
+    mainFrame.Size = UDim2.new(1, -110, 0, 250)
+    mainFrame.Position = UDim2.new(0, 110, 0, 40)
+    mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.CanvasSize = UDim2.new(0, 0, 0, 1000)
+    mainFrame.ScrollBarThickness = 6
+    mainFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+    mainFrame.Parent = window
 
-	local uiListLayout = Instance.new("UIListLayout")
-	uiListLayout.Parent = mainFrame
-	uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	uiListLayout.Padding = UDim.new(0, 10)
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Parent = mainFrame
+    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout.Padding = UDim.new(0, 10)
 
-	local uiPadding = Instance.new("UIPadding")
-	uiPadding.PaddingTop = UDim.new(0, 10)
-	uiPadding.PaddingBottom = UDim.new(0, 10)
-	uiPadding.PaddingLeft = UDim.new(0, 10)
-	uiPadding.PaddingRight = UDim.new(0, 10)
-	uiPadding.Parent = mainFrame
+    local uiPadding = Instance.new("UIPadding")
+    uiPadding.PaddingTop = UDim.new(0, 10)
+    uiPadding.PaddingBottom = UDim.new(0, 10)
+    uiPadding.PaddingLeft = UDim.new(0, 10)
+    uiPadding.PaddingRight = UDim.new(0, 10)
+    uiPadding.Parent = mainFrame
 
-	-- Funções de Minimização/Maximização
-	local isMinimized = false
+    -- Funções de Minimização/Maximização
+    local isMinimized = false
 
-	local function animateFrameSize(targetSize, mainFramTargetSize, topBarTargetSize, tabPanelTargetSize)
-		local tweenService = game:GetService("TweenService")
-		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local function animateFrameSize(targetSize, mainFramTargetSize, topBarTargetSize, tabPanelTargetSize)
+        local tweenService = game:GetService("TweenService")
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-		local frameTween = tweenService:Create(window, tweenInfo, {Size = targetSize})
-		local frameTabTween = tweenService:Create(mainFrame, tweenInfo, {Size = mainFramTargetSize})
-		local topBarTween = tweenService:Create(topBar, tweenInfo, {Size = topBarTargetSize})
-		local tabPanelTween = tweenService:Create(tabPanel, tweenInfo, {Size = tabPanelTargetSize})
+        local frameTween = tweenService:Create(window, tweenInfo, {Size = targetSize})
+        local frameTabTween = tweenService:Create(mainFrame, tweenInfo, {Size = mainFramTargetSize})
+        local topBarTween = tweenService:Create(topBar, tweenInfo, {Size = topBarTargetSize})
+        local tabPanelTween = tweenService:Create(tabPanel, tweenInfo, {Size = tabPanelTargetSize})
 
-		frameTween:Play()
-		frameTabTween:Play()
-		topBarTween:Play()
-		tabPanelTween:Play()
+        frameTween:Play()
+        frameTabTween:Play()
+        topBarTween:Play()
+        tabPanelTween:Play()
 
-		frameTween.Completed:Wait()
-		frameTabTween.Completed:Wait()
-		topBarTween.Completed:Wait()
-		tabPanelTween.Completed:Wait()
-	end
+        frameTween.Completed:Wait()
+        frameTabTween.Completed:Wait()
+        topBarTween.Completed:Wait()
+        tabPanelTween.Completed:Wait()
+    end
 
-	minimizeButton.MouseButton1Click:Connect(function()
-		isMinimized = not isMinimized
-		if isMinimized then
-			animateFrameSize(UDim2.new(0, 520, 0, 40), UDim2.new(0, 410, 0, 0), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 0))
-		else
-			animateFrameSize(UDim2.new(0, 520, 0, 300), UDim2.new(0, 410, 0, 250), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 260))
-		end
-	end)
+        minimizeButton.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        if isMinimized then
+            animateFrameSize(UDim2.new(0, 520, 0, 40), UDim2.new(0, 410, 0, 0), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 0))
+        else
+            animateFrameSize(UDim2.new(0, 520, 0, 300), UDim2.new(0, 410, 0, 250), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 260))
+        end
+    end)
 
-	local function ensureTabPanelVisible()
-		if not tabPanel.Visible and not isMinimized then
-			while not isMinimized and not tabPanel.Visible do
-				wait(0)
-				tabPanel.Visible = true
-			end
-		end
-	end
+    local function ensureTabPanelVisible()
+        if not tabPanel.Visible and not isMinimized then
+            while not isMinimized and not tabPanel.Visible do
+                wait(0)
+                tabPanel.Visible = true
+            end
+        end
+    end
 
-	tabPanel:GetPropertyChangedSignal("Visible"):Connect(ensureTabPanelVisible)
-	minimizeButton.MouseButton1Click:Connect(ensureTabPanelVisible)
+    tabPanel:GetPropertyChangedSignal("Visible"):Connect(ensureTabPanelVisible)
+    minimizeButton.MouseButton1Click:Connect(ensureTabPanelVisible)
 
-	-- Animação de inicialização
-	local tweenService = game:GetService("TweenService")
-	local tweenInfo = TweenInfo.new(1.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-	local openTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(0.5, -260, 0.5, -150)}) -- Desliza para o centro da tela
-	openTween:Play()
+    -- Animação de inicialização
+    local tweenService = game:GetService("TweenService")
+    local tweenInfo = TweenInfo.new(1.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+    local openTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(0.5, -260, 0.5, -150)}) -- Desliza para o centro da tela
+    openTween:Play()
 
-	return window
+    return window
 end
 
-function CreateTab(window, tabPanel, options)
-	local tabFrame = Instance.new("ScrollingFrame")
-	tabFrame.Size = UDim2.new(1, -110, 1, -40)
-	tabFrame.Position = UDim2.new(0, 110, 0, 40)
-	tabFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-	tabFrame.BorderSizePixel = 0
-	tabFrame.CanvasSize = UDim2.new(0, 0, 0, 999)
-	tabFrame.ScrollBarThickness = 6
-	tabFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)    
-	tabFrame.ClipsDescendants = true
-	tabFrame.Visible = false
-	tabFrame.Parent = window
-
-	local tabListLayout = Instance.new("UIListLayout")
-	tabListLayout.Parent = tabFrame
-	tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	tabListLayout.Padding = UDim.new(0, 10)
-
-	local tabPadding = Instance.new("UIPadding")
-	tabPadding.PaddingTop = UDim.new(0, 3)
-	tabPadding.PaddingBottom = UDim.new(0, 3)  
-	tabPadding.PaddingLeft = UDim.new(0, 10)
-	tabPadding.PaddingRight = UDim.new(0, 10)
-	tabPadding.Parent = tabFrame
-
-	local tt = Instance.new("UICorner")
-	tt.CornerRadius = UDim.new(0, 8)
-	tt.Parent = tabFrame
-
-	local tabButton = Instance.new("TextButton")
-	tabButton.Size = UDim2.new(1, 0, 0, 30)
-	tabButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-	tabButton.TextColor3 = Color3.new(1, 1, 1)
-	tabButton.Text = options.Name
-	tabButton.TextSize = 14
-	tabButton.Parent = tabPanel
-
-	local t = Instance.new("UICorner")
-	t.CornerRadius = UDim.new(0, 5)
-	t.Parent = tabButton
-
-	local s = Instance.new("UIStroke")
-	s.Parent = tabButton
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Color = Color3.new(0, 0, 0)
-	s.Thickness = 1
-
-	local ic = Instance.new("ImageLabel")
-	ic.BackgroundTransparency = 1
-	ic.BorderSizePixel = 0
-	ic.Position = UDim2.new(0, 0.5, 0.5, 0)
-	ic.Size = UDim2.new(0, 20, 0, 20)
-	ic.AnchorPoint = Vector2.new(0, 0.5)
-	ic.Image = options.Icon or "rbxassetid://76530199889334"
-	ic.Parent = tabButton
-
-	tabButton.MouseButton1Click:Connect(function()
-		for _, tab in ipairs(window:GetChildren()) do
-			if tab:IsA("ScrollingFrame") and tab.Parent == window then
-				tab.Visible = false
-			end
-		end
-		tabFrame.Visible = true
-	end)
-
-	return tabFrame
-end
-
-function CreateToggle(tabFrame, options)
-	-- Criar o botão de toggle
-	local toggleButton = Instance.new("Frame")
-	toggleButton.Size = UDim2.new(1, 0, 0, 42)
-	toggleButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-	toggleButton.Parent = tabFrame
-
-	-- Adicionar bordas arredondadas
-	local tc = Instance.new("UICorner")
-	tc.CornerRadius = UDim.new(0, 4)
-	tc.Parent = toggleButton
-
-	-- Adicionar preenchimento
-	local tp = Instance.new("UIPadding")
-	tp.PaddingTop = UDim.new(0, 6)
-	tp.PaddingBottom = UDim.new(0, 6)
-	tp.PaddingLeft = UDim.new(0, 6)
-	tp.PaddingRight = UDim.new(0, 6)
-	tp.Parent = toggleButton
-
-	-- Adicionar borda
-	local ts = Instance.new("UIStroke")
-	ts.Parent = toggleButton
-	ts.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	ts.Color = Color3.new(0, 0, 0)
-	ts.Thickness = 1
-
-	-- Criar a caixa de seleção (check)
-	local check = Instance.new("TextButton")
-	check.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-	check.Size = UDim2.new(0, 30, 0, 30)
-	check.Text = ""
-	check.Position = UDim2.new(1, 0, 0, 0)
-	check.AnchorPoint = Vector2.new(1, 0)
-	check.BorderSizePixel = 0
-	check.Parent = toggleButton
-
-	-- Adicionar borda arredondada à caixa de seleção
-	local cc = Instance.new("UICorner")
-	cc.CornerRadius = UDim.new(0, 6)
-	cc.Parent = check
-
-	-- Adicionar borda à caixa de seleção
-	local cs = Instance.new("UIStroke")
-	cs.Parent = check
-	cs.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	cs.Color = Color3.new(0, 0, 0)
-	cs.Thickness = 1
-
-	-- Criar o ícone da caixa de seleção (pode ser alterado para um ícone de 'checked' ou 'unchecked')
-	local checkicon = Instance.new("ImageButton")
-	checkicon.BackgroundTransparency = 1
-	checkicon.BorderSizePixel = 0
-	checkicon.ImageTransparency = 1
-	checkicon.Size = UDim2.new(1, 0, 1, 0)
-	checkicon.AnchorPoint = Vector2.new(0, 0)
-	checkicon.Image = "rbxassetid://117182478841098"  -- Deixe vazio ou adicione a imagem desejada
-	checkicon.Parent = check
-
-	-- Criar título do toggle
-	local title = Instance.new("TextLabel")
-	title.Size = UDim2.new(1, -40, 1, 0)
-	title.Position = UDim2.new(0, 0, 0, 0)
-	title.BackgroundTransparency = 1
-	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.TextColor3 = Color3.new(1, 1, 1)
-	title.Text = options.Name or "Toggle"
-	title.TextSize = 15
-	title.TextScaled = true
-	title.Parent = toggleButton
-
-	local TitleUIStroke = Instance.new("UIStroke")
-	TitleUIStroke.Parent = title
-	TitleUIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	TitleUIStroke.Color = Color3.new(0, 0, 0)
-	TitleUIStroke.Thickness = 1
-
-	local isToggled = options.Default or false
-
-	checkicon.MouseButton1Click:Connect(function()
-		isToggled = not isToggled
-
-		if isToggled then
-			checkicon.ImageTransparency = 0
-			check.BackgroundColor3 = Color3.new(0.105882, 0.952941, 0.0117647)
-		elseif not isToggled then
-			checkicon.ImageTransparency = 1
-			check.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-		end
-
-		if options.Callback then
-			options.Callback(isToggled)
-		end
-	end)
-
-	toggleButton.Parent = tabFrame
-end
-
-function CreateButton(tabFrame, options)
-	local Button = Instance.new("Frame")
-	Button.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
-	Button.Size = UDim2.new(1, 0, 0, 42)
-	Button.BorderSizePixel = 0
-	Button.Parent = tabFrame
-
-	local UICorner = Instance.new("UICorner")
-	UICorner.CornerRadius = UDim.new(0, 4)
-	UICorner.Parent = Button
-
-	local UIPadding = Instance.new("UIPadding")
-	UIPadding.PaddingLeft = UDim.new(0, 6)
-	UIPadding.PaddingRight = UDim.new(0, 6)
-	UIPadding.PaddingTop = UDim.new(0, 6)
-	UIPadding.PaddingBottom = UDim.new(0, 6)
-	UIPadding.Parent = Button
-
-	local UIStroke = Instance.new("UIStroke")
-	UIStroke.Parent = Button
-	UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	UIStroke.Color = Color3.new(0, 0, 0)
-	UIStroke.Thickness = 1
-
-	local Icon = Instance.new("ImageLabel")
-	Icon.BackgroundTransparency = 1
-	Icon.BorderSizePixel = 0
-	Icon.ImageTransparency = 0
-	Icon.Position = UDim2.new(1, 0, 0, 0)
-	Icon.Size = UDim2.new(0, 30, 0, 30)
-	Icon.AnchorPoint = Vector2.new(1, 0)
-	Icon.Image = "rbxassetid://111913000851081"
-	Icon.Parent = Button
-
-	local Title = Instance.new("TextButton")
-	Title.Size = UDim2.new(1, -35, 1, 0)
-	Title.Position = UDim2.new(0, 0, 0, 0)
-	Title.BackgroundTransparency = 1
-	Title.TextXAlignment = Enum.TextXAlignment.Left
-	Title.TextColor3 = Color3.new(1, 1, 1)
-	Title.Text = options.Name or "Button"
-	Title.TextSize = 15
-	Title.TextScaled = true
-	Title.Parent = Button
-
-	local TitleUIStroke = Instance.new("UIStroke")
-	TitleUIStroke.Parent = Title
-	TitleUIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	TitleUIStroke.Color = Color3.new(0, 0, 0)
-	TitleUIStroke.Thickness = 1
-
-	if options.Callback then
-		Title.MouseButton1Click:Connect(function()
-			options.Callback()
-		end)
-	end
-end
-
-function CreateTextBox(tabFrame, options)
-	local InputTextBox = Instance.new("Frame")
-	InputTextBox.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
-	InputTextBox.Size = UDim2.new(1, 0, 0, 42)
-	InputTextBox.BorderSizePixel = 0
-	InputTextBox.Parent = tabFrame
-
-	local iCorner = Instance.new("UICorner")
-	iCorner.CornerRadius = UDim.new(0, 4)
-	iCorner.Parent = InputTextBox
-
-	local iPadding = Instance.new("UIPadding")
-	iPadding.PaddingLeft = UDim.new(0, 6)
-	iPadding.PaddingRight = UDim.new(0, 6)
-	iPadding.PaddingTop = UDim.new(0, 6)
-	iPadding.PaddingBottom = UDim.new(0, 6)
-	iPadding.Parent = InputTextBox
-
-	local iStroke = Instance.new("UIStroke")
-	iStroke.Parent = InputTextBox
-	iStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	iStroke.Color = Color3.new(0, 0, 0)
-	iStroke.Thickness = 1
-
-	local textbox = Instance.new("TextBox")
-	textbox.Parent = InputTextBox
-	textbox.BackgroundColor3 = Color3.new(0.34902, 0.34902, 0.34902)
-	textbox.Size = UDim2.new(0, 130, 1, 0)
-	textbox.Position = UDim2.new(1, -130, 0, 0)
-	textbox.TextXAlignment = Enum.TextXAlignment.Center
-	textbox.TextYAlignment = Enum.TextYAlignment.Top
-	textbox.TextColor3 = Color3.new(1, 1, 1)
-	textbox.Text = ""
-	textbox.TextSize = 15
-	textbox.TextScaled = true
-	textbox.ClearTextOnFocus = false
-	textbox.PlaceholderText = ""
-
-	local textboxuic = Instance.new("UICorner")
-	textboxuic.CornerRadius = UDim.new(0, 6)
-	textboxuic.Parent = textbox
-
-	local textboxuis = Instance.new("UIStroke")
-	textboxuis.Parent = textbox
-	textboxuis.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	textboxuis.Color = Color3.new(0, 0, 0)
-	textboxuis.Thickness = 1
-
-	local textboxtextuis = Instance.new("UIStroke")
-	textboxtextuis.Color = Color3.new(0, 0, 0)
-	textboxtextuis.Parent = textbox
-	textboxtextuis.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	textboxtextuis.Thickness = 1
-
-	local title = Instance.new("TextLabel")
-	title.Size = UDim2.new(0.74, -35, 1, 0)
-	title.Position = UDim2.new(0, 0, 0, 0)
-	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.TextColor3 = Color3.new(1, 1, 1)
-	title.Text = options.Name or "TextBox"
-	title.TextSize = 15
-	title.BorderSizePixel = 0
-	title.BackgroundTransparency = 1
-	title.TextScaled = true
-	title.Parent = InputTextBox
-
-	local titleuis = Instance.new("UIStroke")
-	titleuis.Parent = title
-	titleuis.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	titleuis.Color = Color3.new(0, 0, 0)
-	titleuis.Thickness = 1
-
-	if options.Callback then
-		textbox.FocusLost:Connect(function(enterPressed)
-			options.Callback(textbox.Text, enterPressed)
-		end)
-	end
-end
-
-
-
-function CreateLabel(tabFrame, options)
-	local framela = Instance.new("Frame")
-	framela.Size = UDim2.new(1, 0, 0, 32)
-	framela.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-	framela.Parent = tabFrame
-
-	local labelcr = Instance.new("TextLabel")
-	labelcr.Size = UDim2.new(1, 0, 1, 0)
-	labelcr.Position = UDim2.new(0, 0, 0, 0)
-	labelcr.TextXAlignment = Enum.TextXAlignment.Left
-	labelcr.BackgroundTransparency = 1
-	labelcr.TextColor3 = options.TextColor3 or Color3.new(1, 1, 1)
-	labelcr.Text = options.Text or "Label"
-	labelcr.TextSize = options.TextSize or 14
-	labelcr.Parent = framela
-	labelcr.TextScaled = true
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 30, 0, 30)
-	icon.Position = UDim2.new(1, -30, 0.5, -15)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://134686345982262"
-	icon.Parent = framela
-
-	local s = Instance.new("UIStroke")
-	s.Color = Color3.new(0, 0, 0)
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Thickness = 1
-	s.Parent = framela
-	s.Transparency = 0
-
-	local sssss = Instance.new("UIStroke")
-	sssss.Color = Color3.new(0, 0, 0)
-	sssss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	sssss.Thickness = 1
-	sssss.Parent = labelcr
-	sssss.Transparency = 0
-
-	local ss = Instance.new("UIStroke")
-	ss.Color = Color3.new(0, 0, 0)
-	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss.Thickness = 1
-	ss.Parent = framela
-	ss.Transparency = 0
-
-	local p = Instance.new("UIPadding")
-	p.PaddingTop = UDim.new(0, 6)
-	p.PaddingLeft = UDim.new(0, 6)
-	p.PaddingBottom = UDim.new(0, 6)
-	p.PaddingRight = UDim.new(0, 6)
-	p.Parent = framela
-
-	local C = Instance.new("UICorner")
-	C.CornerRadius = UDim.new(0, 4)
-	C.Parent = framela
-end
-
-function CreateSlider(tabFrame, options)
-	-- Criar o container do slider
-	local Slider = Instance.new("Frame")
-	Slider.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
-	Slider.Size = UDim2.new(1, 0, 0, 46)
-	Slider.Position = UDim2.new(0, 0, 0, 0)
-	Slider.Parent = tabFrame
-	Slider.BorderSizePixel = 0
-
-	-- Bordas arredondadas para o container do slider
-	local UICorner = Instance.new("UICorner")
-	UICorner.CornerRadius = UDim.new(0, 4)
-	UICorner.Parent = Slider
-
-	-- Preenchimento do slider
-	local UIPadding = Instance.new("UIPadding")
-	UIPadding.PaddingBottom = UDim.new(0, 6)
-	UIPadding.PaddingLeft = UDim.new(0, 6)
-	UIPadding.PaddingRight = UDim.new(0, 6)
-	UIPadding.PaddingTop = UDim.new(0, 6)
-	UIPadding.Parent = Slider
-
-	-- Borda do slider
-	local UIStroke = Instance.new("UIStroke")
-	UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	UIStroke.Color = Color3.new(0, 0, 0)
-	UIStroke.Thickness = 1
-	UIStroke.Parent = Slider
-
-	-- Barra de fundo do slider
-	local SliderBackGround = Instance.new("Frame")
-	SliderBackGround.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
-	SliderBackGround.Size = UDim2.new(1, 0, 0, 10)
-	SliderBackGround.Position = UDim2.new(0, 0, 1, -8)
-	SliderBackGround.Parent = Slider
-	SliderBackGround.BorderSizePixel = 0
-
-	-- Bordas arredondadas para a barra de fundo
-	local BackGroundUICorner = Instance.new("UICorner")
-	BackGroundUICorner.CornerRadius = UDim.new(0, 8)
-	BackGroundUICorner.Parent = SliderBackGround
-
-	-- Borda para a barra de fundo
-	local BackGroundUIStroke = Instance.new("UIStroke")
-	BackGroundUIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	BackGroundUIStroke.Color = Color3.new(0, 0, 0)
-	BackGroundUIStroke.Thickness = 1
-	BackGroundUIStroke.Parent = SliderBackGround
-
-	-- A parte do slider que pode ser arrastada (dragable)
-	local Draggable = Instance.new("Frame")
-	Draggable.BackgroundColor3 = Color3.new(0.6, 0.6, 0.6)
-	Draggable.Size = UDim2.new(0.5, 0, 1, 0)  -- Tamanho inicial
-	Draggable.Position = UDim2.new(0, 0, 0, 0)
-	Draggable.Parent = SliderBackGround
-	Draggable.BorderSizePixel = 0
-	Draggable.Active = true
-	Draggable.ClipsDescendants = true
-	Draggable.ZIndex = 1
-
-	-- Bordas arredondadas para a parte deslizante (Draggable)
-	local DRAGUICORNER = Instance.new("UICorner")
-	DRAGUICORNER.CornerRadius = UDim.new(0, 8)
-	DRAGUICORNER.Parent = Draggable
-
-	-- Título do slider
-	local title = Instance.new("TextLabel")
-	title.Name = "Title"
-	title.Text = options.Name
-	title.TextSize = 20
-	title.Size = UDim2.new(1, -300, 1, -20)
-	title.Position = UDim2.new(0, 0, 0, 0)
-	title.Parent = Slider
-	title.BackgroundTransparency = 1
-	title.TextScaled = false
-	title.TextColor3 = Color3.new(1, 1, 1)
-	title.Font = Enum.Font.GothamBold
-
-	-- Borda para o título
-	local titlestrok = Instance.new("UIStroke")
-	titlestrok.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	titlestrok.Color = Color3.new(0, 0, 0)
-	titlestrok.Thickness = 1
-	titlestrok.Parent = title
-
-	-- Texto que mostra o valor atual
-	local valuetext = Instance.new("TextLabel")
-	valuetext.Name = "Value"
-	valuetext.Text = tostring(options.Default)
-	valuetext.Size = UDim2.new(0, 40, 1, -20)
-	valuetext.Position = UDim2.new(1, -45, 0, 0)
-	valuetext.Parent = Slider
-	valuetext.BackgroundTransparency = 1
-	valuetext.TextSize = 20
-	valuetext.TextScaled = false
-	valuetext.TextColor3 = Color3.new(1, 1, 1)
-	valuetext.Font = Enum.Font.GothamBold
-	valuetext.TextXAlignment = Enum.TextXAlignment.Right
-
-	-- Borda para o texto de valor
-	local valueuistrok = Instance.new("UIStroke")
-	valueuistrok.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	valueuistrok.Color = Color3.new(0, 0, 0)
-	valueuistrok.Thickness = 1
-	valueuistrok.Parent = valuetext
-
-	-- Valores do slider
-	local minValue = options.Min or 0
-	local maxValue = options.Max or 100
-	local defaultValue = options.Default or (minValue + maxValue) / 2
-	local currentValue = defaultValue
-
-	-- Atualiza o tamanho do "draggable" e o texto do valor
-	local function updateSlider()
-		local percentage = (currentValue - minValue) / (maxValue - minValue)
-		Draggable.Size = UDim2.new(percentage, 0, 1, 0)  -- Mudando o tamanho do draggable
-		valuetext.Text = tostring(math.floor(currentValue))  -- Atualizando o valor mostrado
-	end
-
-	-- Iniciar com o valor default
-	updateSlider()
-
-	-- Variáveis para controle do arrasto
-	local dragging = false
-
-	-- Função para iniciar o arrasto
-	local function startDrag(input)
-		dragging = true
-	end
-
-	-- Função para parar o arrasto
-	local function endDrag(input)
-		dragging = false
-	end
-
-	-- Função para manipulação do movimento de arrasto
-	local function updateDrag(input)
-		if dragging then
-			-- Obter a posição do mouse ou toque
-			local mousePosition = input.Position.X
-			local sliderStartX = SliderBackGround.AbsolutePosition.X
-			local sliderWidth = SliderBackGround.AbsoluteSize.X
-
-			-- Calcular o valor baseado na posição do mouse/touch
-			local dragPercentage = (mousePosition - sliderStartX) / sliderWidth
-			dragPercentage = math.clamp(dragPercentage, 0, 1)  -- Limitar o valor de 0 a 1
-			currentValue = minValue + dragPercentage * (maxValue - minValue)
-
-			-- Atualizar o tamanho e o valor
-			updateSlider()
-
-			-- Chamar o callback com o novo valor
-			if options.Callback then
-				options.Callback(currentValue)
-			end
-		end
-	end
-
-	-- Função para detectar onde o clique ou toque acontece
-	local function onSliderClick(input)
-		-- Verificar se é um toque ou clique
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-			-- Calcular o valor a partir do clique
-			local mousePosition = input.Position.X
-			local sliderStartX = SliderBackGround.AbsolutePosition.X
-			local sliderWidth = SliderBackGround.AbsoluteSize.X
-
-			-- Calcular o valor baseado no clique em qualquer ponto da barra
-			local dragPercentage = (mousePosition - sliderStartX) / sliderWidth
-			dragPercentage = math.clamp(dragPercentage, 0, 1)  -- Limitar o valor de 0 a 1
-			currentValue = minValue + dragPercentage * (maxValue - minValue)
-
-			-- Atualizar o tamanho e o valor
-			updateSlider()
-
-			-- Chamar o callback com o novo valor
-			if options.Callback then
-				options.Callback(currentValue)
-			end
-		end
-	end
-
-	-- Verificar se o input é de um dispositivo de toque (celular)
-	local function isMobile()
-		return game:GetService("UserInputService").TouchEnabled
-	end
-
-	-- Verificar se o input é de um dispositivo de desktop (mouse)
-	local function isDesktop()
-		return game:GetService("UserInputService").MouseEnabled
-	end
-
-	-- Conectar os eventos de input para dispositivos móveis (celular) ou desktop
-	if isMobile() then
-		-- Eventos para toque em dispositivos móveis
-		SliderBackGround.InputBegan:Connect(function(input)
-			startDrag(input)
-			onSliderClick(input)
-		end)
-
-		SliderBackGround.InputEnded:Connect(function(input)
-			endDrag(input)
-		end)
-
-		-- Atualizar o slider enquanto o toque se move
-		game:GetService("UserInputService").InputChanged:Connect(function(input)
-			if (input.UserInputType == Enum.UserInputType.Touch) and dragging then
-				updateDrag(input)
-			end
-		end)
-	elseif isDesktop() then
-		-- Eventos para o mouse em dispositivos desktop
-		SliderBackGround.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				startDrag(input)
-				onSliderClick(input)
-			end
-		end)
-
-		SliderBackGround.InputEnded:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				endDrag(input)
-			end
-		end)
-
-		-- Atualizar o slider enquanto o mouse se move
-		game:GetService("UserInputService").InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-				updateDrag(input)
-			end
-		end)
-	end
-
-	-- Inicializar o valor com o valor default
-	if options.Callback then
-		options.Callback(currentValue)
-	end
-end
-
-function CreateInfoLabel(tabFrame, options)
-	local framela = Instance.new("Frame")
-	framela.Size = UDim2.new(1, 0, 0, 32)
-	framela.Parent = tabFrame
-	framela.BackgroundColor3 = Color3.new(0.054902, 0.188235, 0.337255)
-
-	local labelcr = Instance.new("TextLabel")
-	labelcr.Size = UDim2.new(1, 0, 1, 0)
-	labelcr.Position = UDim2.new(0, 0, 0, 0)
-	labelcr.TextXAlignment = Enum.TextXAlignment.Left
-	labelcr.BackgroundTransparency = 1
-	labelcr.TextColor3 = Color3.new(0.0117647, 0.419608, 0.768627)
-	labelcr.Text = options.Text or "Label"
-	labelcr.TextSize = options.TextSize or 14
-	labelcr.Parent = framela
-	labelcr.TextScaled = true
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 30, 0, 30)
-	icon.Position = UDim2.new(1, -30, 0.5, -15)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://92817821432465"
-	icon.Parent = framela
-
-	local s = Instance.new("UIStroke")
-	s.Color = Color3.new(0.0588235, 0.341176, 1)
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Thickness = 1
-	s.Parent = framela
-	s.Transparency = 0
-
-	local ss = Instance.new("UIStroke")
-	ss.Color = Color3.new(0, 0, 0)
-	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss.Thickness = 1
-	ss.Parent = framela
-	ss.Transparency = 0
-
-	local p = Instance.new("UIPadding")
-	p.PaddingTop = UDim.new(0, 6)
-	p.PaddingLeft = UDim.new(0, 6)
-	p.PaddingBottom = UDim.new(0, 6)
-	p.PaddingRight = UDim.new(0, 6)
-	p.Parent = framela
-
-	local C = Instance.new("UICorner")
-	C.CornerRadius = UDim.new(0, 4)
-	C.Parent = framela
-end
-
-function CreateWarnLabel(tabFrame, options)
-	local framela = Instance.new("Frame")
-	framela.Size = UDim2.new(1, 0, 0, 32)
-	framela.Parent = tabFrame
-	framela.BackgroundColor3 = Color3.new(0.168627, 0.141176, 0.0117647)
-
-	local labelcr = Instance.new("TextLabel")
-	labelcr.Size = UDim2.new(1, 0, 1, 0)
-	labelcr.Position = UDim2.new(0, 0, 0, 0)
-	labelcr.TextXAlignment = Enum.TextXAlignment.Left
-	labelcr.BackgroundTransparency = 1
-	labelcr.TextColor3 = Color3.new(0.898039, 0.745098, 0.0627451)
-	labelcr.Text = options.Text or "Label"
-	labelcr.TextSize = options.TextSize or 14
-	labelcr.Parent = framela
-	labelcr.TextScaled = true
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 30, 0, 30)
-	icon.Position = UDim2.new(1, -30, 0.5, -15)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://129568088175768"
-	icon.Parent = framela
-
-	local s = Instance.new("UIStroke")
-	s.Color = Color3.new(0.647059, 0.537255, 0.0431373)
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Thickness = 1
-	s.Parent = framela
-	s.Transparency = 0
-
-	local ss = Instance.new("UIStroke")
-	ss.Color = Color3.new(0, 0, 0)
-	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss.Thickness = 1
-	ss.Parent = framela
-	ss.Transparency = 0
-
-	local p = Instance.new("UIPadding")
-	p.PaddingTop = UDim.new(0, 6)
-	p.PaddingLeft = UDim.new(0, 6)
-	p.PaddingBottom = UDim.new(0, 6)
-	p.PaddingRight = UDim.new(0, 6)
-	p.Parent = framela
-
-	local C = Instance.new("UICorner")
-	C.CornerRadius = UDim.new(0, 4)
-	C.Parent = framela
-end
-
-function CreateDropdown(tabFrame, config)
-	local Dropdown = Instance.new("Frame")
-	local UICorner = Instance.new("UICorner")
-	local UIStroke_1 = Instance.new("UIStroke")
-	local UIStroke_2 = Instance.new("UIStroke")
-	local Title = Instance.new("TextLabel")
-	local UIPadding = Instance.new("UIPadding")
-	local Icon = Instance.new("ImageButton")
-	local ScrollingFrame = Instance.new("ScrollingFrame")
-	local UIPadding_2 = Instance.new("UIPadding")
-	local UIListLayout = Instance.new("UIListLayout")
-
-	Dropdown.Name = config.Name
-	Dropdown.Parent = tabFrame
-	Dropdown.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
-	Dropdown.BorderColor3 = Color3.new(0, 0, 0)
-	Dropdown.BorderSizePixel = 0
-	Dropdown.ClipsDescendants = true
-	Dropdown.Size = UDim2.new(1, 0, 0, 42)
-
-	UICorner.Parent = Dropdown
-	UICorner.CornerRadius = UDim.new(0, 4)
-
-	UIStroke_1.Parent = Dropdown
-	UIStroke_1.Color = Color3.new(0, 0, 0)
-	UIStroke_1.Thickness = 1
-	UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	
-	UIStroke_2.Parent = Title
-	UIStroke_2.Color = Color3.new(0, 0, 0)
-	UIStroke_2.Thickness = 1
-	UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-
-	Title.Name = "Title"
-	Title.Parent = Dropdown
-	Title.BackgroundColor3 = Color3.new(1, 1, 1)
-	Title.BackgroundTransparency = 1
-	Title.BorderColor3 = Color3.new(0, 0, 0)
-	Title.BorderSizePixel = 0
-	Title.Size = UDim2.new(1, -35, 0, 20)
-	Title.Font = Enum.Font.Ubuntu
-	Title.Text = config.Name
-	Title.TextColor3 = Color3.new(1, 1, 1)
-	Title.TextSize = 20
-	Title.TextXAlignment = Enum.TextXAlignment.Left
-
-	UIPadding.Parent = Dropdown
-	UIPadding.PaddingBottom = UDim.new(0, 6)
-	UIPadding.PaddingLeft = UDim.new(0, 6)
-	UIPadding.PaddingRight = UDim.new(0, 6)
-	UIPadding.PaddingTop = UDim.new(0, 6)
-
-	Icon.Name = "Icon"
-	Icon.Parent = Dropdown
-	Icon.AnchorPoint = Vector2.new(1, 0)
-	Icon.BackgroundColor3 = Color3.new(1, 1, 1)
-	Icon.BackgroundTransparency = 1
-	Icon.BorderColor3 = Color3.new(0, 0, 0)
-	Icon.BorderSizePixel = 0
-	Icon.Position = UDim2.new(1, 0, 0, -2)
-	Icon.Size = UDim2.new(0, 30, 0, 30)
-	Icon.Image = "rbxassetid://126874138470311"
-	
-	local UIStroke_Option = Instance.new("UIStroke")
-	UIStroke_Option.Parent = ScrollingFrame
-	UIStroke_Option.Color = Color3.new(0, 0, 0)
-	UIStroke_Option.Thickness = 1
-	UIStroke_Option.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-	ScrollingFrame.Parent = Dropdown
-	ScrollingFrame.Active = true
-	ScrollingFrame.BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)
-	ScrollingFrame.BorderColor3 = Color3.new(0, 0, 0)
-	ScrollingFrame.BorderSizePixel = 0
-	ScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
-	ScrollingFrame.Size = UDim2.new(1, 0, 1, -30)
-	ScrollingFrame.Visible = false
-	ScrollingFrame.ScrollBarThickness = 6
-
-	UIPadding_2.Parent = ScrollingFrame
-	UIPadding_2.PaddingBottom = UDim.new(0, 6)
-	UIPadding_2.PaddingLeft = UDim.new(0, 6)
-	UIPadding_2.PaddingRight = UDim.new(0, 6)
-	UIPadding_2.PaddingTop = UDim.new(0, 6)
-
-	UIListLayout.Parent = ScrollingFrame
-	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout.Padding = UDim.new(0, 3)
-
-	-- Variável para armazenar as opções selecionadas
-	local selectedOptions = {}
-
-	-- Função para criar as opções do dropdown
-	local function createOption(optionNameText, isSelected)
-		local option = Instance.new("Frame")
-		option.Name = "option"
-		option.Parent = ScrollingFrame
-		option.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
-		option.BorderColor3 = Color3.new(0, 0, 0)
-		option.BorderSizePixel = 0
-		option.Size = UDim2.new(1, -3, 0, 36)
-
-		local UICorner_2 = Instance.new("UICorner")
-		UICorner_2.Parent = option
-		UICorner_2.CornerRadius = UDim.new(0, 4)
-
-		local UIStroke_Option = Instance.new("UIStroke")
-		UIStroke_Option.Parent = option
-		UIStroke_Option.Color = Color3.new(0, 0, 0)
-		UIStroke_Option.Thickness = 1
-		UIStroke_Option.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-		local optionName = Instance.new("TextLabel")
-		optionName.Name = "optionName"
-		optionName.Parent = option
-		optionName.BackgroundColor3 = Color3.new(1, 1, 1)
-		optionName.BackgroundTransparency = 1
-		optionName.BorderColor3 = Color3.new(0, 0, 0)
-		optionName.BorderSizePixel = 0
-		optionName.Size = UDim2.new(1, -35, 1, 0)
-		optionName.Font = Enum.Font.Ubuntu
-		optionName.Text = optionNameText
-		optionName.TextColor3 = Color3.new(1, 1, 1)
-		optionName.TextScaled = true
-		optionName.TextWrapped = true
-		optionName.TextXAlignment = Enum.TextXAlignment.Left
-
-		local UIStroke_Opti = Instance.new("UIStroke")
-		UIStroke_Opti.Parent = optionName
-		UIStroke_Opti.Color = Color3.new(0, 0, 0)
-		UIStroke_Opti.Thickness = 1
-		UIStroke_Opti.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-
-		local UIPadding_3 = Instance.new("UIPadding")
-		UIPadding_3.Parent = option
-		UIPadding_3.PaddingBottom = UDim.new(0, 6)
-		UIPadding_3.PaddingLeft = UDim.new(0, 6)
-		UIPadding_3.PaddingRight = UDim.new(0, 6)
-		UIPadding_3.PaddingTop = UDim.new(0, 6)
-
-		local CheckmarkHolder = Instance.new("Frame")
-		CheckmarkHolder.Name = "CheckmarkHolder"
-		CheckmarkHolder.Parent = option
-		CheckmarkHolder.AnchorPoint = Vector2.new(1, 0)
-		CheckmarkHolder.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Cor cinza inativo
-		CheckmarkHolder.BorderColor3 = Color3.new(0, 0, 0)
-		CheckmarkHolder.BorderSizePixel = 0
-		CheckmarkHolder.Position = UDim2.new(1, 3, 0, -3)
-		CheckmarkHolder.Size = UDim2.new(0, 30, 0, 30)
-
-		local UICorner_3 = Instance.new("UICorner")
-		UICorner_3.Parent = CheckmarkHolder
-		UICorner_3.CornerRadius = UDim.new(0, 6)
-
-		local Checkmark = Instance.new("ImageButton")
-		Checkmark.Name = "Checkmark"
-		Checkmark.Parent = CheckmarkHolder
-		Checkmark.BackgroundColor3 = Color3.new(1, 1, 1)
-		Checkmark.BackgroundTransparency = 1
-		Checkmark.ImageTransparency = 1
-		Checkmark.BorderColor3 = Color3.new(0, 0, 0)
-		Checkmark.BorderSizePixel = 0
-		Checkmark.Size = UDim2.new(1, 0, 1, 0)
-		Checkmark.Image = "rbxassetid://117182478841098"
-
-		local UIStroke_Optio = Instance.new("UIStroke")
-		UIStroke_Optio.Parent = Checkmark
-		UIStroke_Optio.Color = Color3.new(0, 0, 0)
-		UIStroke_Optio.Thickness = 1
-		UIStroke_Optio.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-		local UICorner_4 = Instance.new("UICorner")
-		UICorner_4.Parent = Checkmark
-		UICorner_4.CornerRadius = UDim.new(0, 6)
-
-		local function toggleOption()
-			local isSelected = false
-			for i, selectedOption in ipairs(selectedOptions) do
-				if selectedOption == optionNameText then
-					table.remove(selectedOptions, i)
-					isSelected = true
-					break
-				end
-			end
-
-			if not isSelected then
-				if not config.MultipleOptions then
-					-- Deseleciona todas as outras opções se múltiplas opções não forem permitidas
-					for _, opt in ipairs(ScrollingFrame:GetChildren()) do
-						if opt:IsA("Frame") and opt.Name == "option" then
-							local holder = opt:FindFirstChild("CheckmarkHolder")
-							local checkmark = holder and holder:FindFirstChild("Checkmark")
-							if holder and checkmark then
-								holder.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Cinza inativo
-								checkmark.ImageTransparency = 1 -- Oculta o ícone de seleção
-							end
-						end
-					end
-					selectedOptions = {}
-				end
-				table.insert(selectedOptions, optionNameText)
-			end
-
-			-- Atualiza o estado visual da opção
-			if isSelected then
-				CheckmarkHolder.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Cinza inativo
-				Checkmark.ImageTransparency = 1 -- Oculta o ícone de seleção
-			else
-				Checkmark.ImageTransparency = 0
-				CheckmarkHolder.BackgroundColor3 = Color3.new(0.105882, 0.952941, 0.0117647) -- Verde ativo
-			end
-
-			-- Chama o callback com as opções selecionadas
-			config.CallBack(selectedOptions)
-		end
-
-		-- Se a opção já foi selecionada como padrão, atualiza o checkmark
-		if isSelected then
-			Checkmark.ImageTransparency = 0
-			CheckmarkHolder.BackgroundColor3 = Color3.new(0.105882, 0.952941, 0.0117647) -- Verde ativo
-		end
-
-		Checkmark.MouseButton1Click:Connect(toggleOption)
-		return option
-	end
-
-	-- Criando as opções passadas em config.Options
-	for _, optionNameText in ipairs(config.Options) do
-		local isSelected = table.find(config.Default, optionNameText) ~= nil
-		if isSelected then
-			table.insert(selectedOptions, optionNameText)
-		end
-		createOption(optionNameText, isSelected)
-	end
-
-	-- Animação para abrir/fechar dropdown
-	local isDropdownOpen = false
-	local function toggleDropdown()
-		isDropdownOpen = not isDropdownOpen
-		local tweenService = game:GetService("TweenService")
-		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-		-- Definindo a visibilidade do ScrollingFrame antes ou depois da animação
-		if isDropdownOpen then
-			-- Ao abrir, tornamos o ScrollingFrame visível imediatamente
-			ScrollingFrame.Visible = true
-		end
-
-		-- Definindo o tamanho de destino dependendo do estado (aberto ou fechado)
-		local targetSize = isDropdownOpen and UDim2.new(1, 0, 0, 200) or UDim2.new(1, 0, 0, 42)
-
-		-- Criando a animação de alteração do tamanho
-		local dropdownTween = tweenService:Create(Dropdown, tweenInfo, {Size = targetSize})
-
-		dropdownTween:Play()
-
-		-- Se estiver fechando, escondemos o ScrollingFrame após a animação
-		if not isDropdownOpen then
-			dropdownTween.Completed:Connect(function()
-				ScrollingFrame.Visible = false
-			end)
-		end
-	end
-
-
-	Icon.MouseButton1Click:Connect(toggleDropdown)
-end
+return CreateWindow
