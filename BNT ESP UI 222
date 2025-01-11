@@ -44,7 +44,7 @@ local function isVisible(target)
         end
 
         local camera = workspace.CurrentCamera
-        local targetPartPos = target.Character[_G.targetPart].Position
+        local targetPartPos = target.Character:FindFirstChild(_G.targetPart).Position
         local rayOrigin = camera.CFrame.Position
         local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
 
@@ -64,7 +64,7 @@ end
 local function isInFrontOfCamera(player)
     if player.Character and player.Character:FindFirstChild(_G.targetPart) then
         local camera = workspace.CurrentCamera
-        local targetPartPos = player.Character[_G.targetPart].Position
+        local targetPartPos = player.Character:FindFirstChild(_G.targetPart).Position
         local cameraDirection = camera.CFrame.LookVector
         local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
 
@@ -107,7 +107,7 @@ end
 local function aimAt(target)
     if target and target.Character and target.Character:FindFirstChild(_G.targetPart) then
         local camera = workspace.CurrentCamera
-        local aimPosition = target.Character[_G.targetPart].Position
+        local aimPosition = target.Character:FindFirstChild(_G.targetPart).Position
         camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
     end
 end
@@ -130,18 +130,9 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shl
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
 local Tab = Window:MakeTab({
-    Name = "Aimbot",
+    Name = "Tab",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
-})
-
-Tab:AddToggle({
-    Name = "AimBot",
-    Default = false,
-    Callback = function(Value)
-        SilentAimEnabled = Value
-        print("Silent Aim: ", Value)
-    end    
 })
 
 Tab:AddToggle({
@@ -150,6 +141,15 @@ Tab:AddToggle({
     Callback = function(Value)
         WallCheckEnabled = Value
         print("Wall Check: ", Value)
+    end    
+})
+
+Tab:AddToggle({
+    Name = "Silent Aim",
+    Default = false,
+    Callback = function(Value)
+        SilentAimEnabled = Value
+        print("Silent Aim: ", Value)
     end    
 })
 
