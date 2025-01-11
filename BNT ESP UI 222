@@ -533,7 +533,6 @@ Tab1:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.teamcheck = Value
-        TeamCheck()
     end
 })
 
