@@ -227,89 +227,104 @@ game.Players.PlayerAdded:Connect(function(player)
     setupPlayerBox(player)
 end)
 
-_G.AimBotEnabled = false
-_G.AimPart = "Head"
-_G.WallCheckEnabled = false
-_G.TeamCheckEnabled = false
+local SilentAimEnabled = false
+local WallCheckEnabled = false
+local FOV = 75
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
+local TeamCheckEnabled = false
+_G.targetPart = "Head"
 
-_G.FovThickness = 1.5
-_G.FovFilled = false
-_G.FovColor = Color3.new(1, 1, 1)
-_G.FovTransparency = 1
-_G.FovVisible = false
-_G.FovSize = 75
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local camera = game.Workspace.CurrentCamera
-local aimPart = _G.AimPart
-
-local fovCircle = Drawing.new("Circle")
-fovCircle.Thickness = _G.FovThickness
-fovCircle.Filled = _G.FovFilled
-fovCircle.Color = _G.FovColor
-fovCircle.Transparency = _G.FovTransparency
-fovCircle.Visible = _G.FovVisible
-
-local fovRadius = _G.FovSize
-
-local fovEnabled = _G.FovVisible
-
-local aimbotEnabled = _G.AimBotEnabled
-local wallcheckEnabled = _G.WallCheckEnabled
-local teamCheckEnabled = _G.TeamCheckEnabled
-
-local function updateFovCircle()
-    if fovEnabled then
-        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-        fovCircle.Position = mousePos
-        fovCircle.Radius = fovRadius
-        fovCircle.Visible = true
-    else
-        fovCircle.Visible = false
+local function getFOVPosition()
+    local camera = workspace.CurrentCamera
+    if FOVPosition == "Center" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif FOVPosition == "Mouse" then
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        return Vector2.new(mouse.X, mouse.Y)
     end
 end
 
-RunService.RenderStepped:Connect(updateFovCircle)
+local function isPlayerInFOV(player)
+    local mousePos = getFOVPosition()
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
+        local charPart = player.Character:FindFirstChild(_G.targetPart)
+        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
 
-local function notBehindWall(target)
-    local ray = Ray.new(LocalPlayer.Character.Head.Position, (target.Position - LocalPlayer.Character.Head.Position).Unit * 300)
-    local part, position = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character}, false, true)
-    if part then
-        local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
-        if not humanoid then
-            humanoid = part.Parent.Parent:FindFirstChildOfClass("Humanoid")
-        end
-        if humanoid and target and humanoid.Parent == target.Parent then
-            local pos, visible = camera:WorldToScreenPoint(target.Position)
-            if visible then
-                return true
-            end
-        end
+        return distance <= FOV
     end
     return false
 end
 
-local function getClosestPlayerInFOV()
-    local closestPlayer = nil
-    local shortestDistance = fovRadius
+local function isVisible(target)
+    if WallCheckEnabled then
+        if not target or not target.Character or not target.Character:FindFirstChild(_G.targetPart) then
+            return false
+        end
 
-    for _, targetPlayer in pairs(Players:GetPlayers()) do
-        if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
-            if teamCheckEnabled and targetPlayer.Team == LocalPlayer.Team then
+        local camera = workspace.CurrentCamera
+        local targetPartPos = target.Character:FindFirstChild(_G.targetPart).Position
+        local rayOrigin = camera.CFrame.Position
+        local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+        local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+        if raycastResult and raycastResult.Instance then
+            return raycastResult.Instance:IsDescendantOf(target.Character)
+        end
+    end
+    return true
+end
+
+local function isInFrontOfCamera(player)
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
+        local camera = workspace.CurrentCamera
+        local targetPartPos = player.Character:FindFirstChild(_G.targetPart).Position
+        local cameraDirection = camera.CFrame.LookVector
+        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
+
+        local dotProduct = cameraDirection:Dot(directionToPlayer)
+        return dotProduct > 0
+    end
+    return false
+end
+
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local players = game.Players:GetPlayers()
+    local closestDistance = math.huge
+    local mousePos = getFOVPosition()
+
+    for _, player in pairs(players) do
+        if player ~= game.Players.LocalPlayer and isVisible(player) then
+            if TeamCheckEnabled and player.Team == game.Players.LocalPlayer.Team then
                 continue
             end
-            
-            local head = targetPlayer.Character[aimPart]
-            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
-            if onScreen then
-                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
 
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closestPlayer = head
+            if isPlayerInFOV(player) and isInFrontOfCamera(player) then
+                local charPart = player.Character:FindFirstChild(_G.targetPart)
+                if charPart then
+                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        closestPlayer = player
+                    end
                 end
             end
         end
@@ -318,20 +333,26 @@ local function getClosestPlayerInFOV()
     return closestPlayer
 end
 
-local function silentAimAtClosestPlayer()
-    if aimbotEnabled then
-        local targetHead = getClosestPlayerInFOV()
-
-        if targetHead then
-            if not wallcheckEnabled or notBehindWall(targetHead) then
-                local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
-                camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
-            end
-        end
+local function aimAt(target)
+    if target and target.Character and target.Character:FindFirstChild(_G.targetPart) then
+        local camera = workspace.CurrentCamera
+        local aimPosition = target.Character:FindFirstChild(_G.targetPart).Position
+        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
     end
 end
 
-RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
+game:GetService("RunService").RenderStepped:Connect(function()
+    if SilentAimEnabled then
+        local target = getClosestPlayer()
+        if target then
+            aimAt(target)
+        end
+    end
+
+    FOVCircle.Position = getFOVPosition()
+    FOVCircle.Radius = FOV
+    FOVCircle.Visible = FOVVisible
+end)
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -376,7 +397,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Enable Aimbot",
     Callback = function(Value)
-        _G.AimBotEnabled = Value
+        SilentAimEnabled = Value
     end,
 })
 
@@ -385,7 +406,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Enable WallCheck",
     Callback = function(Value)
-        _G.WallCheckEnabled = Value
+        WallCheckEnabled = Value
     end,
 })
 
@@ -394,7 +415,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Enable TeamCheck",
     Callback = function(Value)
-        _G.TeamCheckEnabled = Value
+        TeamCheckEnabled = Value
     end,
 })
 
@@ -403,7 +424,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Show Fov",
     Callback = function(Value)
-        _G.FovVisible = Value
+        FOVVisible = Value
     end,
 })
 
@@ -412,7 +433,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "Fov Filled",
     Callback = function(Value)
-        _G.FovFilled = Value
+        FOVCircle.Filled = Value
     end,
 })
 
@@ -421,7 +442,7 @@ Tab:CreateColorPicker({
     Color = Color3.fromRGB(0, 255, 0),
     Flag = "Fov Color",
     Callback = function(Value)
-        _G.FovColor = Value
+        FOVCircle.Color = Value
     end
 })
 
@@ -433,7 +454,7 @@ Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "Fov Transparency",
     Callback = function(Value)
-        _G.FovTransparency = Value
+        FOVCircle.Transparency = Value
     end,
 })
 
@@ -445,7 +466,7 @@ Tab:CreateSlider({
     CurrentValue = 1,
     Flag = "Fov Thickness",
     Callback = function(Value)
-        _G.FovThickness = Value
+        FOVCircle.Thickness = Value
     end,
 })
 
@@ -456,7 +477,7 @@ Tab:CreateDropdown({
     MultipleOptions = false,
     Flag = "AimPart",
     Callback = function(Options)
-        _G.AimPart = Options[1]
+        _G.targetPart = Options[1]
     end,
 })
 
