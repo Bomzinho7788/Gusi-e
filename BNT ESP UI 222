@@ -246,7 +246,7 @@ local FOVVisible = false
 local FOVPosition = "Center"
 local FOVCircle = Drawing.new("Circle")
 local TeamCheckEnabled = false
-local targetPart = "Head"
+_G.targetPart = "Head"
 
 FOVCircle.Radius = FOV
 FOVCircle.Thickness = 1
@@ -268,8 +268,8 @@ end
 
 local function isPlayerInFOV(player)
     local mousePos = getFOVPosition()
-    if player.Character and player.Character:FindFirstChild(targetPart) then
-        local charPart = player.Character:FindFirstChild(targetPart)
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
+        local charPart = player.Character:FindFirstChild(_G.targetPart)
         local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
         local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
 
@@ -280,7 +280,7 @@ end
 
 local function isVisible(target)
     if WallCheckEnabled then
-        if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
+        if not target or not target.Character or not target.Character:FindFirstChild(_G.targetPart) then
             return false
         end
 
@@ -303,9 +303,9 @@ local function isVisible(target)
 end
 
 local function isInFrontOfCamera(player)
-    if player.Character and player.Character:FindFirstChild(targetPart) then
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
         local camera = workspace.CurrentCamera
-        local targetPartPos = player.Character[targetPart].Position
+        local targetPartPos = player.Character[_G.targetPart].Position
         local cameraDirection = camera.CFrame.LookVector
         local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
 
@@ -328,7 +328,7 @@ local function getClosestPlayer()
             end
 
             if isPlayerInFOV(player) and isInFrontOfCamera(player) then
-                local charPart = player.Character:FindFirstChild(targetPart)
+                local charPart = player.Character:FindFirstChild(_G.targetPart)
                 if charPart then
                     local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
                     local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
@@ -346,9 +346,9 @@ local function getClosestPlayer()
 end
 
 local function aimAt(target)
-    if target and target.Character and target.Character:FindFirstChild(targetPart) then
+    if target and target.Character and target.Character:FindFirstChild(_G.targetPart) then
         local camera = workspace.CurrentCamera
-        local aimPosition = target.Character[targetPart].Position
+        local aimPosition = target.Character[_G.targetPart].Position
         camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
     end
 end
@@ -402,7 +402,7 @@ Tab:AddDropdown({
 	Default = "Head",
 	Options = {"Head", "HumanoidRootPart"},
 	Callback = function(Options)
-		targetPart = Options[1]
+		_G.targetPart = Options[1]
 	end    
 })
 
