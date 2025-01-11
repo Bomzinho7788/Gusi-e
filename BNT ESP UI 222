@@ -540,7 +540,7 @@ Tab1:CreateToggle({
 
 Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-Tab1:CreateDropdown({
+Tab1:CreateColorPicker({
     Name = "Team Color",
     Color = Color3.fromRGB(0, 255, 0),
     Flag = "teamcolor",
@@ -549,7 +549,7 @@ Tab1:CreateDropdown({
     end
 })
 
-Tab1:CreateDropdown({
+Tab1:CreateColorPicker({
     Name = "Enemy Color",
     Color = Color3.fromRGB(255, 0, 0),
     Flag = "enemycolor",
@@ -558,7 +558,7 @@ Tab1:CreateDropdown({
     end
 })
 
-Tab1:CreateDropdown({
+Tab1:CreateColorPicker({
     Name = "Box Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxColor",
@@ -568,7 +568,7 @@ Tab1:CreateDropdown({
     end
 })
 
-Tab1:CreateDropdown({
+Tab1:CreateColorPicker({
     Name = "Box Filled Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxFilledColor",
@@ -577,7 +577,7 @@ Tab1:CreateDropdown({
     end
 })
 
-Tab1:CreateDropdown({
+Tab1:CreateColorPicker({
     Name = "Tracer Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TracerColor",
