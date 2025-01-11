@@ -1,3 +1,5 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
 local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
 local currentCamera = workspace.CurrentCamera
@@ -363,3 +365,431 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Radius = FOV
     FOVCircle.Visible = FOVVisible
 end)
+
+local Window = OrionLib:MakeWindow({Name = "Aimbot + Esp + Hit Box", HidePremium = false, IntroEnabled = false, SaveConfig = true, ConfigFolder = "ESPHUB"})
+
+local Tab = Window:MakeTab({
+	Name = "AimBot",
+	Icon = ""
+})
+
+Tab:AddToggle({
+	Name = "Enable Aimbot",
+	Default = false,
+	Callback = function(Value)
+		SilentAimEnabled = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Enable WallCheck",
+	Default = false,
+	Callback = function(Value)
+		WallCheckEnabled = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Enable TeamCheck",
+	Default = false,
+	Callback = function(Value)
+		TeamCheckEnabled = Value
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Aim Part",
+	Default = "Head",
+	Options = {"Head", "HumanoidRootPart"},
+	Callback = function(Options)
+		targetPart = Options[1]
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Fov Position",
+	Default = "Center",
+	Options = {"Center", "Mouse"},
+	Callback = function(Options)
+		FOVPosition = Options[1]
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Show Fov",
+	Default = false,
+	Callback = function(Value)
+		FOVVisible = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Fov Filled",
+	Default = false,
+	Callback = function(Value)
+		FOVCircle.Filled = Value
+	end    
+})
+
+Tab:AddColorpicker({
+	Name = "Fov Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		FOVCircle.Color = Value
+	end	  
+})
+
+Tab:AddSlider({
+	Name = "Fov Size",
+	Min = 0,
+	Max = 650,
+	Default = 100,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "",
+	Callback = function(Value)
+		FOV = Value
+	end    
+})
+
+Tab:AddSlider({
+	Name = "Fov Thickness",
+	Min = 0,
+	Max = 1,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		FOV = Value
+	end    
+})
+
+local Tab1 = Window:MakeTab({
+	Name = "Esp",
+	Icon = ""
+})
+
+Tab1:AddLabel("Geral Settings")
+
+Tab1:AddToggle({
+	Name = "Show 2D Box",
+	Default = false,
+	Callback = function(Value)
+		_G.boxVisible = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Box Filled",
+	Default = false,
+	Callback = function(Value)
+		_G.boxFilledVisible = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Show Health Bar",
+	Default = false,
+	Callback = function(Value)
+		_G.HealthBarVisible = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Health Bar Filled",
+	Default = false,
+	Callback = function(Value)
+		_G.HealthBarFilled = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Show Tracer",
+	Default = false,
+	Callback = function(Value)
+		_G.TracerVisible = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Show Name",
+	Default = false,
+	Callback = function(Value)
+		ESP.ShowName = Value
+    end
+})
+
+Tab1:AddToggle({
+	Name = "Show Distance",
+	Default = false,
+	Callback = function(Value)
+		ESP.ShowDistance = Value
+    end
+})
+
+Tab1:AddToggle({
+    Name = "TeamCheck",
+	Default = false,
+	Callback = function(Value)
+		_G.teamcheck = Value
+        TeamCheck()
+    end
+})
+
+Tab1:AddLabel("Color Settings")
+
+Tab1:AddColorpicker({
+	Name = "Team Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		_G.teamcolor = Value
+	end	  
+})
+
+Tab1:AddColorpicker({
+	Name = "Enemy Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		_G.enemycolor = Value
+	end	  
+})
+
+Tab1:AddColorpicker({
+	Name = "Box Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		_G.BoxColor = Value
+	end	  
+})
+
+Tab1:AddColorpicker({
+	Name = "Box Filled Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		_G.boxFilledColor = Value
+	end	  
+})
+
+Tab1:AddColorpicker({
+	Name = "Tracer Color",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		_G.TracerColor = Value
+	end	  
+})
+
+Tab1:AddLabel("Transparency Settings")
+
+Tab1:AddSlider({
+	Name = "Box Transparency",
+	Min = 0,
+	Max = 1,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.boxTransparency = Value
+	end    
+})
+
+Tab1:AddSlider({
+	Name = "Box Filled Transparency",
+	Min = 0,
+	Max = 1,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.boxFilledTransparency = Value
+	end    
+})
+
+Tab1:AddSlider({
+	Name = "Health Bar Transparency",
+	Min = 0,
+	Max = 1,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.HealthBarTransparency = Value
+	end    
+})
+
+Tab1:AddSlider({
+	Name = "Tracer Transparency",
+	Min = 0,
+	Max = 1,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.TracerTransparency = Value
+	end    
+})
+
+Tab1:AddLabel("Thickness Settings")
+
+Tab1:AddSlider({
+	Name = "Box Thickness",
+	Min = 0,
+	Max = 10,
+	Default = 1.5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.boxThickness = Value
+	end    
+})
+
+Tab1:AddSlider({
+	Name = "Health Bar Thickness",
+	Min = 0,
+	Max = 10,
+	Default = 1.5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.HealthBarThickness = Value
+	end    
+})
+
+Tab1:AddSlider({
+	Name = "Tracer Thickness",
+	Min = 0,
+	Max = 10,
+	Default = 1.5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.05,
+	ValueName = "",
+	Callback = function(Value)
+		_G.TracerThickness = Value
+	end    
+})
+
+Tab1:AddLabel("Other Settings")
+
+Tab1:AddDropdown({
+	Name = "Teamcheck Mode",
+	Default = "colors",
+	Options = {"colors", "invisible"},
+	Callback = function(Options)
+		_G.teamcheckmode = Options[1]
+	end    
+})
+
+Tab1:AddDropdown({
+	Name = "Health Bar Position",
+	Default = "Left",
+	Options = {"Left", "Right", "Top", "Bottom"},
+	Callback = function(Options)
+		_G.HealthBarPosition = Options[1]
+	end    
+})
+
+Tab1:AddDropdown({
+	Name = "Tracer Position",
+	Default = "Bottom",
+	Options = {"Bottom", "Middle", "Top"},
+	Callback = function(Options)
+		_G.TracerFrom = Options[1]
+	end    
+})
+
+_G.HeadSize = 1
+_G.Disabled = false
+_G.htry = 0.6
+_G.Color = Color3.new(255, 0, 0)
+_G.TeamCheck = false
+
+-- Função para verificar se dois jogadores estão no mesmo time
+local function mesmoTime(jogador1, jogador2)
+    if jogador1.Team == jogador2.Team then
+        return true
+    end
+    return false
+end
+
+-- Função para atualizar as propriedades da hitbox
+local function atualizarHitbox()
+    for _, v in ipairs(game:GetService('Players'):GetPlayers()) do
+        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+            if not _G.TeamCheck or mesmoTime(game:GetService('Players').LocalPlayer, v) then
+                pcall(function()
+                    if _G.Disabled == true then
+                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                            humanoidRootPart.Transparency = _G.htry
+                            humanoidRootPart.BrickColor = _G.Color
+                            humanoidRootPart.Material = "Neon"
+                            humanoidRootPart.CanCollide = false
+                        end
+                    elseif _G.Disabled == false then
+                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            humanoidRootPart.Size = Vector3.new(2, 2, 2)
+                            humanoidRootPart.Transparency = _G.htry
+                            humanoidRootPart.BrickColor = _G.Color
+                            humanoidRootPart.Material = "Neon"
+                            humanoidRootPart.CanCollide = false
+                        end
+                    end
+                end)
+            end
+        end
+    end
+end
+
+-- Função chamada a cada quadro (RenderStepped)
+game:GetService('RunService').RenderStepped:Connect(function()
+    atualizarHitbox()
+end)
+
+local Tab3 = Window:MakeTab({
+	Name = "Others",
+	Icon = ""
+})
+
+Tab3:AddToggle({
+	Name = "Enable HitBox",
+	Default = false,
+	Callback = function(Value)
+		_G.Disabled = Value
+    end
+})
+
+Tab3:AddSlider({
+	Name = "Hit Box Size Multiplier",
+	Min = 0,
+	Max = 40,
+	Default = 1,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.5,
+	ValueName = "",
+	Callback = function(Value)
+		_G.HeadSize = Value
+	end    
+})
+
+Tab3:AddSlider({
+	Name = "Hit Box Transparency",
+	Min = 0,
+	Max = 1,
+	Default = 0.05,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 0.5,
+	ValueName = "",
+	Callback = function(Value)
+		_G.htry = Value
+	end    
+})
+
+OrionLib:Init()
