@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
@@ -10,12 +10,12 @@ local LegOff = Vector3.new(0, 3, 0)
 
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/linemaster2/esp-library/main/library.lua"))();
 
-ESP.Enabled  true;
+ESP.Enabled = true;
 ESP.ShowName = false;
 ESP.ShowDistance = false;
 
-_G.teamcheck = false
-_G.teamcheckmode = "colors"
+_G.temcheck = false
+_G.temcheckmode = "colors"
 _G.teamcolor = Color3.new(0, 1, 0)
 _G.enemycolor = Color3.new(1, 0, 0)
 
@@ -23,6 +23,8 @@ _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
+
+_G.ShowBox = false
 
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
@@ -42,19 +44,6 @@ _G.TracerTransparency = 1
 _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
-
-local function BoxType()
-    if _G.BoxType == "2D Box" then
-        _G.boxVisible = true
-        ESP.ShowBox = false
-    elseif _G.BoxType == "Corner Box" then
-        _G.boxVisible = false
-        ESP.ShowBox = true
-    else
-        _G.boxVisible = false
-        ESP.ShowBox = false
-    end
-end
 
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
@@ -186,7 +175,7 @@ local function setupPlayerBox(v)
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
                 if _G.teamcheck == true then
-                    if _G.teamcheckmode == "colors" then
+                    if _G.temcheckmode == "colors" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
@@ -196,7 +185,7 @@ local function setupPlayerBox(v)
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
                         end
-                    elseif _G.teamcheckmode == "invisible" then
+                    elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == lplr.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
@@ -238,104 +227,89 @@ game.Players.PlayerAdded:Connect(function(player)
     setupPlayerBox(player)
 end)
 
-local SilentAimEnabled = false
-local WallCheckEnabled = false
-local FOV = 75
-local FOVVisible = false
-local FOVPosition = "Center"
-local FOVCircle = Drawing.new("Circle")
-local TeamCheckEnabled = false
-_G.targetPart = "Head"
+_G.AimBotEnabled = false
+_G.AimPart = "Head"
+_G.WallCheckEnabled = false
+_G.TeamCheckEnabled = false
 
-FOVCircle.Radius = FOV
-FOVCircle.Thickness = 1
-FOVCircle.Color = Color3.new(1, 1, 1)
-FOVCircle.Transparency = 1
-FOVCircle.Visible = FOVVisible
-FOVCircle.Filled = false
-FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+_G.FovThickness = 1.5
+_G.FovFilled = false
+_G.FovColor = Color3.new(1, 1, 1)
+_G.FovTransparency = 1
+_G.FovVisible = false
+_G.FovSize = 75
 
-local function getFOVPosition()
-    local camera = workspace.CurrentCamera
-    if FOVPosition == "Center" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    elseif FOVPosition == "Mouse" then
-        local mouse = game.Players.LocalPlayer:GetMouse()
-        return Vector2.new(mouse.X, mouse.Y)
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+local aimPart = _G.AimPart
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = _G.FovThickness
+fovCircle.Filled = _G.FovFilled
+fovCircle.Color = _G.FovColor
+fovCircle.Transparency = _G.FovTransparency
+fovCircle.Visible = _G.FovVisible
+
+local fovRadius = _G.FovSize
+
+local fovEnabled = _G.FovVisible
+
+local aimbotEnabled = _G.AimBotEnabled
+local wallcheckEnabled = _G.WallCheckEnabled
+local teamCheckEnabled = _G.TeamCheckEnabled
+
+local function updateFovCircle()
+    if fovEnabled then
+        local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        fovCircle.Position = mousePos
+        fovCircle.Radius = fovRadius
+        fovCircle.Visible = true
+    else
+        fovCircle.Visible = false
     end
 end
 
-local function isPlayerInFOV(player)
-    local mousePos = getFOVPosition()
-    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
-        local charPart = player.Character:FindFirstChild(_G.targetPart)
-        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+RunService.RenderStepped:Connect(updateFovCircle)
 
-        return distance <= FOV
+local function notBehindWall(target)
+    local ray = Ray.new(LocalPlayer.Character.Head.Position, (target.Position - LocalPlayer.Character.Head.Position).Unit * 300)
+    local part, position = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character}, false, true)
+    if part then
+        local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
+        if not humanoid then
+            humanoid = part.Parent.Parent:FindFirstChildOfClass("Humanoid")
+        end
+        if humanoid and target and humanoid.Parent == target.Parent then
+            local pos, visible = camera:WorldToScreenPoint(target.Position)
+            if visible then
+                return true
+            end
+        end
     end
     return false
 end
 
-local function isVisible(target)
-    if WallCheckEnabled then
-        if not target or not target.Character or not target.Character:FindFirstChild(_G.targetPart) then
-            return false
-        end
-
-        local camera = workspace.CurrentCamera
-        local targetPartPos = target.Character:FindFirstChild(_G.targetPart).Position
-        local rayOrigin = camera.CFrame.Position
-        local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
-
-        local raycastParams = RaycastParams.new()
-        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-        raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
-
-        local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
-
-        if raycastResult and raycastResult.Instance then
-            return raycastResult.Instance:IsDescendantOf(target.Character)
-        end
-    end
-    return true
-end
-
-local function isInFrontOfCamera(player)
-    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
-        local camera = workspace.CurrentCamera
-        local targetPartPos = player.Character:FindFirstChild(_G.targetPart).Position
-        local cameraDirection = camera.CFrame.LookVector
-        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
-
-        local dotProduct = cameraDirection:Dot(directionToPlayer)
-        return dotProduct > 0
-    end
-    return false
-end
-
-local function getClosestPlayer()
+local function getClosestPlayerInFOV()
     local closestPlayer = nil
-    local players = game.Players:GetPlayers()
-    local closestDistance = math.huge
-    local mousePos = getFOVPosition()
+    local shortestDistance = fovRadius
 
-    for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer and isVisible(player) then
-            if TeamCheckEnabled and player.Team == game.Players.LocalPlayer.Team then
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild(aimPart) then
+            if teamCheckEnabled and targetPlayer.Team == LocalPlayer.Team then
                 continue
             end
+            
+            local head = targetPlayer.Character[aimPart]
+            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local mousePos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).magnitude
 
-            if isPlayerInFOV(player) and isInFrontOfCamera(player) then
-                local charPart = player.Character:FindFirstChild(_G.targetPart)
-                if charPart then
-                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
-
-                    if distance < closestDistance then
-                        closestDistance = distance
-                        closestPlayer = player
-                    end
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = head
                 end
             end
         end
@@ -344,357 +318,395 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
-local function aimAt(target)
-    if target and target.Character and target.Character:FindFirstChild(_G.targetPart) then
-        local camera = workspace.CurrentCamera
-        local aimPosition = target.Character:FindFirstChild(_G.targetPart).Position
-        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
-    end
-end
+local function silentAimAtClosestPlayer()
+    if aimbotEnabled then
+        local targetHead = getClosestPlayerInFOV()
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    if SilentAimEnabled then
-        local target = getClosestPlayer()
-        if target then
-            aimAt(target)
+        if targetHead then
+            if not wallcheckEnabled or notBehindWall(targetHead) then
+                local aimPosition = targetHead.Position + Vector3.new(0, 0.5, 0)
+                camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+            end
         end
     end
-
-    FOVCircle.Position = getFOVPosition()
-    FOVCircle.Radius = FOV
-    FOVCircle.Visible = FOVVisible
-end)
-
-if SilentAimEnabled then
-    FOVCircle.Visible = true
-else
-    FOVCircle.Visible = false
 end
 
-local Window = OrionLib:MakeWindow({Name = "ESP + AIMBOT", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+RunService.RenderStepped:Connect(silentAimAtClosestPlayer)
 
-local Tab = Window:MakeTab({
-    Name = "Aimbot",
-    Icon = "rbxassetid://4483345998"
+local Window = Rayfield:CreateWindow({
+    Name = "BNT ESP",
+    Icon = 0,
+    LoadingTitle = "By Bomzinho",
+    LoadingSubtitle = "Loading....",
+    Theme = "Amethyst",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "ESPP"
+    },
+
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+
+    KeySystem = true,
+    KeySettings = {
+        Title = "BNT ESP",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"4321", "1234"}
+    }
 })
 
-local Tab1 = Window:MakeTab({
-    Name = "ESP",
-    Icon = "rbxassetid://4483345998"
-})
+local Tab = Window:CreateTab("Aimbot", 4483362458)
 
-Tab:AddToggle({
-    Name = "AimBot",
-    Default = false,
+Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab:CreateToggle({
+    Name = "Enable Aimbot",
+    CurrentValue = false,
+    Flag = "Enable Aimbot",
     Callback = function(Value)
-        SilentAimEnabled = Value
-        print("Silent Aim: ", Value)
-    end    
+        _G.AimBotEnabled = Value
+    end,
 })
 
-Tab:AddToggle({
-    Name = "Wall Check",
-    Default = false,
+Tab:CreateToggle({
+    Name = "Enable WallCheck",
+    CurrentValue = false,
+    Flag = "Enable WallCheck",
     Callback = function(Value)
-        WallCheckEnabled = Value
-        print("Wall Check: ", Value)
-    end    
+        _G.WallCheckEnabled = Value
+    end,
 })
 
-Tab:AddToggle({
-    Name = "Team Check",
-    Default = false,
+Tab:CreateToggle({
+    Name = "Enable TeamCheck",
+    CurrentValue = false,
+    Flag = "Enable TeamCheck",
     Callback = function(Value)
-        TeamCheckEnabled = Value
-        print("Team Check: ", Value)
-    end    
+        _G.TeamCheckEnabled = Value
+    end,
 })
 
-Tab:AddColorpicker({
-    Name = "FOV Color",
-    Default = Color3.fromRGB(255, 0, 0),
+Tab:CreateToggle({
+    Name = "Show Fov",
+    CurrentValue = false,
+    Flag = "Show Fov",
     Callback = function(Value)
-        FOVCircle.Color = Value
-        print("FOV Color: ", Value)
-    end   
+        _G.FovVisible = Value
+    end,
 })
 
-Tab:AddSlider({
-    Name = "FOV Thickness",
-    Min = 1,
-    Max = 10,
-    Default = 1,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 1,
-    ValueName = "Thickness",
+Tab:CreateToggle({
+    Name = "Fov Filled",
+    CurrentValue = false,
+    Flag = "Fov Filled",
     Callback = function(Value)
-        FOVCircle.Thickness = Value
-        print("FOV Thickness: ", Value)
-    end    
+        _G.FovFilled = Value
+    end,
 })
 
-Tab:AddSlider({
-    Name = "FOV Transparency",
-    Min = 0,
-    Max = 1,
-    Default = 1,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 0.1,
-    ValueName = "Transparency",
+Tab:CreateDropdown({
+    Name = "Fov Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Fov Color",
     Callback = function(Value)
-        FOVCircle.Transparency = Value
-        print("FOV Transparency: ", Value)
-    end    
+        _G.FovColor = Value
+    end
 })
 
-Tab:AddDropdown({
-    Name = "FOV Position",
-    Default = "Center",
-    Options = {"Center", "Mouse"},
+Tab:CreateSlider({
+    Name = "Fov Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Transparency",
     Callback = function(Value)
-        FOVPosition = Value
-        print("FOV Position: ", Value)
-    end    
+        _G.FovTransparency = Value
+    end,
 })
 
-Tab:AddDropdown({
-    Name = "Aim Part",
-    Default = "Head",
-    Options = {"Head", "HumanoidRootPart"},
+Tab:CreateSlider({
+    Name = "Fov Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Thickness",
     Callback = function(Value)
-        _G.targetPart = Value
-        print("Aim part: ", Value)
-    end    
+        _G.FovThickness = Value
+    end,
 })
 
-Tab1:AddToggle({
+Tab:CreateDropdown({
+    Name = "AimPart",
+    Options = {"Head", "Humanoid"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "AimPart",
+    Callback = function(Options)
+        _G.AimPart = Options[1]
+    end,
+})
+
+local Tab1 = Window:CreateTab("ESP", 4483362458)
+
+Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateToggle({
+    Name = "Show Box",
+    CurrentValue = false,
+    Flag = "Show Box",
+    Callback = function(Value)
+        _G.boxVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Box Filled",
+    CurrentValue = false,
+    Flag = "BoxFilled",
+    Callback = function(Value)
+        _G.boxFilledVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Health Bar",
+    CurrentValue = false,
+    Flag = "healthbarouf",
+    Callback = function(Value)
+        _G.HealthBarVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Health Bar Filled",
+    CurrentValue = false,
+    Flag = "healthbarouff",
+    Callback = function(Value)
+        _G.HealthBarFilled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Tracer",
+    CurrentValue = false,
+    Flag = "Name",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
     Name = "Show Name",
-    Default = ESP.ShowName,
+    CurrentValue = false,
+    Flag = "Name",
     Callback = function(Value)
         ESP.ShowName = Value
-    end
+    end,
 })
 
-Tab1:AddToggle({
+Tab1:CreateToggle({
     Name = "Show Distance",
-    Default = ESP.ShowDistance,
+    CurrentValue = false,
+    Flag = "Distance",
     Callback = function(Value)
         ESP.ShowDistance = Value
-    end
+    end,
 })
 
-Tab1:AddToggle({
-    Name = "Team Check",
-    Default = _G.teamcheck,
+Tab1:CreateToggle({
+    Name = "Teamcheck",
+    CurrentValue = false,
+    Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
-    end
+        ESP.Teamcheck = Value
+        getfenv().EspSettings.TeamCheck = Value
+    end,
 })
 
-Tab1:AddDropdown({
-    Name = "Team Check Mode",
-    Default = _G.teamcheckmode,
-    Options = {"colors", "invisible"},
-    Callback = function(Value)
-        _G.teamcheckmode = Value
-    end
-})
+Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-Tab1:AddColorpicker({
+Tab1:CreateDropdown({
     Name = "Team Color",
-    Default = _G.teamcolor,
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "teamcolor",
     Callback = function(Value)
         _G.teamcolor = Value
     end
 })
 
-Tab1:AddColorpicker({
+Tab1:CreateDropdown({
     Name = "Enemy Color",
-    Default = _G.enemycolor,
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "enemycolor",
     Callback = function(Value)
         _G.enemycolor = Value
     end
 })
 
-Tab1:AddColorpicker({
+Tab1:CreateDropdown({
     Name = "Box Color",
-    Default = _G.boxColor,
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxColor",
     Callback = function(Value)
         _G.boxColor = Value
+        ESP.BoxColor = Value
     end
 })
 
-Tab1:AddSlider({
-    Name = "Box Thickness",
-    Min = 0,
-    Max = 10,
-    Default = _G.boxThickness,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.1,
-    ValueName = "Thickness",
-    Callback = function(Value)
-        _G.boxThickness = Value
-    end
-})
-
-Tab1:AddSlider({
-    Name = "Box Transparency",
-    Min = 0,
-    Max = 1,
-    Default = _G.boxTransparency,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.01,
-    ValueName = "Transparency",
-    Callback = function(Value)
-        _G.boxTransparency = Value
-    end
-})
-
-Tab1:AddToggle({
-    Name = "Box Visible",
-    Default = _G.boxVisible,
-    Callback = function(Value)
-        _G.boxVisible = Value
-    end
-})
-
-Tab1:AddColorpicker({
+Tab1:CreateDropdown({
     Name = "Box Filled Color",
-    Default = _G.boxFilledColor,
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilledColor",
     Callback = function(Value)
         _G.boxFilledColor = Value
     end
 })
 
-Tab1:AddSlider({
-    Name = "Box Filled Transparency",
-    Min = 0,
-    Max = 1,
-    Default = _G.boxFilledTransparency,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.01,
-    ValueName = "Transparency",
-    Callback = function(Value)
-        _G.boxFilledTransparency = Value
-    end
-})
-
-Tab1:AddToggle({
-    Name = "Box Filled Visible",
-    Default = _G.boxFilledVisible,
-    Callback = function(Value)
-        _G.boxFilledVisible = Value
-    end
-})
-
-Tab1:AddSlider({
-    Name = "Health Bar Thickness",
-    Min = 0,
-    Max = 10,
-    Default = _G.HealthBarThickness,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.1,
-    ValueName = "Thickness",
-    Callback = function(Value)
-        _G.HealthBarThickness = Value
-    end
-})
-
-Tab1:AddToggle({
-    Name = "Health Bar Visible",
-    Default = _G.HealthBarVisible,
-    Callback = function(Value)
-        _G.HealthBarVisible = Value
-    end
-})
-
-Tab1:AddSlider({
-    Name = "Health Bar Transparency",
-    Min = 0,
-    Max = 1,
-    Default = _G.HealthBarTransparency,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.01,
-    ValueName = "Transparency",
-    Callback = function(Value)
-        _G.HealthBarTransparency = Value
-    end
-})
-
-Tab1:AddColorpicker({
-    Name = "Health Bar Color",
-    Default = _G.HealthBarColor,
-    Callback = function(Value)
-        _G.HealthBarColor = Value
-    end
-})
-
-Tab1:AddToggle({
-    Name = "Health Bar Filled",
-    Default = _G.HealthBarFilled,
-    Callback = function(Value)
-        _G.HealthBarFilled = Value
-    end
-})
-
-Tab1:AddDropdown({
-    Name = "Health Bar Position",
-    Default = _G.HealthBarPosition,
-    Options = {"Left", "Right", "Top", "Bottom"},
-    Callback = function(Value)
-        _G.HealthBarPosition = Value
-    end
-})
-
-Tab1:AddToggle({
-    Name = "Tracer Visible",
-    Default = _G.TracerVisible,
-    Callback = function(Value)
-        _G.TracerVisible = Value
-    end
-})
-
-Tab1:AddSlider({
-    Name = "Tracer Thickness",
-    Min = 0,
-    Max = 10,
-    Default = _G.TracerThickness,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.1,
-    ValueName = "Thickness",
-    Callback = function(Value)
-        _G.TracerThickness = Value
-    end
-})
-
-Tab1:AddSlider({
-    Name = "Tracer Transparency",
-    Min = 0,
-    Max = 1,
-    Default = _G.TracerTransparency,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.01,
-    ValueName = "Transparency",
-    Callback = function(Value)
-        _G.TracerTransparency = Value
-    end
-})
-
-Tab1:AddColorpicker({
+Tab1:CreateDropdown({
     Name = "Tracer Color",
-    Default = _G.TracerColor,
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TracerColor",
     Callback = function(Value)
         _G.TracerColor = Value
     end
 })
 
-Tab1:AddDropdown({
-    Name = "Tracer From",
-    Default = _G.TracerFrom,
-    Options = {"Bottom", "Middle", "Top"},
+Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxTransparency",
     Callback = function(Value)
-        _G.TracerFrom = Value
-    end
+        _G.boxTransparency = Value
+    end,
 })
 
-OrionLib:Init()
+Tab1:CreateSlider({
+    Name = "Box Filled Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        _G.boxFilledTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarTransparency",
+    Callback = function(Value)
+        _G.HealthBarTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTransparency",
+    Callback = function(Value)
+        _G.TracerTransparency = Value
+    end,
+})
+
+Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxThickness",
+    Callback = function(Value)
+        _G.boxThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarThickness",
+    Callback = function(Value)
+        _G.HealthBarThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracer Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerThickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"colors", "invisible"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "TeamcheckMode",
+    Callback = function(Options)
+        _G.temcheckmode = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Health Bar Position",
+    Options = {"Left", "Right", "Top", Bottom},
+    CurrentOption = {"Left"},
+    MultipleOptions = false,
+    Flag = "HealthBarPosition",
+    Callback = function(Options)
+        _G.HealthBarPosition = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Tracer From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "TracerFrom",
+    Callback = function(Options)
+        _G.TracerFrom = Options[1]
+    end,
+})
+
+Rayfield:LoadConfiguration()
