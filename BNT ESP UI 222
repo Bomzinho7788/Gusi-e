@@ -354,39 +354,82 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Visible = FOVVisible
 end)
 
-local chamsEnabled = false
-local selectedColor = Color3.fromRGB(255, 0, 0)
+--[[ 
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
 
-local function getRGBColor()
-    -- Implementação do seu método para retornar uma cor RGB se necessário
-    return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
-end
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
 
-local function toggleChams(Value)
-    chamsEnabled = Value
-    updateChams()  -- Chama a função de atualização imediatamente após ativar/desativar os chams
-end
+local e = {
+    ESP_TeamCheck = false,
+    Chams = true,
+    Chams_Color = Color3.fromRGB(0, 0, 255),
+    Chams_Transparency = 0.9,
+    Chams_Glow_Color = Color3.fromRGB(255, 0, 0),
+    Glow_Transparency = 0.3
+}
 
-local function updateChams()
-    while chamsEnabled do
-        for _, player in pairs(game.Players:GetPlayers()) do
-            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                for _, part in pairs(player.Character:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        if chamsEnabled then
-                            part.BrickColor = BrickColor.new(selectedColor)
-                            part.Material = Enum.Material.Neon
-                        else
-                            part.Material = Enum.Material.Plastic
-                        end
-                    end
-                end
-            end
+local function DestroyChams(character)
+    for _, part in ipairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Transparency ~= 1 then
+            local glow = part:FindFirstChild("Glow")
+            local chams = part:FindFirstChild("Chams")
+
+            if glow then glow:Destroy() end
+            if chams then chams:Destroy() end
         end
-        wait(0)  -- Aguarda o próximo frame para continuar a execução
     end
 end
 
+RunService.Heartbeat:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                if not (Settings.ESP_TeamCheck and player.Team == LocalPlayer.Team) then
+                    local character = player.Character
+
+                    for _, part in ipairs(character:GetChildren()) do
+                        if part:IsA("BasePart") and part.Transparency ~= 1 then
+                            if Settings.Chams then
+                                if not part:FindFirstChild("Glow") and not part:FindFirstChild("Chams") then
+                                    -- Criação do Chams
+                                    local chamsBox = Instance.new("BoxHandleAdornment", part)
+                                    chamsBox.Name = "Chams"
+                                    chamsBox.AlwaysOnTop = true
+                                    chamsBox.ZIndex = 4
+                                    chamsBox.Adornee = part
+                                    chamsBox.Color3 = Settings.Chams_Color
+                                    chamsBox.Transparency = Settings.Chams_Transparency
+                                    chamsBox.Size = part.Size + Vector3.new(0.02, 0.02, 0.02)
+
+                                    -- Criação do Glow
+                                    local glowBox = Instance.new("BoxHandleAdornment", part)
+                                    glowBox.Name = "Glow"
+                                    glowBox.AlwaysOnTop = false
+                                    glowBox.ZIndex = 3
+                                    glowBox.Adornee = part
+                                    glowBox.Color3 = Settings.Chams_Glow_Color
+                                    glowBox.Size = chamsBox.Size + Vector3.new(0.13, 0.13, 0.13)
+                                    glowBox.Transparency = Settings.Glow_Transparency
+                                end
+                            else
+                                -- Destruir Chams se não habilitado
+                                DestroyChams(character)
+                            end
+                        end
+                    end
+                else
+                    DestroyChams(player.Character)
+                end
+            else
+                DestroyChams(player.Character)
+            end
+        end
+    end
+end)
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -581,7 +624,7 @@ Tab1:CreateToggle({
     CurrentValue = false,
     Flag = "Namtte",
     Callback = function(Value)
-        chamsEnabled = Value
+        e.chams = Value
     end,
 })
 
@@ -658,7 +701,16 @@ Tab1:CreateColorPicker({
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "boxFilbybtgrvledColor",
     Callback = function(Value)
-        selectedColor = Value
+        e.Chams_Color = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Glow Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilbybtgrvledColor",
+    Callback = function(Value)
+        e.Chams_Glow_Color = Value
     end
 })
 
@@ -694,6 +746,30 @@ Tab1:CreateSlider({
     Flag = "boxFilledTransparency",
     Callback = function(Value)
         _G.boxFilledTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        e.Chams_Transparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Glow Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        e.Glow_Transparency = Value
     end,
 })
 
