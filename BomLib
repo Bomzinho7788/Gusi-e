@@ -604,8 +604,8 @@ function CreateSlider(tabFrame, options)
 	-- Barra de fundo do slider
 	local SliderBackGround = Instance.new("Frame")
 	SliderBackGround.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
-	SliderBackGround.Size = UDim2.new(1, 0, 0, 10)
-	SliderBackGround.Position = UDim2.new(0, 0, 1, -8)
+	SliderBackGround.Size = UDim2.new(1, 0, 0, 20)
+	SliderBackGround.Position = UDim2.new(0, 0, 1, -16)
 	SliderBackGround.Parent = Slider
 	SliderBackGround.BorderSizePixel = 0
 
@@ -775,7 +775,7 @@ function CreateSlider(tabFrame, options)
 		SliderBackGround.InputEnded:Connect(function(input)
 			endDrag(input)
 		end)
-		
+
 		Draggable.InputBegan:Connect(function(input)
 			startDrag(input)
 			onSliderClick(input)
@@ -1184,10 +1184,8 @@ function CreateDropdown(tabFrame, config)
 		end
 	end
 
-
 	Icon.MouseButton1Click:Connect(toggleDropdown)
 end
-
 
 return { 
 	CreateWindow = CreateWindow,
