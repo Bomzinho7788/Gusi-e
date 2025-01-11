@@ -44,7 +44,7 @@ local function isVisible(target)
         end
 
         local camera = workspace.CurrentCamera
-        local targetPartPos = target.Character[targetPart].Position
+        local targetPartPos = target.Character[_G.targetPart].Position
         local rayOrigin = camera.CFrame.Position
         local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
 
@@ -130,9 +130,18 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shl
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
 local Tab = Window:MakeTab({
-    Name = "Tab",
+    Name = "Aimbot",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
+})
+
+Tab:AddToggle({
+    Name = "AimBot",
+    Default = false,
+    Callback = function(Value)
+        SilentAimEnabled = Value
+        print("Silent Aim: ", Value)
+    end    
 })
 
 Tab:AddToggle({
@@ -141,15 +150,6 @@ Tab:AddToggle({
     Callback = function(Value)
         WallCheckEnabled = Value
         print("Wall Check: ", Value)
-    end    
-})
-
-Tab:AddToggle({
-    Name = "Silent Aim",
-    Default = false,
-    Callback = function(Value)
-        SilentAimEnabled = Value
-        print("Silent Aim: ", Value)
     end    
 })
 
