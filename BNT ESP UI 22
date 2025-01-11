@@ -1,4 +1,11 @@
-local myWindow = CreateWindow({Name = "Test"})  -- Cria a janela
+-- Carregar o código do arquivo remoto via HttpGet
+local url = "https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BomLib"
+loadstring(game:HttpGet(url))() -- Executa o código e obtém as funções criadas
+
+-- Agora você pode usar diretamente as funções como CreateWindow, CreateTab, etc.
+
+-- Criar a janela
+local myWindow = CreateWindow({Name = "Test"})  -- Cria a janela principal
 local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")  -- Encontra o painel de abas
 
 -- Criação da primeira aba
