@@ -376,7 +376,7 @@ local Window = Rayfield:CreateWindow({
         RememberJoins = true
     },
 
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
         Title = "BNT ESP",
         Subtitle = "Key System",
