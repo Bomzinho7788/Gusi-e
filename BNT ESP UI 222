@@ -447,6 +447,18 @@ Tab:CreateColorPicker({
 })
 
 Tab:CreateSlider({
+    Name = "Fov Size",
+    Range = {0, 550},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 75,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOVCircle.Radius = Value
+    end,
+})
+
+Tab:CreateSlider({
     Name = "Fov Transparency",
     Range = {0, 1},
     Increment = .05,
