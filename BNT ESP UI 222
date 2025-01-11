@@ -416,7 +416,7 @@ Tab:CreateToggle({
     end,
 })
 
-Tab:CreateDropdown({
+Tab:CreateColorPicker({
     Name = "Fov Color",
     Color = Color3.fromRGB(0, 255, 0),
     Flag = "Fov Color",
