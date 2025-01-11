@@ -2,7 +2,7 @@ local function CreateWindow(options)
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = options.Name or "Window"
 	screenGui.ResetOnSpawn = false
-	screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+	screenGui.Parent = game:GetService("CoreGui")
 
 	local window = Instance.new("Frame")
 	window.Size = UDim2.new(0, 520, 0, 300)
@@ -930,8 +930,9 @@ function CreateDropdown(tabFrame, config)
 	local UIPadding_2 = Instance.new("UIPadding")
 	local UIListLayout = Instance.new("UIListLayout")
 	local Selected = Instance.new("TextLabel")
+
 	Dropdown.Name = "Dropdown"
-	Dropdown.Parent = game.StarterGui.ScreenGui
+	Dropdown.Parent = tabFrame
 	Dropdown.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
 	Dropdown.BorderColor3 = Color3.new(0, 0, 0)
 	Dropdown.BorderSizePixel = 0
