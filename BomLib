@@ -2,7 +2,7 @@ local function CreateWindow(options)
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = options.Name or "Window"
 	screenGui.ResetOnSpawn = false
-	screenGui.Parent = game:GetService("CoreGui")
+	screenGui.Parent = game.Players.LocalPlayer.PlayerGui
 
 	local window = Instance.new("Frame")
 	window.Size = UDim2.new(0, 520, 0, 300)
@@ -62,17 +62,15 @@ local function CreateWindow(options)
 	closeButton.Parent = topBar
 
 	closeButton.MouseButton1Click:Connect(function()
-    	local tweenService = game:GetService("TweenService")
-    	local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-  	  	local currentY = window.Position.Y.Scale -- Posição Y atual em escala
-   	 	local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, currentY, window.Position.Y.Offset)}) -- Desliza para fora da tela à direita
+		local tweenService = game:GetService("TweenService")
+		local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)}) -- Desliza para fora da tela à direita
 
-    	closeTween:Play()
-    	closeTween.Completed:Connect(function()
-        	screenGui:Destroy()
-    	end)
+		closeTween:Play()
+		closeTween.Completed:Connect(function()
+			screenGui:Destroy()
+		end)
 	end)
-
 
 	local u7 = Instance.new("UICorner")
 	u7.CornerRadius = UDim.new(0, 8)
@@ -925,35 +923,31 @@ end
 function CreateDropdown(tabFrame, config)
 	local Dropdown = Instance.new("Frame")
 	local UICorner = Instance.new("UICorner")
-	local UIStroke_1 = Instance.new("UIStroke")
-	local UIStroke_2 = Instance.new("UIStroke")
 	local Title = Instance.new("TextLabel")
 	local UIPadding = Instance.new("UIPadding")
 	local Icon = Instance.new("ImageButton")
 	local ScrollingFrame = Instance.new("ScrollingFrame")
 	local UIPadding_2 = Instance.new("UIPadding")
 	local UIListLayout = Instance.new("UIListLayout")
-
-	Dropdown.Name = config.Name
-	Dropdown.Parent = tabFrame
+	local Selected = Instance.new("TextLabel")
+	Dropdown.Name = "Dropdown"
+	Dropdown.Parent = game.StarterGui.ScreenGui
 	Dropdown.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
 	Dropdown.BorderColor3 = Color3.new(0, 0, 0)
 	Dropdown.BorderSizePixel = 0
 	Dropdown.ClipsDescendants = true
+	Dropdown.Position = UDim2.new(3.91251014e-08, 0, 0.165217385, 0)
+	Dropdown.Parent = tabFrame
 	Dropdown.Size = UDim2.new(1, 0, 0, 42)
 
 	UICorner.Parent = Dropdown
 	UICorner.CornerRadius = UDim.new(0, 4)
-
-	UIStroke_1.Parent = Dropdown
-	UIStroke_1.Color = Color3.new(0, 0, 0)
-	UIStroke_1.Thickness = 1
-	UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-	UIStroke_2.Parent = Title
-	UIStroke_2.Color = Color3.new(0, 0, 0)
-	UIStroke_2.Thickness = 1
-	UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	
+	local s = Instance.new("UIStroke")
+	s.Parent = Dropdown
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Color = Color3.new(0, 0, 0)
+	s.Thickness = 1
 
 	Title.Name = "Title"
 	Title.Parent = Dropdown
@@ -961,9 +955,9 @@ function CreateDropdown(tabFrame, config)
 	Title.BackgroundTransparency = 1
 	Title.BorderColor3 = Color3.new(0, 0, 0)
 	Title.BorderSizePixel = 0
-	Title.Size = UDim2.new(1, -35, 0, 20)
+	Title.Size = UDim2.new(0.400000006, -35, 0, 20)
 	Title.Font = Enum.Font.Ubuntu
-	Title.Text = config.Name
+	Title.Text = "DropDown"
 	Title.TextColor3 = Color3.new(1, 1, 1)
 	Title.TextSize = 20
 	Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -985,21 +979,33 @@ function CreateDropdown(tabFrame, config)
 	Icon.Size = UDim2.new(0, 30, 0, 30)
 	Icon.Image = "rbxassetid://126874138470311"
 
-	local UIStroke_Option = Instance.new("UIStroke")
-	UIStroke_Option.Parent = ScrollingFrame
-	UIStroke_Option.Color = Color3.new(0, 0, 0)
-	UIStroke_Option.Thickness = 1
-	UIStroke_Option.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
 	ScrollingFrame.Parent = Dropdown
 	ScrollingFrame.Active = true
+	ScrollingFrame.Visible = false
 	ScrollingFrame.BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)
 	ScrollingFrame.BorderColor3 = Color3.new(0, 0, 0)
 	ScrollingFrame.BorderSizePixel = 0
 	ScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
 	ScrollingFrame.Size = UDim2.new(1, 0, 1, -30)
-	ScrollingFrame.Visible = false
 	ScrollingFrame.ScrollBarThickness = 6
+	
+	local s2 = Instance.new("UIStroke")
+	s2.Parent = ScrollingFrame
+	s2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s2.Color = Color3.new(0, 0, 0)
+	s2.Thickness = 1
+	
+	local s3 = Instance.new("UIStroke")
+	s3.Parent = Title
+	s3.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	s3.Color = Color3.new(0, 0, 0)
+	s3.Thickness = 1
+	
+	local s0 = Instance.new("UIStroke")
+	s0.Parent = Selected
+	s0.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	s0.Color = Color3.new(0, 0, 0)
+	s0.Thickness = 1
 
 	UIPadding_2.Parent = ScrollingFrame
 	UIPadding_2.PaddingBottom = UDim.new(0, 6)
@@ -1011,30 +1017,64 @@ function CreateDropdown(tabFrame, config)
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Padding = UDim.new(0, 3)
 
+	Selected.Name = "Selected"
+	Selected.Parent = Dropdown
+	Selected.BackgroundColor3 = Color3.new(1, 1, 1)
+	Selected.BackgroundTransparency = 1
+	Selected.BorderColor3 = Color3.new(0, 0, 0)
+	Selected.BorderSizePixel = 0
+	Selected.Position = UDim2.new(1, -255, 0, 0)
+	Selected.Size = UDim2.new(0.675000012, -35, 0, 20)
+	Selected.Font = Enum.Font.Ubuntu
+	Selected.Text = "Selected: "
+	Selected.TextColor3 = Color3.new(1, 1, 1)
+	Selected.TextScaled = true
+	Selected.TextSize = 20
+	Selected.TextWrapped = true
+	Selected.TextXAlignment = Enum.TextXAlignment.Left
+
 	-- Variável para armazenar as opções selecionadas
 	local selectedOptions = {}
 
 	-- Função para criar as opções do dropdown
 	local function createOption(optionNameText, isSelected)
 		local option = Instance.new("Frame")
+		local UICorner_2 = Instance.new("UICorner")
+		local optionName = Instance.new("TextLabel")
+		local UIPadding_3 = Instance.new("UIPadding")
+		local CheckmarkHolder = Instance.new("Frame")
+		local UICorner_3 = Instance.new("UICorner")
+		local Checkmark = Instance.new("ImageButton")
+		local UICorner_4 = Instance.new("UICorner")
+
 		option.Name = "option"
 		option.Parent = ScrollingFrame
 		option.BackgroundColor3 = Color3.new(0.298039, 0.298039, 0.298039)
 		option.BorderColor3 = Color3.new(0, 0, 0)
 		option.BorderSizePixel = 0
 		option.Size = UDim2.new(1, -3, 0, 36)
+		
+		local s = Instance.new("UIStroke")
+		s.Parent = Dropdown
+		s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		s.Color = Color3.new(0, 0, 0)
+		s.Thickness = 1
+		
+		local s1 = Instance.new("UIStroke")
+		s1.Parent = CheckmarkHolder
+		s1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		s1.Color = Color3.new(0, 0, 0)
+		s1.Thickness = 1
+		
+		local s2 = Instance.new("UIStroke")
+		s2.Parent = optionName
+		s2.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+		s2.Color = Color3.new(0, 0, 0)
+		s2.Thickness = 1
 
-		local UICorner_2 = Instance.new("UICorner")
 		UICorner_2.Parent = option
 		UICorner_2.CornerRadius = UDim.new(0, 4)
 
-		local UIStroke_Option = Instance.new("UIStroke")
-		UIStroke_Option.Parent = option
-		UIStroke_Option.Color = Color3.new(0, 0, 0)
-		UIStroke_Option.Thickness = 1
-		UIStroke_Option.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-		local optionName = Instance.new("TextLabel")
 		optionName.Name = "optionName"
 		optionName.Parent = option
 		optionName.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -1046,37 +1086,28 @@ function CreateDropdown(tabFrame, config)
 		optionName.Text = optionNameText
 		optionName.TextColor3 = Color3.new(1, 1, 1)
 		optionName.TextScaled = true
+		optionName.TextSize = 20
 		optionName.TextWrapped = true
 		optionName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local UIStroke_Opti = Instance.new("UIStroke")
-		UIStroke_Opti.Parent = optionName
-		UIStroke_Opti.Color = Color3.new(0, 0, 0)
-		UIStroke_Opti.Thickness = 1
-		UIStroke_Opti.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-
-		local UIPadding_3 = Instance.new("UIPadding")
 		UIPadding_3.Parent = option
 		UIPadding_3.PaddingBottom = UDim.new(0, 6)
 		UIPadding_3.PaddingLeft = UDim.new(0, 6)
 		UIPadding_3.PaddingRight = UDim.new(0, 6)
 		UIPadding_3.PaddingTop = UDim.new(0, 6)
 
-		local CheckmarkHolder = Instance.new("Frame")
 		CheckmarkHolder.Name = "CheckmarkHolder"
 		CheckmarkHolder.Parent = option
 		CheckmarkHolder.AnchorPoint = Vector2.new(1, 0)
-		CheckmarkHolder.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Cor cinza inativo
+		CheckmarkHolder.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
 		CheckmarkHolder.BorderColor3 = Color3.new(0, 0, 0)
 		CheckmarkHolder.BorderSizePixel = 0
 		CheckmarkHolder.Position = UDim2.new(1, 3, 0, -3)
 		CheckmarkHolder.Size = UDim2.new(0, 30, 0, 30)
 
-		local UICorner_3 = Instance.new("UICorner")
 		UICorner_3.Parent = CheckmarkHolder
 		UICorner_3.CornerRadius = UDim.new(0, 6)
 
-		local Checkmark = Instance.new("ImageButton")
 		Checkmark.Name = "Checkmark"
 		Checkmark.Parent = CheckmarkHolder
 		Checkmark.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -1087,13 +1118,6 @@ function CreateDropdown(tabFrame, config)
 		Checkmark.Size = UDim2.new(1, 0, 1, 0)
 		Checkmark.Image = "rbxassetid://117182478841098"
 
-		local UIStroke_Optio = Instance.new("UIStroke")
-		UIStroke_Optio.Parent = Checkmark
-		UIStroke_Optio.Color = Color3.new(0, 0, 0)
-		UIStroke_Optio.Thickness = 1
-		UIStroke_Optio.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-		local UICorner_4 = Instance.new("UICorner")
 		UICorner_4.Parent = Checkmark
 		UICorner_4.CornerRadius = UDim.new(0, 6)
 
@@ -1134,6 +1158,9 @@ function CreateDropdown(tabFrame, config)
 				CheckmarkHolder.BackgroundColor3 = Color3.new(0.105882, 0.952941, 0.0117647) -- Verde ativo
 			end
 
+			-- Atualiza o label com as opções selecionadas
+			Selected.Text = "Selected : " .. table.concat(selectedOptions, ", ")
+
 			-- Chama o callback com as opções selecionadas
 			config.CallBack(selectedOptions)
 		end
@@ -1157,6 +1184,9 @@ function CreateDropdown(tabFrame, config)
 		createOption(optionNameText, isSelected)
 	end
 
+	-- Exibir opções padrão ao criar o Dropdown
+	Selected.Text = "Selected : " .. table.concat(selectedOptions, ", ")
+
 	-- Animação para abrir/fechar dropdown
 	local isDropdownOpen = false
 	local function toggleDropdown()
@@ -1164,9 +1194,7 @@ function CreateDropdown(tabFrame, config)
 		local tweenService = game:GetService("TweenService")
 		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-		-- Definindo a visibilidade do ScrollingFrame antes ou depois da animação
 		if isDropdownOpen then
-			-- Ao abrir, tornamos o ScrollingFrame visível imediatamente
 			ScrollingFrame.Visible = true
 		end
 
