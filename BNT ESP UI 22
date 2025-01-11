@@ -1,12 +1,4 @@
--- Carregar o código do arquivo remoto via HttpGet
 local url = "https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BomLib"
-local loadedCode, err = pcall(function()
-    return loadstring(game:HttpGet(url))()
-end)
+local CreateWindow = loadstring(game:HttpGet(url))()
 
--- Se o carregamento falhou, mostre o erro
-if not loadedCode then
-    warn("Falha ao carregar o código:", err)
-else
-    print("Código carregado com sucesso!")
-end
+local myWindow = CreateWindow({Name = "Test"})
