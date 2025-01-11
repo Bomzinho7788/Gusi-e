@@ -62,15 +62,17 @@ local function CreateWindow(options)
 	closeButton.Parent = topBar
 
 	closeButton.MouseButton1Click:Connect(function()
-		local tweenService = game:GetService("TweenService")
-		local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)}) -- Desliza para fora da tela à direita
+    	local tweenService = game:GetService("TweenService")
+    	local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+  	  	local currentY = window.Position.Y.Scale -- Posição Y atual em escala
+   	 	local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, currentY, window.Position.Y.Offset)}) -- Desliza para fora da tela à direita
 
-		closeTween:Play()
-		closeTween.Completed:Connect(function()
-			screenGui:Destroy()
-		end)
+    	closeTween:Play()
+    	closeTween.Completed:Connect(function()
+        	screenGui:Destroy()
+    	end)
 	end)
+
 
 	local u7 = Instance.new("UICorner")
 	u7.CornerRadius = UDim.new(0, 8)
