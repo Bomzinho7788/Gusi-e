@@ -1,202 +1,136 @@
--- Carregar a biblioteca Orion
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-local Window = OrionLib:MakeWindow({Name = "Bom_Hub_Aim_V5", HidePremium = true, SaveConfig = true, ConfigFolder = "SilentAimSettings"})
+local myWindow = CreateWindow({Name = "Test"})  -- Cria a janela
+local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")  -- Encontra o painel de abas
 
--- Configurar a aba principal
-local tab1 = Window:MakeTab({Name = "Aimbot", Icon = "rbxassetid://4483345998", PremiumOnly = false})
-
--- Variáveis de configuração
-local SilentAimEnabled = false
-local FOV = 100
-local FOVVisible = false
-local FOVPosition = "Center"
-local FOVCircle = Drawing.new("Circle")
-
--- Configurar o círculo de FOV
-FOVCircle.Radius = FOV
-FOVCircle.Thickness = 1
-FOVCircle.Color = Color3.new(1, 1, 1)
-FOVCircle.Transparency = 1
-FOVCircle.Visible = FOVVisible
-FOVCircle.Filled = false
-FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
-
--- Função para obter a posição da FOV
-local function getFOVPosition()
-    local camera = workspace.CurrentCamera
-    if FOVPosition == "Center" then
-        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-    else
-        local mouse = game.Players.LocalPlayer:GetMouse()
-        return Vector2.new(mouse.X, mouse.Y)
-    end
-end
-
--- Função de Silent Aim
-local targetPart = "HumanoidRootPart" -- Padrão inicial: "Barriga"
-
-tab1:AddDropdown({
-    Name = "Parte do Corpo",
-    Options = {"Cabeça", "Barriga"},
-    Default = "Barriga",
-    Callback = function(selected)
-        if selected == "Cabeça" then
-            targetPart = "Head"
-        elseif selected == "Barriga" then
-            targetPart = "HumanoidRootPart"
-        end
-    end
+-- Criação da primeira aba
+local tab1 = CreateTab(myWindow, tabPanel, {
+    Name = "Tab 1",
+    Icon = "rbxassetid://76530199889334"
 })
 
--- Função para verificar se o jogador está dentro do FOV
-local function isPlayerInFOV(player)
-    local mousePos = getFOVPosition()
-    if player.Character and player.Character:FindFirstChild(targetPart) then
-        local charPart = player.Character:FindFirstChild(targetPart)
-        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
-
-        return distance <= FOV
-    end
-    return false
-end
-
--- Função para verificar se há parede no caminho entre a câmera e o alvo
-local function isVisible(target)
-    if not target or not target.Character or not target.Character:FindFirstChild(targetPart) then
-        return false
-    end
-
-    local camera = workspace.CurrentCamera
-    local targetPartPos = target.Character[targetPart].Position
-    local rayOrigin = camera.CFrame.Position
-    local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
-
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
-
-    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
-
-    if raycastResult and raycastResult.Instance then
-        return raycastResult.Instance:IsDescendantOf(target.Character)
-    end
-
-    return true
-end
-
--- Função para pegar o jogador mais próximo dentro do FOV
-local function getClosestPlayerInFOV()
-    local closestPlayer = nil
-    local players = game.Players:GetPlayers()
-    local closestDistance = FOV
-    local mousePos = getFOVPosition()
-
-    for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer and isPlayerInFOV(player) then
-            local charPart = player.Character:FindFirstChild(targetPart)
-            if charPart then
-                local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
-
-                if distance < closestDistance and isVisible(player) then
-                    closestDistance = distance
-                    closestPlayer = player
-                end
-            end
-        end
-    end
-
-    return closestPlayer
-end
-
--- Função para mirar no jogador
-local function aimAt(target)
-    if target and target.Character and target.Character:FindFirstChild(targetPart) then
-        local camera = workspace.CurrentCamera
-        local aimPosition = target.Character[targetPart].Position
-        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
-    end
-end
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    if SilentAimEnabled then
-        local target = getClosestPlayerInFOV()
-        if target then
-            aimAt(target)
-        end
-    end
-
-    -- Atualiza a posição do círculo de FOV
-    FOVCircle.Position = getFOVPosition()
-    FOVCircle.Radius = FOV
-    FOVCircle.Visible = FOVVisible
-end)
-
--- Toggle para ativar/desativar o Silent Aim
-tab1:AddToggle({
-    Name = "Ativar Aimbot",
+-- Criação de outros componentes na tab1
+CreateToggle(tab1, {
+    Name = "Toggle",
     Default = false,
-    Callback = function(value)
-        SilentAimEnabled = value
+    Callback = function(Value)
+        print("Toggle Value:", Value)
     end
 })
 
--- Dropdown para selecionar a posição da FOV (Centro ou Posição do Dedo)
-tab1:AddDropdown({
-    Name = "Posição da FOV",
-    Default = "Center",
-    Options = {"Center", "Finger"},
-    Callback = function(option)
-        FOVPosition = option
+CreateButton(tab1, {
+    Name = "Botão 1",
+    Callback = function()
+        print("Botão 1 foi clicado!")
     end
 })
 
--- Textbox para definir o tamanho da FOV
-tab1:AddTextbox({
-    Name = "Tamanho da FOV (0 - 300)",
-    Default = "100",
-    TextDisappear = true,
+CreateLabel(tab1, {
+    Text = "Label 1",
+})
+
+CreateWarnLabel(tab1, {
+    Text = "Warning Label 1",
+})
+
+CreateInfoLabel(tab1, {
+    Text = "Info Label 1",
+})
+
+CreateSlider(tab1, {
+    Name = "Volume",
+    Default = 70,
+    Min = 0,
+    Max = 100,
     Callback = function(value)
-        local size = tonumber(value)
-        if size and size >= 0 and size <= 300 then
-            FOV = size
-        else
-            warn("Tamanho inválido! Use um valor entre 0 e 300.")
+        print("Volume:", value)
+    end
+})
+
+CreateTextBox(tab1, {
+    Name = "Test",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("Texto digitado1:", text)
         end
     end
 })
 
--- Toggle para mostrar/ocultar o círculo de FOV
-tab1:AddToggle({
-    Name = "Mostrar FOV",
+CreateDropdown(tab1, {
+    Name = "Dropdown",
+    MultipleOptions = true,
+    Default = {"Option 1", "Option 2"},
+    Options = {"Option 1", "Option 2", "Option 3"},
+    CallBack = function(Options)
+        print("Selected = ", Options)
+    end
+})
+
+-- Criação da segunda aba
+local tab2 = CreateTab(myWindow, tabPanel, {
+    Name = "Tab 2",
+    Icon = "rbxassetid://92817821432465"
+})
+
+-- Criação de componentes na tab2
+CreateToggle(tab2, {
+    Name = "Toggle 1 tab 2",
     Default = false,
+    Callback = function(Value)
+        print("Tab 2 Toggle Value:", Value)
+    end
+})
+
+CreateButton(tab2, {
+    Name = "Botão 2",
+    Callback = function()
+        print("Botão 2 foi clicado!")
+    end
+})
+
+CreateLabel(tab2, {
+    Text = "Label 2",
+})
+
+CreateWarnLabel(tab2, {
+    Text = "Warning Label 2",
+})
+
+CreateInfoLabel(tab2, {
+    Text = "Info Label 2",
+})
+
+CreateTextBox(tab2, {
+    Name = "Test2",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("Texto digitado1:", text)
+        end
+    end
+})
+
+CreateDropdown(tab2, {
+    Name = "Dropdown",
+    MultipleOptions = false,
+    Default = {"Option 1"},
+    Options = {"Option 1", "Option 2", "Option 3"},
+    CallBack = function(Options)
+        print("Selected = ", Options)
+    end
+})
+
+CreateSlider(tab2, {
+    Name = "Volume",
+    Default = 5024,
+    Min = 553,
+    Max = 10520,
     Callback = function(value)
-        FOVVisible = value
+        print("Volume:", value)
     end
 })
 
--- Dropdown para selecionar a cor do FOV
-local colors = {
-    ["Branco"] = Color3.new(1, 1, 1),
-    ["Vermelho"] = Color3.new(1, 0, 0),
-    ["Verde"] = Color3.new(0, 1, 0),
-    ["Azul"] = Color3.new(0, 0, 1),
-    ["Amarelo"] = Color3.new(1, 1, 0),
-    ["Roxo"] = Color3.new(0.5, 0, 1),
-    ["Laranja"] = Color3.new(1, 0.5, 0),
-    ["Ciano"] = Color3.new(0, 1, 1),
-    ["Rosa"] = Color3.new(1, 0.5, 0.8),
-    ["Cinza"] = Color3.new(0.5, 0.5, 0.5)
-}
-
-tab1:AddDropdown({
-    Name = "Selecione a cor do FOV",
-    Options = {"Branco", "Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Laranja", "Ciano", "Rosa", "Cinza"},
-    Default = "Branco",
-    Callback = function(selected)
-        FOVCircle.Color = colors[selected]
+-- Mostra a primeira aba por padrão
+for _, tab in ipairs(myWindow:GetChildren()) do
+    if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
+        tab.Visible = false
     end
-})
-
-OrionLib:Init()
+end
+tab1.Visible = true
