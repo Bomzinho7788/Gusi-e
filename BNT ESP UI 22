@@ -1,4 +1,10 @@
 local url = "https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BomLib"
-local CreateWindow = loadstring(game:HttpGet(url))()
+local library = loadstring(game:HttpGet(url))()
 
-local myWindow = CreateWindow({Name = "Test"})
+local myWindow = library.CreateWindow({Name = "Test"})
+local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
+
+local tab1 = library.CreateTab(myWindow, tabPanel, {
+	Name = "Tab 1",
+	Icon = "rbxassetid://76530199889334"
+})
