@@ -2,7 +2,7 @@ local function CreateWindow(options)
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = options.Name or "Window"
 	screenGui.ResetOnSpawn = false
-	screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+	screenGui.Parent = game:GetService("CoreGui")
 
 	local window = Instance.new("Frame")
 	window.Size = UDim2.new(0, 520, 0, 300)
@@ -572,6 +572,107 @@ function CreateLabel(tabFrame, options)
 	C.Parent = framela
 end
 
+
+function CreateInfoLabel(tabFrame, options)
+	local framela = Instance.new("Frame")
+	framela.Size = UDim2.new(1, 0, 0, 32)
+	framela.Parent = tabFrame
+	framela.BackgroundColor3 = Color3.new(0.054902, 0.188235, 0.337255)
+
+	local labelcr = Instance.new("TextLabel")
+	labelcr.Size = UDim2.new(1, 0, 1, 0)
+	labelcr.Position = UDim2.new(0, 0, 0, 0)
+	labelcr.TextXAlignment = Enum.TextXAlignment.Left
+	labelcr.BackgroundTransparency = 1
+	labelcr.TextColor3 = Color3.new(0.0117647, 0.419608, 0.768627)
+	labelcr.Text = options.Text or "Label"
+	labelcr.TextSize = options.TextSize or 14
+	labelcr.Parent = framela
+	labelcr.TextScaled = true
+
+	local icon = Instance.new("ImageLabel")
+	icon.Size = UDim2.new(0, 30, 0, 30)
+	icon.Position = UDim2.new(1, -30, 0.5, -15)
+	icon.BackgroundTransparency = 1
+	icon.Image = "rbxassetid://92817821432465"
+	icon.Parent = framela
+
+	local s = Instance.new("UIStroke")
+	s.Color = Color3.new(0.0588235, 0.341176, 1)
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Thickness = 1
+	s.Parent = framela
+	s.Transparency = 0
+
+	local ss = Instance.new("UIStroke")
+	ss.Color = Color3.new(0, 0, 0)
+	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	ss.Thickness = 1
+	ss.Parent = framela
+	ss.Transparency = 0
+
+	local p = Instance.new("UIPadding")
+	p.PaddingTop = UDim.new(0, 6)
+	p.PaddingLeft = UDim.new(0, 6)
+	p.PaddingBottom = UDim.new(0, 6)
+	p.PaddingRight = UDim.new(0, 6)
+	p.Parent = framela
+
+	local C = Instance.new("UICorner")
+	C.CornerRadius = UDim.new(0, 4)
+	C.Parent = framela
+end
+
+function CreateWarnLabel(tabFrame, options)
+	local framela = Instance.new("Frame")
+	framela.Size = UDim2.new(1, 0, 0, 32)
+	framela.Parent = tabFrame
+	framela.BackgroundColor3 = Color3.new(0.168627, 0.141176, 0.0117647)
+
+	local labelcr = Instance.new("TextLabel")
+	labelcr.Size = UDim2.new(1, 0, 1, 0)
+	labelcr.Position = UDim2.new(0, 0, 0, 0)
+	labelcr.TextXAlignment = Enum.TextXAlignment.Left
+	labelcr.BackgroundTransparency = 1
+	labelcr.TextColor3 = Color3.new(0.898039, 0.745098, 0.0627451)
+	labelcr.Text = options.Text or "Label"
+	labelcr.TextSize = options.TextSize or 14
+	labelcr.Parent = framela
+	labelcr.TextScaled = true
+
+	local icon = Instance.new("ImageLabel")
+	icon.Size = UDim2.new(0, 30, 0, 30)
+	icon.Position = UDim2.new(1, -30, 0.5, -15)
+	icon.BackgroundTransparency = 1
+	icon.Image = "rbxassetid://129568088175768"
+	icon.Parent = framela
+
+	local s = Instance.new("UIStroke")
+	s.Color = Color3.new(0.647059, 0.537255, 0.0431373)
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Thickness = 1
+	s.Parent = framela
+	s.Transparency = 0
+
+	local ss = Instance.new("UIStroke")
+	ss.Color = Color3.new(0, 0, 0)
+	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	ss.Thickness = 1
+	ss.Parent = framela
+	ss.Transparency = 0
+
+	local p = Instance.new("UIPadding")
+	p.PaddingTop = UDim.new(0, 6)
+	p.PaddingLeft = UDim.new(0, 6)
+	p.PaddingBottom = UDim.new(0, 6)
+	p.PaddingRight = UDim.new(0, 6)
+	p.Parent = framela
+
+	local C = Instance.new("UICorner")
+	C.CornerRadius = UDim.new(0, 4)
+	C.Parent = framela
+end
+
 function CreateSlider(tabFrame, options)
 	-- Criar o container do slider
 	local Slider = Instance.new("Frame")
@@ -621,7 +722,7 @@ function CreateSlider(tabFrame, options)
 	BackGroundUIStroke.Thickness = 1
 	BackGroundUIStroke.Parent = SliderBackGround
 
-	-- A parte do slider que pode ser arrastada (dragable)
+	-- A parte do slider que pode ser arrastada (draggable)
 	local Draggable = Instance.new("Frame")
 	Draggable.BackgroundColor3 = Color3.new(0.6, 0.6, 0.6)
 	Draggable.Size = UDim2.new(0.5, 0, 1, 0)  -- Tamanho inicial
@@ -809,106 +910,6 @@ function CreateSlider(tabFrame, options)
 	if options.Callback then
 		options.Callback(currentValue)
 	end
-end
-
-function CreateInfoLabel(tabFrame, options)
-	local framela = Instance.new("Frame")
-	framela.Size = UDim2.new(1, 0, 0, 32)
-	framela.Parent = tabFrame
-	framela.BackgroundColor3 = Color3.new(0.054902, 0.188235, 0.337255)
-
-	local labelcr = Instance.new("TextLabel")
-	labelcr.Size = UDim2.new(1, 0, 1, 0)
-	labelcr.Position = UDim2.new(0, 0, 0, 0)
-	labelcr.TextXAlignment = Enum.TextXAlignment.Left
-	labelcr.BackgroundTransparency = 1
-	labelcr.TextColor3 = Color3.new(0.0117647, 0.419608, 0.768627)
-	labelcr.Text = options.Text or "Label"
-	labelcr.TextSize = options.TextSize or 14
-	labelcr.Parent = framela
-	labelcr.TextScaled = true
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 30, 0, 30)
-	icon.Position = UDim2.new(1, -30, 0.5, -15)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://92817821432465"
-	icon.Parent = framela
-
-	local s = Instance.new("UIStroke")
-	s.Color = Color3.new(0.0588235, 0.341176, 1)
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Thickness = 1
-	s.Parent = framela
-	s.Transparency = 0
-
-	local ss = Instance.new("UIStroke")
-	ss.Color = Color3.new(0, 0, 0)
-	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss.Thickness = 1
-	ss.Parent = framela
-	ss.Transparency = 0
-
-	local p = Instance.new("UIPadding")
-	p.PaddingTop = UDim.new(0, 6)
-	p.PaddingLeft = UDim.new(0, 6)
-	p.PaddingBottom = UDim.new(0, 6)
-	p.PaddingRight = UDim.new(0, 6)
-	p.Parent = framela
-
-	local C = Instance.new("UICorner")
-	C.CornerRadius = UDim.new(0, 4)
-	C.Parent = framela
-end
-
-function CreateWarnLabel(tabFrame, options)
-	local framela = Instance.new("Frame")
-	framela.Size = UDim2.new(1, 0, 0, 32)
-	framela.Parent = tabFrame
-	framela.BackgroundColor3 = Color3.new(0.168627, 0.141176, 0.0117647)
-
-	local labelcr = Instance.new("TextLabel")
-	labelcr.Size = UDim2.new(1, 0, 1, 0)
-	labelcr.Position = UDim2.new(0, 0, 0, 0)
-	labelcr.TextXAlignment = Enum.TextXAlignment.Left
-	labelcr.BackgroundTransparency = 1
-	labelcr.TextColor3 = Color3.new(0.898039, 0.745098, 0.0627451)
-	labelcr.Text = options.Text or "Label"
-	labelcr.TextSize = options.TextSize or 14
-	labelcr.Parent = framela
-	labelcr.TextScaled = true
-
-	local icon = Instance.new("ImageLabel")
-	icon.Size = UDim2.new(0, 30, 0, 30)
-	icon.Position = UDim2.new(1, -30, 0.5, -15)
-	icon.BackgroundTransparency = 1
-	icon.Image = "rbxassetid://129568088175768"
-	icon.Parent = framela
-
-	local s = Instance.new("UIStroke")
-	s.Color = Color3.new(0.647059, 0.537255, 0.0431373)
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Thickness = 1
-	s.Parent = framela
-	s.Transparency = 0
-
-	local ss = Instance.new("UIStroke")
-	ss.Color = Color3.new(0, 0, 0)
-	ss.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	ss.Thickness = 1
-	ss.Parent = framela
-	ss.Transparency = 0
-
-	local p = Instance.new("UIPadding")
-	p.PaddingTop = UDim.new(0, 6)
-	p.PaddingLeft = UDim.new(0, 6)
-	p.PaddingBottom = UDim.new(0, 6)
-	p.PaddingRight = UDim.new(0, 6)
-	p.Parent = framela
-
-	local C = Instance.new("UICorner")
-	C.CornerRadius = UDim.new(0, 4)
-	C.Parent = framela
 end
 
 function CreateDropdown(tabFrame, config)
