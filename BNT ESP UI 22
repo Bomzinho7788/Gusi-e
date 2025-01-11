@@ -9,11 +9,125 @@ local tab1 = library.CreateTab(myWindow, tabPanel, {
 	Icon = "rbxassetid://76530199889334"
 })
 
-local tab2 = library.CreateTab(myWindow, tabPanel, {
-	Name = "Tab 2",
-	Icon = "rbxassetid://76530199889334"
+library.CreateToggle(tab1, {
+	Name = "Toggle",
+	Default = false,
+	Callback = function(Value)
+		print("Toggle Value:", Value)
+	end
 })
 
+library.CreateButton(tab1, {
+	Name = "Botão 1",
+	Callback = function()
+		print("Botão 1 foi clicado!")
+	end
+})
+
+library.CreateLabel(tab1, {
+	Text = "Label 1",
+})
+
+library.CreateWarnLabel(tab1, {
+	Text = "Warning Label 1",
+})
+
+library.CreateInfoLabel(tab1, {
+	Text = "Info Label 1",
+})
+
+library.CreateSlider(tab1, {
+	Name = "Volume",
+	Default = 70,
+	Min = 0,
+	Max = 100,
+	Callback = function(value)
+		print("Volume:", value)
+	end
+})
+
+
+library.CreateTextBox(tab1, {
+	Name = "Test",
+	Callback = function(text, enterPressed)
+		if enterPressed then
+			print("Texto digitado1:", text)
+		end
+	end
+})
+
+library.CreateDropdown(tab1, {
+	Name = "Dropdown",
+	MultipleOptions = true,
+	Default = {"Option 1", "Option 2"},
+	Options = {"Option 1", "Option 2", "Option 3"},
+	CallBack = function(Options)
+		print("Selected = ", Options)
+	end
+})
+
+local tab2 = library.CreateTab(myWindow, tabPanel, {
+	Name = "Tab 2",
+	Icon = "rbxassetid://92817821432465"
+})
+
+library.CreateToggle(tab2, {
+	Name = "Toggle 1 tab 2",
+	Default = false,
+	Callback = function(Value)
+		print("Tab 2 Toggle Value:", Value)
+	end
+})
+
+library.CreateButton(tab2, {
+	Name = "Botão 2",
+	Callback = function()
+		print("Botão 2 foi clicado!")
+	end
+})
+
+library.CreateLabel(tab2, {
+	Text = "Label 2",
+})
+
+library.CreateWarnLabel(tab2, {
+	Text = "Warning Label 2",
+})
+
+library.CreateInfoLabel(tab2, {
+	Text = "Info Label 2",
+})
+
+library.CreateTextBox(tab2, {
+	Name = "Test2",
+	Callback = function(text, enterPressed)
+		if enterPressed then
+			print("Texto digitado1:", text)
+		end
+	end
+})
+
+library.CreateDropdown(tab2, {
+	Name = "Dropdown",
+	MultipleOptions = false,
+	Default = {"Option 1"},
+	Options = {"Option 1", "Option 2", "Option 3"},
+	CallBack = function(Options)
+		print("Selected = ", Options)
+	end
+})
+
+library.CreateSlider(tab2, {
+	Name = "Volume",
+	Default = 5024,
+	Min = 553,
+	Max = 10520,
+	Callback = function(value)
+		print("Volume:", value)
+	end
+})
+
+-- Mostra a primeira aba por padrão
 for _, tab in ipairs(myWindow:GetChildren()) do
 	if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
 		tab.Visible = false
