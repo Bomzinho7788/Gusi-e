@@ -6,7 +6,7 @@ local function CreateWindow(options)
 
     local window = Instance.new("Frame")
     window.Size = UDim2.new(0, 520, 0, 300)
-    window.Position = UDim2.new(-0.5, -260, 0.5, -150) -- Começa fora da tela à esquerda
+    window.Position = UDim2.new(-0.5, -260, 0.5, -150)
     window.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
     window.BorderSizePixel = 0
     window.BackgroundTransparency = 0
@@ -64,7 +64,7 @@ local function CreateWindow(options)
     closeButton.MouseButton1Click:Connect(function()
         local tweenService = game:GetService("TweenService")
         local tweenInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)}) -- Desliza para fora da tela à direita
+        local closeTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(1.5, -260, 0.5, -150)})
 
         closeTween:Play()
         closeTween.Completed:Connect(function()
@@ -157,7 +157,6 @@ local function CreateWindow(options)
     uiPadding.PaddingRight = UDim.new(0, 10)
     uiPadding.Parent = mainFrame
 
-    -- Funções de Minimização/Maximização
     local isMinimized = false
 
     local function animateFrameSize(targetSize, mainFramTargetSize, topBarTargetSize, tabPanelTargetSize)
@@ -180,10 +179,10 @@ local function CreateWindow(options)
         tabPanelTween.Completed:Wait()
     end
 
-        minimizeButton.MouseButton1Click:Connect(function()
+    minimizeButton.MouseButton1Click:Connect(function()
         isMinimized = not isMinimized
         if isMinimized then
-            animateFrameSize(UDim2.new(0, 520, 0, 40), UDim2.new(0, 410, 0, 0), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 0))
+                animateFrameSize(UDim2.new(0, 520, 0, 40), UDim2.new(0, 410, 0, 0), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 0))
         else
             animateFrameSize(UDim2.new(0, 520, 0, 300), UDim2.new(0, 410, 0, 250), UDim2.new(1, 0, 0, 40), UDim2.new(0, 110, 0, 260))
         end
@@ -204,10 +203,81 @@ local function CreateWindow(options)
     -- Animação de inicialização
     local tweenService = game:GetService("TweenService")
     local tweenInfo = TweenInfo.new(1.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-    local openTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(0.5, -260, 0.5, -150)}) -- Desliza para o centro da tela
+    local openTween = tweenService:Create(window, tweenInfo, {Position = UDim2.new(0.5, -260, 0.5, -150)})
     openTween:Play()
 
     return window
 end
 
-return CreateWindow
+local function CreateTab(window, tabPanel, options)
+    local tabFrame = Instance.new("ScrollingFrame")
+    tabFrame.Size = UDim2.new(1, -110, 1, -40)
+    tabFrame.Position = UDim2.new(0, 110, 0, 40)
+    tabFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    tabFrame.BorderSizePixel = 0
+    tabFrame.CanvasSize = UDim2.new(0, 0, 0, 999)
+    tabFrame.ScrollBarThickness = 6
+    tabFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+    tabFrame.ClipsDescendants = true
+    tabFrame.Visible = false
+    tabFrame.Parent = window
+
+    local tabListLayout = Instance.new("UIListLayout")
+    tabListLayout.Parent = tabFrame
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.Padding = UDim.new(0, 10)
+
+    local tabPadding = Instance.new("UIPadding")
+    tabPadding.PaddingTop = UDim.new(0, 3)
+    tabPadding.PaddingBottom = UDim.new(0, 3)
+    tabPadding.PaddingLeft = UDim.new(0, 10)
+    tabPadding.PaddingRight = UDim.new(0, 10)
+    tabPadding.Parent = tabFrame
+
+    local tt = Instance.new("UICorner")
+    tt.CornerRadius = UDim.new(0, 8)
+    tt.Parent = tabFrame
+
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(1, 0, 0, 30)
+    tabButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    tabButton.TextColor3 = Color3.new(1, 1, 1)
+    tabButton.Text = options.Name
+    tabButton.TextSize = 14
+    tabButton.Parent = tabPanel
+
+    local t = Instance.new("UICorner")
+    t.CornerRadius = UDim.new(0, 5)
+    t.Parent = tabButton
+
+    local s = Instance.new("UIStroke")
+    s.Parent = tabButton
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    s.Color = Color3.new(0, 0, 0)
+    s.Thickness = 1
+
+    local ic = Instance.new("ImageLabel")
+    ic.BackgroundTransparency = 1
+    ic.BorderSizePixel = 0
+    ic.Position = UDim2.new(0, 0.5, 0.5, 0)
+    ic.Size = UDim2.new(0, 20, 0, 20)
+    ic.AnchorPoint = Vector2.new(0, 0.5)
+    ic.Image = options.Icon or "rbxassetid://76530199889334"
+    ic.Parent = tabButton
+
+    tabButton.MouseButton1Click:Connect(function()
+        for _, tab in ipairs(window:GetChildren()) do
+            if tab:IsA("ScrollingFrame") and tab.Parent == window then
+                tab.Visible = false
+            end
+        end
+        tabFrame.Visible = true
+    end)
+
+    return tabFrame
+end
+
+return {
+    CreateWindow = CreateWindow,
+    CreateTab = CreateTab
+}
