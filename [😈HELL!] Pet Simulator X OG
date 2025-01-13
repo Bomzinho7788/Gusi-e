@@ -1,18 +1,17 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-
-local FOV_RADIUS = 200 -- Tamanho do FOV em pixels
-local FOV_CIRCLE_COLOR = Color3.new(1, 0, 0) -- Cor do círculo do FOV (vermelho)
-local FOV_CIRCLE_TRANSPARENCY = 0.5 -- Transparência do círculo do FOV
-
+local FOV_RADIUS = 350
+local FOV_CIRCLE_COLOR = Color3.new(1, 1, 1)
+local FOV_CIRCLE_TRANSPARENCY = 0.5
 local Parried = false
-local Cooldown = tick()
+local LastParryTime = 0
+local ParryCooldown = 0
+local AutoParryEnabled = true
 
--- Desenha o círculo de FOV
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Transparency = FOV_CIRCLE_TRANSPARENCY
 FOVCircle.Visible = true
@@ -21,13 +20,11 @@ FOVCircle.Filled = false
 FOVCircle.Color = FOV_CIRCLE_COLOR
 FOVCircle.Radius = FOV_RADIUS
 
--- Atualiza a posição do círculo no centro da tela
-RunService.RenderStepped:Connect(function()
+local function UpdateFOVCircle()
     local ViewportSize = workspace.CurrentCamera.ViewportSize
     FOVCircle.Position = Vector2.new(ViewportSize.X / 2, ViewportSize.Y / 2)
-end)
+end
 
--- Função para calcular se a bola está dentro do FOV
 local function IsInFOV(ball)
     local ScreenPos, OnScreen = workspace.CurrentCamera:WorldToViewportPoint(ball.Position)
     if not OnScreen then
@@ -38,34 +35,104 @@ local function IsInFOV(ball)
     return Distance <= FOV_RADIUS
 end
 
--- Função para pegar a bola correta
 local function GetBall()
     for _, ball in ipairs(workspace.Balls:GetChildren()) do
         if ball:GetAttribute("realBall") then
             return ball
         end
     end
+    return nil
 end
 
--- Loop principal
+local function onCharacterAdded(newCharacter)
+    repeat wait() until newCharacter:FindFirstChild("HumanoidRootPart")
+
+    Parried = false
+    LastParryTime = tick()
+end
+
+Player.CharacterAdded:Connect(onCharacterAdded)
+
+local Window = Rayfield:CreateWindow({
+    Name = "GM HUB",
+    Icon = 0,
+    LoadingTitle = "By Bomzinho",
+    LoadingSubtitle = "Loading...",
+    Theme = "Amethyst",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "EkSPP"
+    },
+
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+
+    KeySystem = true,
+    KeySettings = {
+        Title = "GM HUB",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"yh77k6"}
+    }
+})
+
+local tab = Window:CreateTab("Configs", 4483362458)
+
+tab:CreateSlider({
+    Name = "Fov Size",
+    Range = {50, 1000},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = 350,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOV_RADIUS = Value
+    	FOVCircle.Radius = FOV_RADIUS
+    end,
+})
+
+tab:CreateToggle({
+    Name = "Auto Parry",
+    CurrentValue = false,
+    Flag = "Enable Aimbot",
+    Callback = function(Value)
+        AutoParryEnabled = Value
+    end,
+})
+
 RunService.Heartbeat:Connect(function()
+    UpdateFOVCircle()
+
     local Ball = GetBall()
-    local HRP = Character:FindFirstChild("HumanoidRootPart")
-    
+    local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+
     if Ball and HRP then
         local Speed = Ball.AssemblyLinearVelocity.Magnitude
         local Distance = (HRP.Position - Ball.Position).Magnitude
-        local TimeToHit = Distance / Speed
 
-        -- Verifica condições para realizar o parry
-        if not Parried and Ball:GetAttribute("target") == Player.Name and TimeToHit <= 0.55 and IsInFOV(Ball) then
-            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-            Parried = true
-            Cooldown = tick()
+        local TimeToHit = Speed > 0 and Distance / Speed or math.huge
+
+        if AutoParryEnabled and Ball:GetAttribute("target") == Player.Name and TimeToHit <= 0.55 and IsInFOV(Ball) then
+            if not Parried and (tick() - LastParryTime) >= ParryCooldown then
+                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                Parried = true
+                LastParryTime = tick()
+                print("Parry realizado!")
+            end
         end
 
-        -- Reseta o parry após 1 segundo
-        if Parried and (tick() - Cooldown) >= 1 then
+        if Parried and (tick() - LastParryTime) >= 0.5 then
             Parried = false
         end
     end
