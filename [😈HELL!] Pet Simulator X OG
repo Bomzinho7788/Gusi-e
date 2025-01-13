@@ -126,6 +126,7 @@ RunService.Heartbeat:Connect(function()
         if AutoParryEnabled and Ball:GetAttribute("target") == Player.Name and TimeToHit <= 0.55 and IsInFOV(Ball) then
             if not Parried and (tick() - LastParryTime) >= ParryCooldown then
                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
                 Parried = true
                 LastParryTime = tick()
                 print("Parry realizado!")
