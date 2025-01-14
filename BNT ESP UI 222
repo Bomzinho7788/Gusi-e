@@ -315,15 +315,18 @@ local function getClosestPlayer()
                 continue
             end
 
-            if isPlayerInFOV(player) and isInFrontOfCamera(player) then
-                local charPart = player.Character:FindFirstChild(_G.targetPart)
-                if charPart then
-                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
-                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+            -- Verifica se o jogador está vivo
+            if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+                if isPlayerInFOV(player) and isInFrontOfCamera(player) then
+                    local charPart = player.Character:FindFirstChild(_G.targetPart)
+                    if charPart then
+                        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
 
-                    if distance < closestDistance then
-                        closestDistance = distance
-                        closestPlayer = player
+                        if distance < closestDistance then
+                            closestDistance = distance
+                            closestPlayer = player
+                        end
                     end
                 end
             end
@@ -334,10 +337,12 @@ local function getClosestPlayer()
 end
 
 local function aimAt(target)
-    if target and target.Character and target.Character:FindFirstChild(_G.targetPart) then
-        local camera = workspace.CurrentCamera
-        local aimPosition = target.Character:FindFirstChild(_G.targetPart).Position
-        camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+    if target and target.Character then
+        if target.Character:FindFirstChild(_G.targetPart) then
+            local camera = workspace.CurrentCamera
+            local aimPosition = target.Character[_G.targetPart].Position
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+        end
     end
 end
 
@@ -352,6 +357,34 @@ game:GetService("RunService").RenderStepped:Connect(function()
     FOVCircle.Position = getFOVPosition()
     FOVCircle.Radius = FOV
     FOVCircle.Visible = FOVVisible
+end)
+
+-- Definir a parte alvo inicial
+local targetPart = "Head"
+
+-- Função para alternar entre Head e HumanoidRootPart
+local function toggleParts()
+    local character = game.Players.LocalPlayer.Character
+    if not character then return end
+    
+    local head = character:FindFirstChild("Head")
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if head and humanoidRootPart then
+        if _G.targetPart == "Head" then
+            _G.targetPart = "HumanoidRootPart"
+        elseif _G.targetPart == "HumanoidRootPart" then
+            _G.targetPart = "Head"
+        end
+    else
+        warn("Head ou HumanoidRootPart não encontrados!")
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        toggleParts()
+    end
 end)
 
 local Window = Rayfield:CreateWindow({
@@ -485,8 +518,8 @@ Tab:CreateSlider({
 
 Tab:CreateDropdown({
     Name = "AimPart",
-    Options = {"Head", "Humanoid"},
-    CurrentOption = {"colors"},
+    Options = {"Head", "HumanoidRootPart"},
+    CurrentOption = {"Head"},
     MultipleOptions = false,
     Flag = "AimPart",
     Callback = function(Options)
