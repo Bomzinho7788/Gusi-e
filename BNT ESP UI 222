@@ -843,74 +843,6 @@ local function hideSkeleton(character)
     end
 end
 
-local function draw(player, character)
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then
-        print("Humanoid not found in character: " .. character.Name)
-        return
-    end
-
-    if humanoid.RigType == Enum.HumanoidRigType.R6 then
-        draw6(player, character)
-    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
-        draw15(player, character)
-    end
-
-    humanoid.Died:Connect(function()
-        print("Character died: " .. character.Name)
-        wait(0.025)
-        hideSkeleton(character)
-    end)
-end
-
-local function clearLines(character)
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then
-        print("Humanoid not found in character: " .. character.Name)
-        return
-    end
-    wait(0.025)
-    hideSkeleton(character)
-end
-
-local function onCharacterAdded(player, character)
-    print("Character added: " .. character.Name)
-    wait(0.025)
-    coroutine.wrap(draw)(player, character)
-end
-
-local function onCharacterRemoving(player)
-    if player.Character then
-        print("Character removing: " .. player.Character.Name)
-        clearLines(player.Character)
-    end
-end
-
-local function onPlayerAdded(player)
-    print("Player added: " .. player.Name)
-    if player.Character then
-        wait(0.025)
-        onCharacterAdded(player, player.Character)
-    end
-    player.CharacterAdded:Connect(function(character)
-        wait(0.025)
-        onCharacterAdded(player, character)
-    end)
-    player.CharacterRemoving:Connect(function()
-        wait(0.025)
-        onCharacterRemoving(player)
-    end)
-end
-
-for _, player in pairs(game.Players:GetPlayers()) do
-    wait(0.025)
-    if player ~= LocalPlayer then
-        onPlayerAdded(player)
-    end
-end
-
-game.Players.PlayerAdded:Connect(onPlayerAdded)
-
 _G.EspSkeleton = false
 _G.SkeletonColor = Color3.new(1, 0, 0)
 _G.SkeletonTransparency = 1
@@ -1446,7 +1378,7 @@ Tab1:CreateDropdown({
 
 Tab1:CreateDropdown({
     Name = "Health Bar Position",
-    Options = {"Left", "Right", "Top", Bottom},
+    Options = {"Left", "Right", "Top", "Bottom"},
     CurrentOption = {"Left"},
     MultipleOptions = false,
     Flag = "HealthBarPosition",
@@ -1467,3 +1399,67 @@ Tab1:CreateDropdown({
 })
 
 Rayfield:LoadConfiguration()
+
+local function draw(player, character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+
+    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+        draw6(player, character)
+    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
+        draw15(player, character)
+    end
+
+    humanoid.Died:Connect(function()
+        wait(0.025)
+        hideSkeleton(character)
+    end)
+end
+
+local function clearLines(character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+    wait(0.025)
+    hideSkeleton(character)
+end
+
+local function onCharacterAdded(player, character)
+    wait(0.025)
+    coroutine.wrap(draw)(player, character)
+end
+
+local function onCharacterRemoving(player)
+    if player.Character then
+        clearLines(player.Character)
+    end
+end
+
+local function onPlayerAdded(player)
+    if player.Character then
+        wait(0.025)
+        onCharacterAdded(player, player.Character)
+    end
+    player.CharacterAdded:Connect(function(character)
+        wait(0.025)
+        onCharacterAdded(player, character)
+    end)
+    player.CharacterRemoving:Connect(function()
+        wait(0.025)
+        onCharacterRemoving(player)
+    end)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    wait(0.025)
+    if player ~= LocalPlayer then
+        onPlayerAdded(player)
+    end
+end
+
+game.Players.PlayerAdded:Connect(onPlayerAdded)
