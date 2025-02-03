@@ -910,6 +910,10 @@ local function drawhit(player)
     coroutine.wrap(update)()
 end
 
+
+
+
+
 _G.LookAngles = true
 _G.LookAngleThickness = 1.4
 _G.LookAngleTransparency = 1
