@@ -122,20 +122,27 @@ end
 
 local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
     local offset = isOutline and 6 or 4
-    local healthBarSize = (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth))
+    local healthRatio = math.clamp(health / maxHealth, 0, 1)
 
     if _G.HealthBarPosition == "Left" then
-        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
         HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) -- Começa de cima e desce
+
     elseif _G.HealthBarPosition == "Right" then
-        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
         HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y) -- Começa de cima e desce
+
     elseif _G.HealthBarPosition == "Bottom" then
-        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
-        HealthBar.Size = Vector2.new(Box.Size.X, 2)
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset) -- Começa da direita e diminui para a esquerda
+
     elseif _G.HealthBarPosition == "Top" then
-        HealthBar.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
-        HealthBar.Size = Vector2.new(Box.Size.X, 2)
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset) -- Começa da direita e diminui para a esquerda
     end
 end
 
