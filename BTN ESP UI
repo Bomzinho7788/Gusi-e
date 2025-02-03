@@ -26,7 +26,7 @@ _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
 
-_G.BotType = "2D Box"
+_G.BoxType = "2D Box"
 
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
