@@ -8,6 +8,8 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
+local on = false
+
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BTN%20ESP%20UI"))();
 
 ESP.Enabled = true;
@@ -23,6 +25,8 @@ _G.boxColor = Color3.new(0, 0, 0)
 _G.boxThickness = 1
 _G.boxTransparency = 1
 _G.boxVisible = false
+
+_G.BoxType = "2D Box"
 
 _G.boxFilledColor = Color3.new(0, 0, 0)
 _G.boxFilledTransparency = 0.5
@@ -1054,26 +1058,23 @@ local Tab1 = Window:CreateTab("ESP", 4483362458)
 
 Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
-Tab1:CreateToggle({
-    Name = "Show Box 2D",
+local Toggle = Tab1:CreateToggle({
+    Name = "Show Box",
     CurrentValue = false,
     Flag = "Show Box",
-    Callback = function(Value)
-        _G.boxVisible = Value
+    Callback = function(value)
+        if _G.BoxType == "3D Box" then
+            on = value
+            _G.boxVisible = false
+        elseif _G.BoxType == "2D Box" then
+            on = false
+            _G.boxVisible = value
+        end
     end,
 })
 
 Tab1:CreateToggle({
-    Name = "Show Box 3D",
-    CurrentValue = false,
-    Flag = "Show Box 3d",
-    Callback = function(Value)
-        on = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Box Filled IF 2D",
+    Name = "Box Filled",
     CurrentValue = false,
     Flag = "BoxFilled",
     Callback = function(Value)
@@ -1114,6 +1115,15 @@ Tab1:CreateToggle({
     Flag = "Skeleton",
     Callback = function(Value)
         _G.EspSkeleton = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Look Angles",
+    CurrentValue = false,
+    Flag = "LookAngles",
+    Callback = function(Value)
+        _G.LookAngles = Value
     end,
 })
 
@@ -1203,6 +1213,15 @@ Tab1:CreateColorPicker({
     end
 })
 
+Tab1:CreateColorPicker({
+    Name = "Look Angles Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Look Angle Color",
+    Callback = function(Value)
+        _G.LookAngleColor = Value
+    end
+})
+
 Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 Tab1:CreateSlider({
@@ -1265,6 +1284,18 @@ Tab1:CreateSlider({
     end,
 })
 
+Tab1:CreateSlider({
+    Name = "Look Angles Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "LookAngleTransparency",
+    Callback = function(Value)
+        _G.LookAngleTransparency = Value
+    end,
+})
+
 Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 Tab1:CreateSlider({
@@ -1315,6 +1346,18 @@ Tab1:CreateSlider({
     end,
 })
 
+Tab1:CreateSlider({
+    Name = "Look Angles Thickness",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "LookAngleThickness",
+    Callback = function(Value)
+        _G.LookAngleThickness = Value
+    end,
+})
+
 Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 
 Tab1:CreateDropdown({
@@ -1325,6 +1368,17 @@ Tab1:CreateDropdown({
     Flag = "TeamcheckMode",
     Callback = function(Options)
         _G.temcheckmode = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Box Type",
+    Options = {"3D Box", "2D Box"},
+    CurrentOption = {"Left"},
+    MultipleOptions = false,
+    Flag = "BOXTYPE",
+    Callback = function(Options)
+        _G.BotType = Options[1]
     end,
 })
 
@@ -1353,8 +1407,6 @@ Tab1:CreateDropdown({
 local workspace = game:GetService("Workspace")
 local player = game:GetService("Players").LocalPlayer
 local camera = workspace.CurrentCamera
-
-local on = true
 
 local Box_Color = _G.boxColor
 local Box_Thickness = _G.boxThickness
@@ -1609,6 +1661,19 @@ game.Players.PlayerAdded:Connect(function(newplr)
         end)
     end
     coroutine.wrap(ESP)()
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.0000001)
+        if _G.BoxType == "2D Box" and Toggle.Value then
+            on = false
+            _G.boxVisible = true
+        elseif _G.BoxType == "3D Box" and Toggle.Value then
+            on = true
+            _G.boxVisible = false
+        end
+    end
 end)
 
 Rayfield:LoadConfiguration()
