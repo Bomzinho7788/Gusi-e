@@ -198,10 +198,13 @@ local function setupPlayerBox(v)
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
-                        else
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
                         end
                     end
                 end
@@ -404,34 +407,6 @@ local function draw6(player, character)
     local skel_right_lower_leg = Drawing.new("Line")
     local skel_left_lower_leg = Drawing.new("Line")
 
-    skel_head.Visible = _G.EspSkeleton
-    skel_torso.Visible = _G.EspSkeleton
-    skel_left_lower_arm.Visible = _G.EspSkeleton
-    skel_right_lower_arm.Visible = _G.EspSkeleton
-    skel_left_lower_leg.Visible = _G.EspSkeleton
-    skel_right_lower_leg.Visible = _G.EspSkeleton
-
-    skel_head.Color = _G.SkeletonColor
-    skel_torso.Color = _G.SkeletonColor
-    skel_left_lower_arm.Color = _G.SkeletonColor
-                                skel_right_lower_arm.Color = _G.SkeletonColor
-                                skel_left_lower_leg.Color = _G.SkeletonColor
-                                skel_right_lower_leg.Color = _G.SkeletonColor
-
-    skel_head.Transparency = _G.SkeletonTransparency
-    skel_torso.Transparency = _G.SkeletonTransparency
-    skel_left_lower_arm.Transparency = _G.SkeletonTransparency
-    skel_right_lower_arm.Transparency = _G.SkeletonTransparency
-    skel_left_lower_leg.Transparency = _G.SkeletonTransparency
-    skel_right_lower_leg.Transparency = _G.SkeletonTransparency
-
-    skel_head.Thickness = _G.SkeletonThickness
-    skel_torso.Thickness = _G.SkeletonThickness
-    skel_left_lower_arm.Thickness = _G.SkeletonThickness
-    skel_right_lower_arm.Thickness = _G.SkeletonThickness
-    skel_left_lower_leg.Thickness = _G.SkeletonThickness
-    skel_right_lower_leg.Thickness = _G.SkeletonThickness
-
     local function update6()
         local connection
         connection = runservice.RenderStepped:Connect(function()
@@ -469,41 +444,33 @@ local function draw6(player, character)
                     skel_right_lower_leg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
                     skel_right_lower_leg.To = Vector2.new(rightleglower_2d.X, rightleglower_2d.Y)
 
-                    if _G.teamcheck then
-                        if _G.teamcheckmode == "colors" then
-                            if player.TeamColor == lplr.TeamColor then
-                                skel_head.Color = _G.teamcolor
-                                skel_torso.Color = _G.teamcolor
-                                skel_left_lower_arm.Color = _G.teamcolor
-                                skel_right_lower_arm.Color = _G.teamcolor
-                                skel_left_lower_leg.Color = _G.teamcolor
-                                skel_right_lower_leg.Color = _G.teamcolor
-                            else
-                                skel_head.Color = _G.enemycolor
-                                skel_torso.Color = _G.enemycolor
-                                skel_left_lower_arm.Color = _G.enemycolor
-                                skel_right_lower_arm.Color = _G.enemycolor
-                                skel_left_lower_leg.Color = _G.enemycolor
-                                skel_right_lower_leg.Color = _G.enemycolor
-                            end
-                        elseif _G.teamcheckmode == "invisible" then
-                            if player.TeamColor == lplr.TeamColor then
-                                skel_head.Visible = false
-                                skel_torso.Visible = false
-                                skel_left_lower_arm.Visible = false
-                                skel_right_lower_arm.Visible = false
-                                skel_left_lower_leg.Visible = false
-                                skel_right_lower_leg.Visible = false
-                            else
-                                skel_head.Color = _G.SkeletonColor
-                                skel_torso.Color = _G.SkeletonColor
-                                skel_left_lower_arm.Color = _G.SkeletonColor
-                                skel_right_lower_arm.Color = _G.SkeletonColor
-                                skel_left_lower_leg.Color = _G.SkeletonColor
-                                skel_right_lower_leg.Color = _G.SkeletonColor
-                            end
-                        end
-                    end
+                    skel_head.Visible = _G.EspSkeleton
+                    skel_torso.Visible = _G.EspSkeleton
+                    skel_left_lower_arm.Visible = _G.EspSkeleton
+                    skel_right_lower_arm.Visible = _G.EspSkeleton
+                    skel_left_lower_leg.Visible = _G.EspSkeleton
+                    skel_right_lower_leg.Visible = _G.EspSkeleton
+
+                    skel_head.Color = _G.SkeletonColor
+                    skel_torso.Color = _G.SkeletonColor
+                    skel_left_lower_arm.Color = _G.SkeletonColor
+                    skel_right_lower_arm.Color = _G.SkeletonColor
+                    skel_left_lower_leg.Color = _G.SkeletonColor
+                    skel_right_lower_leg.Color = _G.SkeletonColor
+                    
+                    skel_head.Transparency = _G.SkeletonTransparency
+                    skel_torso.Transparency = _G.SkeletonTransparency
+                    skel_left_lower_arm.Transparency = _G.SkeletonTransparency
+                    skel_right_lower_arm.Transparency = _G.SkeletonTransparency
+                    skel_left_lower_leg.Transparency = _G.SkeletonTransparency
+                    skel_right_lower_leg.Transparency = _G.SkeletonTransparency
+
+                    skel_head.Thickness = _G.SkeletonThickness
+                    skel_torso.Thickness = _G.SkeletonThickness
+                    skel_left_lower_arm.Thickness = _G.SkeletonThickness
+                    skel_right_lower_arm.Thickness = _G.SkeletonThickness
+                    skel_left_lower_leg.Thickness = _G.SkeletonThickness
+                    skel_right_lower_leg.Thickness = _G.SkeletonThickness
                 else
                     skel_head.Visible = false
                     skel_torso.Visible = false
@@ -528,6 +495,7 @@ local function draw6(player, character)
         end)
     end
     coroutine.wrap(update6)()
+    return skel_head, skel_torso, skel_left_upper_arm, skel_right_upper_arm, skel_left_lower_arm, skel_right_lower_arm, skel_left_upper_leg, skel_right_upper_leg, skel_left_lower_leg, skel_right_lower_leg
 end
 
 local function draw15(player, character)
@@ -546,70 +514,6 @@ local function draw15(player, character)
     local skel_leftUpperLeg = Drawing.new("Line")
     local skel_leftLowerLeg = Drawing.new("Line")
     local skel_leftFoot = Drawing.new("Line")
-
-    skel_head.Visible = _G.EspSkeleton
-    skel_upperTorso.Visible = _G.EspSkeleton
-    skel_lowerTorso.Visible = _G.EspSkeleton
-    skel_leftUpperArm.Visible = _G.EspSkeleton
-    skel_leftLowerArm.Visible = _G.EspSkeleton
-    skel_leftHand.Visible = _G.EspSkeleton
-    skel_rightUpperArm.Visible = _G.EspSkeleton
-    skel_rightLowerArm.Visible = _G.EspSkeleton
-    skel_rightHand.Visible = _G.EspSkeleton
-    skel_leftUpperLeg.Visible = _G.EspSkeleton
-    skel_leftLowerLeg.Visible = _G.EspSkeleton
-    skel_leftFoot.Visible = _G.EspSkeleton
-    skel_rightUpperLeg.Visible = _G.EspSkeleton
-    skel_rightLowerLeg.Visible = _G.EspSkeleton
-    skel_rightFoot.Visible = _G.EspSkeleton
-
-    skel_head.Color = _G.SkeletonColor
-    skel_upperTorso.Color = _G.SkeletonColor
-    skel_lowerTorso.Color = _G.SkeletonColor
-    skel_leftUpperArm.Color = _G.SkeletonColor
-    skel_leftLowerArm.Color = _G.SkeletonColor
-    skel_leftHand.Color = _G.SkeletonColor
-    skel_rightUpperArm.Color = _G.SkeletonColor
-    skel_rightLowerArm.Color = _G.SkeletonColor
-    skel_rightHand.Color = _G.SkeletonColor
-    skel_leftUpperLeg.Color = _G.SkeletonColor
-    skel_leftLowerLeg.Color = _G.SkeletonColor
-    skel_leftFoot.Color = _G.SkeletonColor
-    skel_rightUpperLeg.Color = _G.SkeletonColor
-    skel_rightLowerLeg.Color = _G.SkeletonColor
-    skel_rightFoot.Color = _G.SkeletonColor
-
-    skel_head.Transparency = _G.SkeletonTransparency
-    skel_upperTorso.Transparency = _G.SkeletonTransparency
-    skel_lowerTorso.Transparency = _G.SkeletonTransparency
-    skel_leftUpperArm.Transparency = _G.SkeletonTransparency
-    skel_leftLowerArm.Transparency = _G.SkeletonTransparency
-    skel_leftHand.Transparency = _G.SkeletonTransparency
-    skel_rightUpperArm.Transparency = _G.SkeletonTransparency
-    skel_rightLowerArm.Transparency = _G.SkeletonTransparency
-    skel_rightHand.Transparency = _G.SkeletonTransparency
-    skel_leftUpperLeg.Transparency = _G.SkeletonTransparency
-    skel_leftLowerLeg.Transparency = _G.SkeletonTransparency
-    skel_leftFoot.Transparency = _G.SkeletonTransparency
-    skel_rightUpperLeg.Transparency = _G.SkeletonTransparency
-    skel_rightLowerLeg.Transparency = _G.SkeletonTransparency
-    skel_rightFoot.Transparency = _G.SkeletonTransparency
-
-    skel_head.Thickness = _G.SkeletonThickness
-    skel_upperTorso.Thickness = _G.SkeletonThickness
-    skel_lowerTorso.Thickness = _G.SkeletonThickness
-    skel_leftUpperArm.Thickness = _G.SkeletonThickness
-    skel_leftLowerArm.Thickness = _G.SkeletonThickness
-    skel_leftHand.Thickness = _G.SkeletonThickness
-    skel_rightUpperArm.Thickness = _G.SkeletonThickness
-    skel_rightLowerArm.Thickness = _G.SkeletonThickness
-    skel_rightHand.Thickness = _G.SkeletonThickness
-    skel_leftUpperLeg.Thickness = _G.SkeletonThickness
-    skel_leftLowerLeg.Thickness = _G.SkeletonThickness
-    skel_leftFoot.Thickness = _G.SkeletonThickness
-    skel_rightUpperLeg.Thickness = _G.SkeletonThickness
-    skel_rightLowerLeg.Thickness = _G.SkeletonThickness
-    skel_rightFoot.Thickness = _G.SkeletonThickness
 
     local function update15()
         local connection
@@ -679,77 +583,69 @@ local function draw15(player, character)
                     skel_rightFoot.From = Vector2.new(rightLowerLeg_2d.X, rightLowerLeg_2d.Y)
                     skel_rightFoot.To = Vector2.new(rightFoot_2d.X, rightFoot_2d.Y)
 
-                    if _G.teamcheck then
-                        if _G.teamcheckmode == "colors" then
-                            if player.TeamColor == lplr.TeamColor then
-                                skel_head.Color = _G.teamcolor
-                                skel_upperTorso.Color = _G.teamcolor
-                                skel_lowerTorso.Color = _G.teamcolor
-                                skel_leftUpperArm.Color = _G.teamcolor
-                                skel_leftLowerArm.Color = _G.teamcolor
-                                skel_leftHand.Color = _G.teamcolor
-                                skel_rightUpperArm.Color = _G.teamcolor
-                                skel_rightLowerArm.Color = _G.teamcolor
-                                skel_rightHand.Color = _G.teamcolor
-                                skel_leftUpperLeg.Color = _G.teamcolor
-                                skel_leftLowerLeg.Color = _G.teamcolor
-                                skel_leftFoot.Color = _G.teamcolor
-                                skel_rightUpperLeg.Color = _G.teamcolor
-                                skel_rightLowerLeg.Color = _G.teamcolor
-                                skel_rightFoot.Color = _G.teamcolor
-                            else
-                                skel_head.Color = _G.enemycolor
-                                skel_upperTorso.Color = _G.enemycolor
-                                skel_lowerTorso.Color = _G.enemycolor
-                                skel_leftUpperArm.Color = _G.enemycolor
-                                skel_leftLowerArm.Color = _G.enemycolor
-                                skel_leftHand.Color = _G.enemycolor
-                                skel_rightUpperArm.Color = _G.enemycolor
-                                skel_rightLowerArm.Color = _G.enemycolor
-                                skel_rightHand.Color = _G.enemycolor
-                                skel_leftUpperLeg.Color = _G.enemycolor
-                                skel_leftLowerLeg.Color = _G.enemycolor
-                                skel_leftFoot.Color = _G.enemycolor
-                                skel_rightUpperLeg.Color = _G.enemycolor
-                                skel_rightLowerLeg.Color = _G.enemycolor
-                                skel_rightFoot.Color = _G.enemycolor
-                            end
-                        elseif _G.teamcheckmode == "invisible" then
-                            if player.TeamColor == lplr.TeamColor then
-                                skel_head.Visible = false
-                                skel_upperTorso.Visible = false
-                                skel_lowerTorso.Visible = false
-                                skel_leftUpperArm.Visible = false
-                                skel_leftLowerArm.Visible = false
-                                skel_leftHand.Visible = false
-                                skel_rightUpperArm.Visible = false
-                                skel_rightLowerArm.Visible = false
-                                skel_rightHand.Visible = false
-                                skel_leftUpperLeg.Visible = false
-                                skel_leftLowerLeg.Visible = false
-                                skel_leftFoot.Visible = false
-                                skel_rightUpperLeg.Visible = false
-                                skel_rightLowerLeg.Visible = false
-                                skel_rightFoot.Visible = false
-                            else
-                                skel_head.Color = _G.SkeletonColor
-                                skel_upperTorso.Color = _G.SkeletonColor
-                                skel_lowerTorso.Color = _G.SkeletonColor
-                                skel_leftUpperArm.Color = _G.SkeletonColor
-                                skel_leftLowerArm.Color = _G.SkeletonColor
-                                skel_leftHand.Color = _G.SkeletonColor
-                                skel_rightUpperArm.Color = _G.SkeletonColor
-                                skel_rightLowerArm.Color = _G.SkeletonColor
-                                skel_rightHand.Color = _G.SkeletonColor
-                                skel_leftUpperLeg.Color = _G.SkeletonColor
-                                skel_leftLowerLeg.Color = _G.SkeletonColor
-                                skel_leftFoot.Color = _G.SkeletonColor
-                                skel_rightUpperLeg.Color = _G.SkeletonColor
-                                skel_rightLowerLeg.Color = _G.SkeletonColor
-                                skel_rightFoot.Color = _G.SkeletonColor
-                            end
-                        end
-                    end
+                    skel_head.Visible = _G.EspSkeleton
+                    skel_upperTorso.Visible = _G.EspSkeleton
+                    skel_lowerTorso.Visible = _G.EspSkeleton
+                    skel_leftUpperArm.Visible = _G.EspSkeleton
+                    skel_leftLowerArm.Visible = _G.EspSkeleton
+                    skel_leftHand.Visible = _G.EspSkeleton
+                    skel_rightUpperArm.Visible = _G.EspSkeleton
+                    skel_rightLowerArm.Visible = _G.EspSkeleton
+                    skel_rightHand.Visible = _G.EspSkeleton
+                    skel_leftUpperLeg.Visible = _G.EspSkeleton
+                    skel_leftLowerLeg.Visible = _G.EspSkeleton
+                    skel_leftFoot.Visible = _G.EspSkeleton
+                    skel_rightUpperLeg.Visible = _G.EspSkeleton
+                    skel_rightLowerLeg.Visible = _G.EspSkeleton
+                    skel_rightFoot.Visible = _G.EspSkeleton
+
+                    skel_head.Color = _G.SkeletonColor
+                    skel_upperTorso.Color = _G.SkeletonColor
+                    skel_lowerTorso.Color = _G.SkeletonColor
+                    skel_leftUpperArm.Color = _G.SkeletonColor
+                    skel_leftLowerArm.Color = _G.SkeletonColor
+                    skel_leftHand.Color = _G.SkeletonColor
+                    skel_rightUpperArm.Color = _G.SkeletonColor
+                    skel_rightLowerArm.Color = _G.SkeletonColor
+                    skel_rightHand.Color = _G.SkeletonColor
+                    skel_leftUpperLeg.Color = _G.SkeletonColor
+                    skel_leftLowerLeg.Color = _G.SkeletonColor
+                    skel_leftFoot.Color = _G.SkeletonColor
+                    skel_rightUpperLeg.Color = _G.SkeletonColor
+                    skel_rightLowerLeg.Color = _G.SkeletonColor
+                    skel_rightFoot.Color = _G.SkeletonColor
+
+                    skel_head.Transparency = _G.SkeletonTransparency
+                    skel_upperTorso.Transparency = _G.SkeletonTransparency
+                    skel_lowerTorso.Transparency = _G.SkeletonTransparency
+                    skel_leftUpperArm.Transparency = _G.SkeletonTransparency
+                    skel_leftLowerArm.Transparency = _G.SkeletonTransparency
+                    skel_leftHand.Transparency = _G.SkeletonTransparency
+                    skel_rightUpperArm.Transparency = _G.SkeletonTransparency
+                    skel_rightLowerArm.Transparency = _G.SkeletonTransparency
+                    skel_rightHand.Transparency = _G.SkeletonTransparency
+                    skel_leftUpperLeg.Transparency = _G.SkeletonTransparency
+                    skel_leftLowerLeg.Transparency = _G.SkeletonTransparency
+                    skel_leftFoot.Transparency = _G.SkeletonTransparency
+                    skel_rightUpperLeg.Transparency = _G.SkeletonTransparency
+                    skel_rightLowerLeg.Transparency = _G.SkeletonTransparency
+                    skel_rightFoot.Transparency = _G.SkeletonTransparency
+
+                    skel_head.Thickness = _G.SkeletonThickness
+                    skel_upperTorso.Thickness = _G.SkeletonThickness
+                    skel_lowerTorso.Thickness = _G.SkeletonThickness
+                    skel_leftUpperArm.Thickness = _G.SkeletonThickness
+                    skel_leftLowerArm.Thickness = _G.SkeletonThickness
+                    skel_leftHand.Thickness = _G.SkeletonThickness
+                    skel_rightUpperArm.Thickness = _G.SkeletonThickness
+                    skel_rightLowerArm.Thickness = _G.SkeletonThickness
+                    skel_rightHand.Thickness = _G.SkeletonThickness
+                    skel_leftUpperLeg.Thickness = _G.SkeletonThickness
+                    skel_leftLowerLeg.Thickness = _G.SkeletonThickness
+                    skel_leftFoot.Thickness = _G.SkeletonThickness
+                    skel_rightUpperLeg.Thickness = _G.SkeletonThickness
+                    skel_rightLowerLeg.Thickness = _G.SkeletonThickness
+                    skel_rightFoot.Thickness = _G.SkeletonThickness
                 else
                     skel_head.Visible = false
                     skel_upperTorso.Visible = false
@@ -792,6 +688,7 @@ local function draw15(player, character)
         end)
     end
     coroutine.wrap(update15)()
+    return skel_head, skel_upperTorso, skel_lowerTorso, skel_leftUpperArm, skel_leftLowerArm, skel_leftHand, skel_rightUpperArm, skel_rightLowerArm, skel_rightHand, skel_leftUpperLeg, skel_leftLowerLeg, skel_leftFoot, skel_rightUpperLeg,skel_rightLowerLeg, skel_rightFoot
 end
 
 local function hideSkeleton(character)
@@ -843,81 +740,78 @@ local function hideSkeleton(character)
     end
 end
 
+local function draw(player, character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+
+    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+        draw6(player, character)
+    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
+        draw15(player, character)
+    end
+
+    humanoid.Died:Connect(function()
+        print("Character died: " .. character.Name)
+        wait(0.025)
+        hideSkeleton(character)
+    end)
+end
+
+local function clearLines(character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+    wait(0.025)
+    hideSkeleton(character)
+end
+
+local function onCharacterAdded(player, character)
+    print("Character added: " .. character.Name)
+    wait(0.025)
+    coroutine.wrap(draw)(player, character)
+end
+
+local function onCharacterRemoving(player)
+    if player.Character then
+        print("Character removing: " .. player.Character.Name)
+        clearLines(player.Character)
+    end
+end
+
+local function onPlayerAdded(player)
+    print("Player added: " .. player.Name)
+    if player.Character then
+        wait(0.025)
+        onCharacterAdded(player, player.Character)
+    end
+    player.CharacterAdded:Connect(function(character)
+        wait(0.025)
+        onCharacterAdded(player, character)
+    end)
+    player.CharacterRemoving:Connect(function()
+        wait(0.025)
+        onCharacterRemoving(player)
+    end)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    wait(0.025)
+    if player ~= LocalPlayer then
+        onPlayerAdded(player)
+    end
+end
+
+game.Players.PlayerAdded:Connect(onPlayerAdded)
+
 _G.EspSkeleton = false
 _G.SkeletonColor = Color3.new(1, 0, 0)
 _G.SkeletonTransparency = 1
 _G.SkeletonThickness = 1.4
-
-local camera = workspace.CurrentCamera
-local plrs = game:GetService("Players")
-local lplr = plrs.LocalPlayer
-
-local function drawhit(player)
-    local lookangle = Drawing.new("Line")
-    lookangle.Thickness = _G.LookAngleThickness
-    lookangle.Transparency = _G.LookAngleTransparency
-    lookangle.Color = _G.LookAngleColor
-    lookangle.Visible = false
-
-    local function update()
-        local c
-        c = game:GetService("RunService").RenderStepped:Connect(function()
-            if player and player.Character and player.Character:FindFirstChild("Head") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
-                for idx = 10, 1, -1 do
-                    local rayparams = RaycastParams.new()
-                    rayparams.FilterDescendantsInstances = {camera, player.Character}
-                    rayparams.FilterType = Enum.RaycastFilterType.Blacklist
-                    
-                    local rayhit = workspace:Raycast(player.Character.Head.Position, player.Character.Head.CFrame.LookVector * idx, rayparams)
-                    if rayhit then
-                        local viewportpointhit, isOnScreen = camera:WorldToViewportPoint(rayhit.Position)
-                        local headpos = camera:WorldToViewportPoint(player.Character.Head.Position)
-
-                        if isOnScreen then
-                            lookangle.From = Vector2.new(headpos.X, headpos.Y)
-                            lookangle.To = Vector2.new(viewportpointhit.X, viewportpointhit.Y)
-                            lookangle.Visible = _G.LookAngles
-
-                            if _G.teamcheck then
-                                if _G.teamcheckmode == "colors" then
-                                    if player.TeamColor == lplr.TeamColor then
-                                        lookangle.Color = _G.teamcolor
-                                    else
-                                        lookangle.Color = _G.enemycolor
-                                    end
-                                elseif _G.teamcheckmode == "invisible" then
-                                    if player.TeamColor == lplr.TeamColor then
-                                        lookangle.Visible = false
-                                    else
-                                        lookangle.Color = _G.LookAngleColor
-                                    end
-                                end
-                            end
-                            break
-                        end
-                    else
-                        lookangle.Visible = false
-                    end
-                end
-            else
-                if not player.Character then
-                    c:Disconnect()
-                end
-                lookangle.Visible = false
-            end
-        end)
-    end
-    coroutine.wrap(update)()
-end
-
-
-
-
-
-_G.LookAngles = true
-_G.LookAngleThickness = 1.4
-_G.LookAngleTransparency = 1
-_G.LookAngleColor = Color3.new(1, 0, 0)
 
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
@@ -1100,7 +994,7 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Show Tracers",
+    Name = "Show Tracer",
     CurrentValue = false,
     Flag = "Tracer",
     Callback = function(Value)
@@ -1109,7 +1003,7 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Show Skeletons",
+    Name = "Show Skeleton",
     CurrentValue = false,
     Flag = "Skeleton",
     Callback = function(Value)
@@ -1118,16 +1012,7 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Show Look Angles",
-    CurrentValue = false,
-    Flag = "LookAngles",
-    Callback = function(Value)
-        _G.LookAngles = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Names",
+    Name = "Show Name",
     CurrentValue = false,
     Flag = "Name",
     Callback = function(Value)
@@ -1136,7 +1021,7 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Show Distances",
+    Name = "Show Distance",
     CurrentValue = false,
     Flag = "Distance",
     Callback = function(Value)
@@ -1195,7 +1080,7 @@ Tab1:CreateColorPicker({
 })
 
 Tab1:CreateColorPicker({
-    Name = "Tracers Color",
+    Name = "Tracer Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "TracerColor",
     Callback = function(Value)
@@ -1204,20 +1089,11 @@ Tab1:CreateColorPicker({
 })
 
 Tab1:CreateColorPicker({
-    Name = "Skeletons Color",
+    Name = "Skeleton Color",
     Color = Color3.fromRGB(255, 255, 255),
     Flag = "Skeleton Color",
     Callback = function(Value)
         _G.SkeletonColor = Value
-    end
-})
-
-Tab1:CreateColorPicker({
-    Name = "Look Angles Color",
-    Color = Color3.fromRGB(255, 255, 255),
-    Flag = "Look Angle Color",
-    Callback = function(Value)
-        _G.LookAngleColor = Value
     end
 })
 
@@ -1260,7 +1136,7 @@ Tab1:CreateSlider({
 })
 
 Tab1:CreateSlider({
-    Name = "Tracers Transparency",
+    Name = "Tracer Transparency",
     Range = {0, 1},
     Increment = .05,
     Suffix = "",
@@ -1272,7 +1148,7 @@ Tab1:CreateSlider({
 })
 
 Tab1:CreateSlider({
-    Name = "Skeletons Transparency",
+    Name = "Skeleton Transparency",
     Range = {0, 1},
     Increment = 0.05,
     Suffix = "",
@@ -1280,18 +1156,6 @@ Tab1:CreateSlider({
     Flag = "SkeletonTransparency",
     Callback = function(Value)
         _G.SkeletonTransparency = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Look Angles Transparency",
-    Range = {0, 1},
-    Increment = 0.05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "LookAngleTransparency",
-    Callback = function(Value)
-        _G.LookAngleTransparency = Value
     end,
 })
 
@@ -1322,7 +1186,7 @@ Tab1:CreateSlider({
 })
 
 Tab1:CreateSlider({
-    Name = "Tracers Thickness",
+    Name = "Tracer Thickness",
     Range = {0, 3},
     Increment = .05,
     Suffix = "",
@@ -1334,7 +1198,7 @@ Tab1:CreateSlider({
 })
 
 Tab1:CreateSlider({
-    Name = "Skeletons Thickness",
+    Name = "Skeleton Thickness",
     Range = {0, 3},
     Increment = 0.05,
     Suffix = "",
@@ -1342,18 +1206,6 @@ Tab1:CreateSlider({
     Flag = "SkeletonThickness",
     Callback = function(Value)
         _G.SkeletonThickness = Value
-    end,
-})
-
-Tab1:CreateSlider({
-    Name = "Look Angles Thickness",
-    Range = {0, 1},
-    Increment = 0.05,
-    Suffix = "",
-    CurrentValue = 1,
-    Flag = "LookAngleThickness",
-    Callback = function(Value)
-        _G.LookAngleThickness = Value
     end,
 })
 
@@ -1372,7 +1224,7 @@ Tab1:CreateDropdown({
 
 Tab1:CreateDropdown({
     Name = "Health Bar Position",
-    Options = {"Left", "Right", "Top", "Bottom"},
+    Options = {"Left", "Right", "Top", Bottom},
     CurrentOption = {"Left"},
     MultipleOptions = false,
     Flag = "HealthBarPosition",
@@ -1382,7 +1234,7 @@ Tab1:CreateDropdown({
 })
 
 Tab1:CreateDropdown({
-    Name = "Tracers From",
+    Name = "Tracer From",
     Options = {"Bottom", "Middle", "Top"},
     CurrentOption = {"Bottom"},
     MultipleOptions = false,
@@ -1393,77 +1245,3 @@ Tab1:CreateDropdown({
 })
 
 Rayfield:LoadConfiguration()
-
-local function draw(player, character)
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then
-        print("Humanoid not found in character: " .. character.Name)
-        return
-    end
-
-    if humanoid.RigType == Enum.HumanoidRigType.R6 then
-        draw6(player, character)
-    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
-        draw15(player, character)
-    end
-
-    humanoid.Died:Connect(function()
-        wait(0.025)
-        hideSkeleton(character)
-    end)
-end
-
-local function clearLines(character)
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then
-        print("Humanoid not found in character: " .. character.Name)
-        return
-    end
-    wait(0.025)
-    hideSkeleton(character)
-end
-
-local function onCharacterAdded(player, character)
-    wait(0.025)
-    coroutine.wrap(draw)(player, character)
-end
-
-local function onCharacterRemoving(player)
-    if player.Character then
-        clearLines(player.Character)
-    end
-end
-
-local function onPlayerAdded(player)
-    if player.Character then
-        wait(0.025)
-        onCharacterAdded(player, player.Character)
-    end
-    player.CharacterAdded:Connect(function(character)
-        wait(0.025)
-        onCharacterAdded(player, character)
-    end)
-    player.CharacterRemoving:Connect(function()
-        wait(0.025)
-        onCharacterRemoving(player)
-    end)
-end
-
-for _, player in pairs(game.Players:GetPlayers()) do
-    wait(0.025)
-    if player ~= LocalPlayer then
-        onPlayerAdded(player)
-    end
-end
-
-game.Players.PlayerAdded:Connect(onPlayerAdded)
-
-for i, v in next, plrs:GetPlayers() do
-    if v ~= lplr then
-        coroutine.wrap(drawhit)(v)
-    end
-end
-
-plrs.PlayerAdded:Connect(function(v)
-    coroutine.wrap(drawhit)(v)
-end)
