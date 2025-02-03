@@ -8,13 +8,6 @@ local worldToViewportPoint = currentCamera.worldToViewportPoint
 local HeadOff = Vector3.new(0, 0.5, 0)
 local LegOff = Vector3.new(0, 3, 0)
 
-
-local esp = ""
-
-ESP.Enabled = true;
-ESP.ShowName = false;
-ESP.ShowDistance = false;
-
 _G.temcheck = false
 _G.temcheckmode = "colors"
 _G.teamcolor = Color3.new(0, 1, 0)
@@ -1119,31 +1112,11 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
-    Name = "Show Names",
-    CurrentValue = false,
-    Flag = "Name",
-    Callback = function(Value)
-        ESP.ShowName = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Distances",
-    CurrentValue = false,
-    Flag = "Distance",
-    Callback = function(Value)
-        ESP.ShowDistance = Value
-    end,
-})
-
-Tab1:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
     Callback = function(Value)
         _G.teamcheck = Value
-        ESP.Teamcheck = Value
-        getfenv().EspSettings.TeamCheck = Value
     end,
 })
 
