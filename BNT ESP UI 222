@@ -910,16 +910,6 @@ local function drawhit(player)
     coroutine.wrap(update)()
 end
 
-for i, v in next, plrs:GetPlayers() do
-    if v ~= lplr then
-        coroutine.wrap(drawhit)(v)
-    end
-end
-
-plrs.PlayerAdded:Connect(function(v)
-    coroutine.wrap(drawhit)(v)
-end)
-
 _G.LookAngles = true
 _G.LookAngleThickness = 1.4
 _G.LookAngleTransparency = 1
@@ -1463,3 +1453,13 @@ for _, player in pairs(game.Players:GetPlayers()) do
 end
 
 game.Players.PlayerAdded:Connect(onPlayerAdded)
+
+for i, v in next, plrs:GetPlayers() do
+    if v ~= lplr then
+        coroutine.wrap(drawhit)(v)
+    end
+end
+
+plrs.PlayerAdded:Connect(function(v)
+    coroutine.wrap(drawhit)(v)
+end)
