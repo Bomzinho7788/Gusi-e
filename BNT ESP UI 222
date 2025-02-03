@@ -577,7 +577,7 @@ Tab1:CreateToggle({
 Tab1:CreateToggle({
     Name = "Show Tracer",
     CurrentValue = false,
-    Flag = "Name",
+    Flag = "Tracer",
     Callback = function(Value)
         _G.TracerVisible = Value
     end,
