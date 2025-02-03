@@ -65,30 +65,30 @@ local function createEsp(player)
         }),
         boxOutline = create("Square", {
             Color = ESP_SETTINGS.BoxOutlineColor,
-            Thickness = 3,
+            Thickness = 0,
             Filled = false
         }),
         box = create("Square", {
             Color = ESP_SETTINGS.BoxColor,
-            Thickness = 1,
+            Thickness = ESP_SETTINGS.BoxThickness,
             Filled = false
         }),
         name = create("Text", {
             Color = ESP_SETTINGS.NameColor,
             Outline = true,
             Center = true,
-            Size = 
+            Size = 9
         }),
         healthOutline = create("Line", {
-            Thickness = 3,
+            Thickness = 2,
             Color = ESP_SETTINGS.HealthOutlineColor
         }),
         health = create("Line", {
             Thickness = 1
         }),
         distance = create("Text", {
-            Color = Color3.new(1, 1, 1),
-            Size = 8,
+            Color = ESP_SETTINGS.DistanceColor,
+            Size = 9,
             Outline = true,
             Center = true
         }),
@@ -132,12 +132,19 @@ local function removeEsp(player)
     cache[player] = nil
 end
 
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
+
 local function updateEsp()
     for player, esp in pairs(cache) do
         local character, team = player.Character, player.Team
         if character and (not ESP_SETTINGS.Teamcheck or (team and team ~= localPlayer.Team)) then
-            local rootPart = character:FindFirstChild("HumanoidRootPart")
-            local head = character:FindFirstChild("Head")
+            local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
+            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
+            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
+            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+
             local humanoid = character:FindFirstChild("Humanoid")
             local isBehindWall = ESP_SETTINGS.WallCheck and isPlayerBehindWall(player)
             local shouldShow = not isBehindWall and ESP_SETTINGS.Enabled
@@ -145,9 +152,9 @@ local function updateEsp()
                 local position, onScreen = camera:WorldToViewportPoint(rootPart.Position)
                 if onScreen then
                     local hrp2D = camera:WorldToViewportPoint(rootPart.Position)
-                    local charSize = (camera:WorldToViewportPoint(rootPart.Position - Vector3.new(0, 3, 0)).Y - camera:WorldToViewportPoint(rootPart.Position + Vector3.new(0, 2.6, 0)).Y) / 2
-                    local boxSize = Vector2.new(math.floor(charSize * 1.8), math.floor(charSize * 1.9))
-                    local boxPosition = Vector2.new(math.floor(hrp2D.X - charSize * 1.8 / 2), math.floor(hrp2D.Y - charSize * 1.6 / 2))
+
+                    local boxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    local boxPosition = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
 
                     if ESP_SETTINGS.ShowName and ESP_SETTINGS.Enabled then
                         esp.name.Visible = true
