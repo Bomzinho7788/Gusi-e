@@ -69,7 +69,7 @@ local function createDrawingObjects()
     HealthBar.Filled = _G.HealthBarFilled
 
     local HealthBarOutline = Drawing.new("Square")
-    HealthBarOutline.Thickness = _G.HealthBarThickness
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
     HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
@@ -100,7 +100,7 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
 
-    HealthBarOutline.Thickness = _G.HealthBarThickness
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
     HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
@@ -167,7 +167,7 @@ local function setupPlayerBox(v)
     local Box, BoxFilled, HealthBar, Tracer, HealthBarOutline = createDrawingObjects()
 
     game:GetService("RunService").RenderStepped:Connect(function()
-        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBarOutline)
 
         if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -337,7 +337,6 @@ local function getClosestPlayer()
                 continue
             end
 
-            -- Verifica se o jogador está vivo
             if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
                 if isPlayerInFOV(player) and isInFrontOfCamera(player) then
                     local charPart = player.Character:FindFirstChild(_G.targetPart)
