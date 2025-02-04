@@ -3,7 +3,6 @@ local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local currentCamera = camera
-local worldToViewportPoint = currentCamera.worldToViewportPoint
 local cache = {}
 
 local bones = {
@@ -93,11 +92,6 @@ local function createEsp(player)
             Outline = true,
             Center = true
         }),
-        tracer = create("Line", {
-            Thickness = ESP_SETTINGS.TracerThickness,
-            Color = ESP_SETTINGS.TracerColor,
-            Transparency = 1
-        }),
         boxLines = {},
     }
 
@@ -107,14 +101,10 @@ end
 
 local function isPlayerBehindWall(player)
     local character = player.Character
-    if not character then
-        return false
-    end
+    if not character then return false end
 
     local rootPart = character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then
-        return false
-    end
+    if not rootPart then return false end
 
     local ray = Ray.new(camera.CFrame.Position, (rootPart.Position - camera.CFrame.Position).Unit * (rootPart.Position - camera.CFrame.Position).Magnitude)
     local hit, position = workspace:FindPartOnRayWithIgnoreList(ray, {localPlayer.Character, character})
@@ -135,24 +125,25 @@ end
 
 local function updateEsp()
     for player, esp in pairs(cache) do
-        local character, team = player.Character, player.Team
+        local character = player.Character
+        local team = player.Team
         if character and (not ESP_SETTINGS.Teamcheck or (team and team ~= localPlayer.Team)) then
-            local RootPart = player.Character.HumanoidRootPart
-            local Head = player.Character.Head
-            local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
-            local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
-            local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
+            local RootPart = character:FindFirstChild("HumanoidRootPart")
+            local Head = character:FindFirstChild("Head")
+            local RootPosition, RootVis = currentCamera:WorldToViewportPoint(RootPart.Position)
+            local HeadPosition = currentCamera:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.5, 0))
+            local LegPosition = currentCamera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0))
 
             local humanoid = character:FindFirstChild("Humanoid")
             local isBehindWall = ESP_SETTINGS.WallCheck and isPlayerBehindWall(player)
             local shouldShow = not isBehindWall and ESP_SETTINGS.Enabled
-            if rootPart and head and humanoid and shouldShow then
-                local position, onScreen = camera:WorldToViewportPoint(rootPart.Position)
+            if RootPart and Head and humanoid and shouldShow then
+                local position, onScreen = currentCamera:WorldToViewportPoint(RootPart.Position)
                 if onScreen then
-                    local hrp2D = camera:WorldToViewportPoint(rootPart.Position)
+                    local hrp2D = currentCamera:WorldToViewportPoint(RootPart.Position)
 
                     local boxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    local boxPosition = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    local boxPosition = Vector2.new(RootPosition.X - boxSize.X / 2, RootPosition.Y - boxSize.Y / 2)
 
                     if ESP_SETTINGS.ShowName and ESP_SETTINGS.Enabled then
                         esp.name.Visible = true
