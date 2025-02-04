@@ -135,8 +135,8 @@ local function updateEsp()
     for player, esp in pairs(cache) do
         local character, team = player.Character, player.Team
         if character and (not ESP_SETTINGS.Teamcheck or (team and team ~= localPlayer.Team)) then
-            local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
+            local RootPart = character.HumanoidRootPart
+            local Head = character.Head
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
             local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
             local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
