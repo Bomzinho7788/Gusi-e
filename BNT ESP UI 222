@@ -69,8 +69,8 @@ local function createDrawingObjects()
     HealthBar.Filled = _G.HealthBarFilled
 
     local HealthBarOutline = Drawing.new("Square")
-    HealthBarOutline.Thickness = 2
-    HealthBarOutline.Visible = _G.HealthBarOutline
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -84,7 +84,7 @@ local function createDrawingObjects()
     return Box, BoxFilled, HealthBar, Tracer, HealthBarOutline
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBaro)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBarOutline)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -100,8 +100,8 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
 
-    HealthBarOutline.Thickness = 2
-    HealthBarOutline.Visible = _G.HealthBarOutline
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -194,7 +194,7 @@ local function setupPlayerBox(v)
                 updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
-                HealthBarOutline.Visible = _G.HealthBarOutline
+                HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
 
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
