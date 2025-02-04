@@ -171,7 +171,7 @@ local function setupPlayerBox(v)
 
         if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-
+            wait(0.1)
             local RootPart = v.Character.HumanoidRootPart
             local Head = v.Character.Head
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
