@@ -70,7 +70,7 @@ local function createDrawingObjects()
 
     local HealthBarOutline = Drawing.new("Square")
     HealthBarOutline.Thickness = _G.HealthBarThickness
-    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
+    HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -101,7 +101,7 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     HealthBar.Filled = _G.HealthBarFilled
 
     HealthBarOutline.Thickness = _G.HealthBarThickness
-    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
+    HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -995,6 +995,15 @@ Tab1:CreateToggle({
     Flag = "healthbarouf",
     Callback = function(Value)
         _G.HealthBarVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Health Bar Outline",
+    CurrentValue = false,
+    Flag = "healtthbarouf",
+    Callback = function(Value)
+        _G.HealthBarOutline = Value
     end,
 })
 
