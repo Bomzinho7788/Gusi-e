@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
+local currentCamera = camera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
 local cache = {}
 
 local bones = {
@@ -135,8 +137,8 @@ local function updateEsp()
     for player, esp in pairs(cache) do
         local character, team = player.Character, player.Team
         if character and (not ESP_SETTINGS.Teamcheck or (team and team ~= localPlayer.Team)) then
-            local RootPart = character.HumanoidRootPart
-            local Head = character.Head
+            local RootPart = player.Character.HumanoidRootPart
+            local Head = player.Character.Head
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
             local HeadPosition = worldToViewportPoint(currentCamera, Head.Position + HeadOff)
             local LegPosition = worldToViewportPoint(currentCamera, RootPart.Position - LegOff)
