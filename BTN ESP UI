@@ -44,7 +44,7 @@ local ESP_SETTINGS = {
     TracerThickness = 2,
     SkeletonsColor = Color3.new(1, 1, 1),
     TracerPosition = "Bottom",
-    DistanceColor,
+    DistanceColor = Color3.new(1, 1, 1),
 }
 
 local function create(class, properties)
