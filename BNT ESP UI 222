@@ -6,7 +6,7 @@ local currentCamera = workspace.CurrentCamera
 local worldToViewportPoint = currentCamera.worldToViewportPoint
 
 local HeadOff = Vector3.new(0, 0.5, 0)
-local LegOff = Vector3.new(0, 4, 0)
+local LegOff = Vector3.new(0, 3, 0)
 
 _G.temcheck = false
 _G.temcheckmode = "colors"
@@ -70,7 +70,7 @@ local function createDrawingObjects()
 
     local HealthBarOutline = Drawing.new("Square")
     HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
-    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
+    HealthBarOutline.Visible = false
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -101,7 +101,7 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     HealthBar.Filled = _G.HealthBarFilled
 
     HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
-    HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
+    HealthBarOutline.Visible = false
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
     HealthBarOutline.Filled = true
@@ -171,7 +171,7 @@ local function setupPlayerBox(v)
 
         if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= lplr and v.Character.Humanoid.Health > 0 then
             local Vector, onScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-            wait(0.1)
+
             local RootPart = v.Character.HumanoidRootPart
             local Head = v.Character.Head
             local RootPosition, RootVis = worldToViewportPoint(currentCamera, RootPart.Position)
@@ -194,7 +194,7 @@ local function setupPlayerBox(v)
                 updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
-                HealthBarOutline.Visible = _G.HealthBarOutline and _G.HealthBarVisible
+                HealthBarOutline.Visible = false
 
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
@@ -994,15 +994,6 @@ Tab1:CreateToggle({
     Flag = "healthbarouf",
     Callback = function(Value)
         _G.HealthBarVisible = Value
-    end,
-})
-
-Tab1:CreateToggle({
-    Name = "Show Health Bar Outline",
-    CurrentValue = false,
-    Flag = "healtthbarouf",
-    Callback = function(Value)
-        _G.HealthBarOutline = Value
     end,
 })
 
