@@ -68,16 +68,23 @@ local function createDrawingObjects()
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
 
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = _G.HealthBarThickness * 2
+    HealthBarOutline.Visible = _G.HealthBarOutline and _G._G.HealthBarVisible
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Color = Color3.new(0, 0, 0)
+    HealthBarOutline.Filled = true
+
     local Tracer = Drawing.new("Line")
     Tracer.Visible = _G.TracerVisible
     Tracer.Thickness = _G.TracerThickness
     Tracer.Transparency = _G.TracerTransparency
     Tracer.Color = _G.TracerColor
 
-    return Box, BoxFilled, HealthBar, Tracer
+    return Box, BoxFilled, HealthBar, Tracer, HealthBarOutline
 end
 
-local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBaro)
     Box.Color = _G.boxColor
     Box.Thickness = _G.boxThickness
     Box.Transparency = _G.boxTransparency
@@ -92,6 +99,12 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
     HealthBar.Transparency = _G.HealthBarTransparency
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
+
+    HealthBarOutline.Thickness = _G.HealthBarThickness * 2
+    HealthBarOutline.Visible = _G.HealthBarOutline and _G._G.HealthBarVisible
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Color = Color3.new(0, 0, 0)
+    HealthBarOutline.Filled = true
 
     Tracer.Visible = _G.TracerVisible
     Tracer.Thickness = _G.TracerThickness
@@ -112,7 +125,7 @@ local function getHealthValues(player)
     return maxHealth, health
 end
 
-local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
+local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
     local offset = isOutline and 6 or 4
     local healthRatio = math.clamp(health / maxHealth, 0, 1)
 
@@ -120,26 +133,38 @@ local function updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition
         local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
         HealthBar.Size = Vector2.new(2, healthBarSize)
         HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) -- Começa de cima e desce
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
 
     elseif _G.HealthBarPosition == "Right" then
         local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
         HealthBar.Size = Vector2.new(2, healthBarSize)
         HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y) -- Começa de cima e desce
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
 
     elseif _G.HealthBarPosition == "Bottom" then
         local healthBarSize = Box.Size.X * healthRatio
         HealthBar.Size = Vector2.new(healthBarSize, 2)
         HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset) -- Começa da direita e diminui para a esquerda
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
 
     elseif _G.HealthBarPosition == "Top" then
         local healthBarSize = Box.Size.X * healthRatio
         HealthBar.Size = Vector2.new(healthBarSize, 2)
         HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset) -- Começa da direita e diminui para a esquerda
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
     end
 end
 
 local function setupPlayerBox(v)
-    local Box, BoxFilled, HealthBar, Tracer = createDrawingObjects()
+    local Box, BoxFilled, HealthBar, Tracer, HealthBarOutline = createDrawingObjects()
 
     game:GetService("RunService").RenderStepped:Connect(function()
         updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer)
@@ -165,11 +190,12 @@ local function setupPlayerBox(v)
                 BoxFilled.Visible = _G.boxFilledVisible
 
                 HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
-                updateHealthBarPosition(HealthBar, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+                updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
+                HealthBarOutline.Visible = _G.HealthBarOutline and _G._G.HealthBarVisible
 
-                -- Atualizando a posição do Tracer
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
