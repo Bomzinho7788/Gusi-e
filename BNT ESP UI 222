@@ -69,7 +69,7 @@ local function createDrawingObjects()
     HealthBar.Filled = _G.HealthBarFilled
 
     local HealthBarOutline = Drawing.new("Square")
-    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Thickness = 2
     HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
@@ -100,7 +100,7 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     HealthBar.Color = _G.HealthBarColor
     HealthBar.Filled = _G.HealthBarFilled
 
-    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Thickness = 2
     HealthBarOutline.Visible = _G.HealthBarOutline
     HealthBarOutline.Transparency = 1
     HealthBarOutline.Color = Color3.new(0, 0, 0)
