@@ -56,7 +56,7 @@ RunService.RenderStepped:Connect(function()
                 box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
                 box.TopLeftVertical.From = BoxPosition
-                box.TopLeftVertical.To = box.TopLeftVertical.From + Vector2.new(0, -cornerLength)
+                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
                 
                 box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                 box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
@@ -68,7 +68,7 @@ RunService.RenderStepped:Connect(function()
                 box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
                 
                 box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                box.BottomLeftVertical.To = box.BottomLeftVertical.From - Vector2.new(0, cornerLength)
+                box.BottomLeftVertical.To = box.BottomLeftVertical.From + Vector2.new(0, cornerLength)
                 
                 box.BottomRight.From = BoxPosition + BoxSize
                 box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
