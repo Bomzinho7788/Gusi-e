@@ -239,7 +239,7 @@ local function setupPlayerBox(v)
                     CornerBox.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
                 
                     CornerBox.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                    CornerBox.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
+                    CornerBox.TopRight.To = CornerBox.TopRight.From - Vector2.new(cornerLength, 0)
                 
                     CornerBox.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                     CornerBox.TopRightVertical.To = CornerBox.TopRightVertical.From + Vector2.new(0, -cornerLength)
