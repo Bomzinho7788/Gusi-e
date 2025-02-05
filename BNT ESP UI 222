@@ -137,6 +137,10 @@ end
 
 local cornerBox = CreateCornerBox()
 
+game:GetService("RunService").RenderStepped:Connect(function()
+    UpdateCornerBox(cornerBox)
+end)
+
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
     Box.Color = _G.boxColor
