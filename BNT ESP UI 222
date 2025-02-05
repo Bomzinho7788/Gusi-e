@@ -61,7 +61,7 @@ local function getHealthValues(player)
     return maxHealth, health
 end
 
-local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health, CornerBox)
+local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health, CornerBox, BoxPosition)
     local offset = isOutline and 6 or 4
     local healthRatio = math.clamp(health / maxHealth, 0, 1)
 
@@ -70,7 +70,7 @@ local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPos
         HealthBar.Size = Vector2.new(2, healthBarSize)
         HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
         
-         HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
         HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
 
     elseif _G.HealthBarPosition == "Right" then
@@ -78,7 +78,7 @@ local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPos
         HealthBar.Size = Vector2.new(2, healthBarSize)
         HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
         
-         HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
         HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
 
     elseif _G.HealthBarPosition == "Bottom" then
@@ -86,7 +86,7 @@ local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPos
         HealthBar.Size = Vector2.new(healthBarSize, 2)
         HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset)
         
-         HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
         HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
 
     elseif _G.HealthBarPosition == "Top" then
@@ -212,27 +212,28 @@ local function setupPlayerBox(v)
             if onScreen then
                 local maxHealth, health = getHealthValues(v)
 
-                if _G.BoxType == "Normal Box" then
-                    for _, line in pairs(CornerBox) do
-                        line.Transparency = 0
-                    end
-
-                    Box.Transparency = 1
-                    BoxFilled.Transparency = 0.5
-
-                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = _G.boxVisible
 
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = _G.boxFilledVisible
+
+                if _G.BoxType == "Normal Box" then
+                    for _, line in pairs(CornerBox) do
+                        line.Transparency = 0
+                    end
+
+                    Box.Transparency = _G.boxTransparency
+                    BoxFilled.Transparency = _G.boxFilledTransparency
+
                 elseif _G.BoxType == "Corner Box" then
                     local BoxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                     local cornerLength = BoxSize.X * 0.2
                     for _, line in pairs(CornerBox) do
-                        line.Transparency = 1
+                        line.Transparency = _G.boxTransparency
                     end
                     Box.Transparency = 0
                     BoxFilled.Transparency = 0
