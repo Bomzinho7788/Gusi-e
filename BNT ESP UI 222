@@ -826,6 +826,73 @@ end
 
 game.Players.PlayerAdded:Connect(onPlayerAdded)
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+_G.HighlightEnabled = false
+_G.HighlightColor = Color3.fromRGB(255, 255, 0)
+_G.HighlightTransparency = 1
+
+_G.OutlineEnabled = false
+_G.OutlineColor = Color3.fromRGB(255, 0, 0)
+_G.OutlineTransparency = 1
+
+local function applyHighlight(player)
+    if player == lplr then return end
+
+    local character = player.Character
+    if not character then return end
+
+    local highlight = character:FindFirstChildOfClass("Highlight")
+    if not highlight then
+        highlight = Instance.new("Highlight")
+        highlight.Parent = character
+    end
+
+    if _G.HighlightEnabled then
+        highlight.Enabled = true
+        highlight.FillTransparency = _G.HighlightTransparency
+        highlight.OutlineTransparency = _G.OutlineTransparency
+        highlight.FillColor = _G.HighlightColor
+        highlight.OutlineColor = _G.OutlineColor
+
+        if _G.temcheck then
+            if _G.temcheckmode == "colors" then
+                if player.TeamColor == lplr.TeamColor then
+                    highlight.FillColor = _G.teamcolor
+                    highlight.OutlineColor = _G.teamcolor
+                else
+                    highlight.FillColor = _G.enemycolor
+                    highlight.OutlineColor = _G.enemycolor
+                end
+            elseif _G.temcheckmode == "invisible" then
+                if player.TeamColor == lplr.TeamColor then
+                    highlight.Enabled = false
+                end
+            end
+        end
+    else
+        highlight.Enabled = false
+    end
+end
+
+function _G.UpdateHighlight()
+    for _, player in ipairs(Players:GetPlayers()) do
+        applyHighlight(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.025)
+        applyHighlight(player)
+    end)
+end)
+
+RunService.RenderStepped:Connect(function()
+    _G.UpdateHighlight()
+end)
+
 local Window = Rayfield:CreateWindow({
     Name = "BNT ESP",
     Icon = 0,
@@ -1025,6 +1092,24 @@ Tab1:CreateToggle({
 })
 
 Tab1:CreateToggle({
+    Name = "Enable Chams",
+    CurrentValue = false,
+    Flag = "Chams",
+    Callback = function(Value)
+        _G.HighlightEnabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Enable Chams Outline",
+    CurrentValue = false,
+    Flag = "ChamsOutline",
+    Callback = function(Value)
+        _G.OutlineEnabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
     Name = "Teamcheck",
     CurrentValue = false,
     Flag = "teamcheck",
@@ -1041,7 +1126,6 @@ Tab1:CreateColorPicker({
     Flag = "teamcolor",
     Callback = function(Value)
         _G.teamcolor = Value
-        green = Value
     end
 })
 
@@ -1087,6 +1171,24 @@ Tab1:CreateColorPicker({
     Flag = "Skeleton Color",
     Callback = function(Value)
         _G.SkeletonColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Chams Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Chams Color",
+    Callback = function(Value)
+        _G.HighlightColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Chams Outline Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Chams Outline Color",
+    Callback = function(Value)
+        _G.OutlineColor = Value
     end
 })
 
@@ -1149,6 +1251,30 @@ Tab1:CreateSlider({
     Flag = "SkeletonTransparency",
     Callback = function(Value)
         _G.SkeletonTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "ChamsTransparency",
+    Callback = function(Value)
+        _G.HighlightTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Outline Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "ChamsOutlineTransparency",
+    Callback = function(Value)
+        _G.OutlineTransparency = Value
     end,
 })
 
