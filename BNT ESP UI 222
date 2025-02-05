@@ -37,6 +37,8 @@ _G.TracerColor = Color3.new(0, 0, 0)
 
 _G.TracerFrom = "Bottom"
 
+_G.BoxType = "Normal Box"
+
 local function getTracerFromPosition()
     if _G.TracerFrom == "Bottom" then
         return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
@@ -1459,6 +1461,17 @@ Tab1:CreateDropdown({
     Flag = "TracerFrom",
     Callback = function(Options)
         _G.TracerFrom = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Box Type",
+    Options = {"Corner Box", "Normal Box"},
+    CurrentOption = {"Normal Box"},
+    MultipleOptions = false,
+    Flag = "BoxType",
+    Callback = function(Options)
+        _G.BoxType = Options[1]
     end,
 })
 
