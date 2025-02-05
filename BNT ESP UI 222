@@ -51,18 +51,18 @@ RunService.RenderStepped:Connect(function()
                 local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                 local cornerLength = BoxSize.X * 0.2
                 
-                -- Ajuste das linhas para criar uma caixa de verdade
+                -- Ajuste das linhas para criar uma caixa de verdade, com cantos virados para dentro
                 box.TopLeft.From = BoxPosition
                 box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
                 box.TopLeftVertical.From = BoxPosition
-                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
+                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
                 
                 box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                 box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
                 
                 box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, cornerLength)
+                box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, -cornerLength)
                 
                 box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
                 box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
@@ -74,7 +74,7 @@ RunService.RenderStepped:Connect(function()
                 box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
                 
                 box.BottomRightVertical.From = BoxPosition + BoxSize
-                box.BottomRightVertical.To = box.BottomRightVertical.From - Vector2.new(0, cornerLength)
+                box.BottomRightVertical.To = box.BottomRightVertical.From + Vector2.new(0, cornerLength)
                 
                 for _, line in pairs(box) do
                     line.Visible = true
