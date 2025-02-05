@@ -5,42 +5,118 @@ local LocalPlayer = Players.LocalPlayer
 
 local ESPBoxes = {}
 
-local function CreateESP(player)
-    if player == LocalPlayer then return end -- Não criar ESP para si mesmo
-    
-    local Box = Drawing.new("Square")
-    Box.Thickness = 2
-    Box.Filled = false
-    Box.Color = Color3.fromRGB(255, 0, 0) -- Cor vermelha
-    Box.Visible = false
+-- Função para criar uma linha
+local function CreateLine()
+    local line = Drawing.new("Line")
+    line.Thickness = 2
+    line.Color = Color3.fromRGB(255, 0, 0) -- Cor vermelha
+    line.Visible = false
+    return line
+end
 
-    ESPBoxes[player] = Box
+-- Função para desenhar a ESP 3D
+local function CreateESP(player)
+    if player == LocalPlayer then return end -- Evita criar ESP para si mesmo
+
+    ESPBoxes[player] = {
+        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Linhas superiores
+        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Linhas inferiores
+        CreateLine(), CreateLine(), CreateLine(), CreateLine()  -- Linhas verticais
+    }
 
     local function Update()
         if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-            Box.Visible = false
+            for _, line in ipairs(ESPBoxes[player]) do
+                line.Visible = false
+            end
             return
         end
 
         local rootPart = player.Character.HumanoidRootPart
-        local screenPosition, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+        local size = Vector3.new(4, 6, 4) -- Tamanho da caixa ESP 3D
+        local corners = {
+            rootPart.CFrame * CFrame.new(-size.X, size.Y, -size.Z),
+            rootPart.CFrame * CFrame.new(size.X, size.Y, -size.Z),
+            rootPart.CFrame * CFrame.new(size.X, size.Y, size.Z),
+            rootPart.CFrame * CFrame.new(-size.X, size.Y, size.Z),
 
-        if onScreen then
-            local size = Vector2.new(100, 150) -- Tamanho da caixa
-            Box.Size = size
-            Box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
-            Box.Visible = true
+            rootPart.CFrame * CFrame.new(-size.X, -size.Y, -size.Z),
+            rootPart.CFrame * CFrame.new(size.X, -size.Y, -size.Z),
+            rootPart.CFrame * CFrame.new(size.X, -size.Y, size.Z),
+            rootPart.CFrame * CFrame.new(-size.X, -size.Y, size.Z),
+        }
+
+        -- Converter para coordenadas de tela
+        local onScreenCorners = {}
+        local isVisible = false
+        for i, corner in ipairs(corners) do
+            local screenPos, onScreen = Camera:WorldToViewportPoint(corner.Position)
+            onScreenCorners[i] = Vector2.new(screenPos.X, screenPos.Y)
+            if onScreen then
+                isVisible = true
+            end
+        end
+
+        if isVisible then
+            local lines = ESPBoxes[player]
+
+            -- Linhas superiores
+            lines[1].From = onScreenCorners[1]
+            lines[1].To = onScreenCorners[2]
+
+            lines[2].From = onScreenCorners[2]
+            lines[2].To = onScreenCorners[3]
+
+            lines[3].From = onScreenCorners[3]
+            lines[3].To = onScreenCorners[4]
+
+            lines[4].From = onScreenCorners[4]
+            lines[4].To = onScreenCorners[1]
+
+            -- Linhas inferiores
+            lines[5].From = onScreenCorners[5]
+            lines[5].To = onScreenCorners[6]
+
+            lines[6].From = onScreenCorners[6]
+            lines[6].To = onScreenCorners[7]
+
+            lines[7].From = onScreenCorners[7]
+            lines[7].To = onScreenCorners[8]
+
+            lines[8].From = onScreenCorners[8]
+            lines[8].To = onScreenCorners[5]
+
+            -- Linhas verticais
+            lines[9].From = onScreenCorners[1]
+            lines[9].To = onScreenCorners[5]
+
+            lines[10].From = onScreenCorners[2]
+            lines[10].To = onScreenCorners[6]
+
+            lines[11].From = onScreenCorners[3]
+            lines[11].To = onScreenCorners[7]
+
+            lines[12].From = onScreenCorners[4]
+            lines[12].To = onScreenCorners[8]
+
+            -- Ativar visibilidade
+            for _, line in ipairs(lines) do
+                line.Visible = true
+            end
         else
-            Box.Visible = false
+            for _, line in ipairs(ESPBoxes[player]) do
+                line.Visible = false
+            end
         end
     end
 
     RunService.RenderStepped:Connect(Update)
 end
 
+-- Detectar novos jogadores
 local function OnPlayerAdded(player)
     player.CharacterAdded:Connect(function()
-        wait(0.5) -- Pequeno delay para garantir que a Character carregou
+        wait(0.5) -- Pequeno delay para garantir que o Character carregue
         CreateESP(player)
     end)
 end
@@ -54,7 +130,9 @@ end
 Players.PlayerAdded:Connect(OnPlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
     if ESPBoxes[player] then
-        ESPBoxes[player]:Remove()
+        for _, line in ipairs(ESPBoxes[player]) do
+            line:Remove()
+        end
         ESPBoxes[player] = nil
     end
 end)
