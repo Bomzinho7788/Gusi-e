@@ -51,29 +51,29 @@ RunService.RenderStepped:Connect(function()
                 local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                 local cornerLength = BoxSize.X * 0.2
                 
-                -- Atualiza posições das linhas
-                box.TopLeft.From = BoxPosition
-                box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
+                -- Atualiza posições das linhas com rotação de 180 graus
+                box.TopLeft.From = BoxPosition + Vector2.new(BoxSize.X, 0) -- Girado
+                box.TopLeft.To = BoxPosition + Vector2.new(BoxSize.X - cornerLength, 0)
                 
                 box.TopLeftVertical.From = BoxPosition
                 box.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
                 
-                box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
+                box.TopRight.From = BoxPosition + Vector2.new(0, 0) -- Girado
+                box.TopRight.To = box.TopRight.From + Vector2.new(cornerLength, 0)
                 
-                box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRightVertical.From = BoxPosition + Vector2.new(0, 0) -- Girado
                 box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, cornerLength)
                 
-                box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y) -- Girado
                 box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
                 
                 box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
                 box.BottomLeftVertical.To = box.BottomLeftVertical.From - Vector2.new(0, cornerLength)
                 
-                box.BottomRight.From = BoxPosition + BoxSize
+                box.BottomRight.From = BoxPosition + BoxSize -- Girado
                 box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
                 
-                box.BottomRightVertical.From = BoxPosition + BoxSize
+                box.BottomRightVertical.From = BoxPosition + BoxSize -- Girado
                 box.BottomRightVertical.To = box.BottomRightVertical.From - Vector2.new(0, cornerLength)
                 
                 -- Torna visível
