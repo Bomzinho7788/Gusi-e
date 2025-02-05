@@ -232,29 +232,29 @@ local function setupPlayerBox(v)
                     Box.Visible = false
                     BoxFilled.Visible = false
                     
-                    box.TopLeft.From = BoxPosition
-                    box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
-                    
-                    box.TopLeftVertical.From = BoxPosition
-                    box.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
+                    CornerBox.TopLeft.From = BoxPosition
+                    CornerBox.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
-                    box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                    box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
+                    CornerBox.TopLeftVertical.From = BoxPosition
+                    CornerBox.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
                 
-                    box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                    box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, -cornerLength)
+                    CornerBox.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                    CornerBox.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
                 
-                    box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                    box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
+                    CornerBox.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                    CornerBox.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, -cornerLength)
                 
-                    box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                    box.BottomLeftVertical.To = box.BottomLeftVertical.From + Vector2.new(0, cornerLength)
+                    CornerBox.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                    CornerBox.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
                 
-                    box.BottomRight.From = BoxPosition + BoxSize
-                    box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
+                    CornerBox.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                    CornerBox.BottomLeftVertical.To = box.BottomLeftVertical.From + Vector2.new(0, cornerLength)
                 
-                    box.BottomRightVertical.From = BoxPosition + BoxSize
-                    box.BottomRightVertical.To = box.BottomRightVertical.From + Vector2.new(0, cornerLength)
+                    CornerBox.BottomRight.From = BoxPosition + BoxSize
+                    CornerBox.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
+                
+                    CornerBox.BottomRightVertical.From = BoxPosition + BoxSize
+                    CornerBox.BottomRightVertical.To = box.BottomRightVertical.From + Vector2.new(0, cornerLength)
                     
                     for _, line in pairs(CornerBox) do
                         line.Visible = _G.boxVisible
