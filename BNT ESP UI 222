@@ -107,7 +107,6 @@ local LocalPlayer = Players.LocalPlayer
 local ESP_Boxes = {}
 
 local function CreateCornerBox()
-    local thickness = 1
     local box = {
         TopLeft = Drawing.new("Line"),
         TopLeftVertical = Drawing.new("Line"),
@@ -120,13 +119,29 @@ local function CreateCornerBox()
     }
     
     for _, line in pairs(box) do
-        line.Color = Color3.fromRGB(255, 0, 0)
-        line.Thickness = thickness
-        line.Visible = false
+        line.Thickness = _G.thickness or 1
+        line.Color = _G.color or Color3.fromRGB(255, 0, 0)
+        line.Visible = _G.visible or false
     end
     
     return box
 end
+
+local function UpdateCornerBox(box)
+    for _, line in pairs(box) do
+        line.Thickness = _G.thickness
+        line.Color = _G.color
+        line.Visible = false
+    end
+end
+
+local cornerBox = CreateCornerBox()
+
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    UpdateCornerBox(cornerBox)
+end)
+
 
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
@@ -1361,6 +1376,7 @@ Tab1:CreateColorPicker({
     Flag = "boxColor",
     Callback = function(Value)
         _G.boxColor = Value
+        _G.color = Value
     end
 })
 
@@ -1506,6 +1522,7 @@ Tab1:CreateSlider({
     Flag = "boxThickness",
     Callback = function(Value)
         _G.boxThickness = Value
+        _G.thickness = Value
     end,
 })
 
