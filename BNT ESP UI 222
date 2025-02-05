@@ -51,30 +51,32 @@ RunService.RenderStepped:Connect(function()
                 local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                 local cornerLength = BoxSize.X * 0.2
                 
-                -- Atualiza posições das linhas
-                box.TopLeft.From = BoxPosition
-                box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
+                -- Troca as linhas superiores pelas inferiores e vice-versa
+                -- Linhas superiores agora estão embaixo
+                box.BottomLeft.From = BoxPosition
+                box.BottomLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
-                box.TopLeftVertical.From = BoxPosition
-                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
+                box.BottomLeftVertical.From = BoxPosition
+                box.BottomLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
                 
-                box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
-                
-                box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, cornerLength)
-                
-                box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
-                
-                box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                box.BottomLeftVertical.To = box.BottomLeftVertical.From - Vector2.new(0, cornerLength)
-                
-                box.BottomRight.From = BoxPosition + BoxSize
+                box.BottomRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                 box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
                 
-                box.BottomRightVertical.From = BoxPosition + BoxSize
-                box.BottomRightVertical.To = box.BottomRightVertical.From - Vector2.new(0, cornerLength)
+                box.BottomRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.BottomRightVertical.To = box.BottomRightVertical.From + Vector2.new(0, cornerLength)
+                
+                -- Linhas inferiores agora estão em cima
+                box.TopLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.TopLeft.To = box.TopLeft.From + Vector2.new(cornerLength, 0)
+                
+                box.TopLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.TopLeftVertical.To = box.TopLeftVertical.From - Vector2.new(0, cornerLength)
+                
+                box.TopRight.From = BoxPosition + BoxSize
+                box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
+                
+                box.TopRightVertical.From = BoxPosition + BoxSize
+                box.TopRightVertical.To = box.TopRightVertical.From - Vector2.new(0, cornerLength)
                 
                 -- Torna visível
                 for _, line in pairs(box) do
