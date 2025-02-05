@@ -3,69 +3,28 @@ local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local function DrawCornerBox(Position, Size, Color)
-    local thickness = 2  -- Ajuste a espessura dos cantos
-    local cornerLength = Size.X * 0.2  -- Percentual do tamanho da caixa para os cantos
+local ESP_Boxes = {}
+
+local function CreateCornerBox()
+    local thickness = 2
+    local box = {
+        TopLeft = Drawing.new("Line"),
+        TopLeftVertical = Drawing.new("Line"),
+        TopRight = Drawing.new("Line"),
+        TopRightVertical = Drawing.new("Line"),
+        BottomLeft = Drawing.new("Line"),
+        BottomLeftVertical = Drawing.new("Line"),
+        BottomRight = Drawing.new("Line"),
+        BottomRightVertical = Drawing.new("Line")
+    }
     
-    -- Linhas superiores
-    local TopLeft = Drawing.new("Line")
-    TopLeft.From = Position
-    TopLeft.To = Position + Vector2.new(cornerLength, 0)
-    TopLeft.Color = Color
-    TopLeft.Thickness = thickness
-    TopLeft.Visible = true
+    for _, line in pairs(box) do
+        line.Color = Color3.fromRGB(255, 0, 0)
+        line.Thickness = thickness
+        line.Visible = false
+    end
     
-    local TopLeftVertical = Drawing.new("Line")
-    TopLeftVertical.From = Position
-    TopLeftVertical.To = Position + Vector2.new(0, cornerLength)
-    TopLeftVertical.Color = Color
-    TopLeftVertical.Thickness = thickness
-    TopLeftVertical.Visible = true
-    
-    local TopRight = Drawing.new("Line")
-    TopRight.From = Position + Vector2.new(Size.X, 0)
-    TopRight.To = TopRight.From - Vector2.new(cornerLength, 0)
-    TopRight.Color = Color
-    TopRight.Thickness = thickness
-    TopRight.Visible = true
-    
-    local TopRightVertical = Drawing.new("Line")
-    TopRightVertical.From = Position + Vector2.new(Size.X, 0)
-    TopRightVertical.To = TopRightVertical.From + Vector2.new(0, cornerLength)
-    TopRightVertical.Color = Color
-    TopRightVertical.Thickness = thickness
-    TopRightVertical.Visible = true
-    
-    -- Linhas inferiores
-    local BottomLeft = Drawing.new("Line")
-    BottomLeft.From = Position + Vector2.new(0, Size.Y)
-    BottomLeft.To = BottomLeft.From + Vector2.new(cornerLength, 0)
-    BottomLeft.Color = Color
-    BottomLeft.Thickness = thickness
-    BottomLeft.Visible = true
-    
-    local BottomLeftVertical = Drawing.new("Line")
-    BottomLeftVertical.From = Position + Vector2.new(0, Size.Y)
-    BottomLeftVertical.To = BottomLeftVertical.From - Vector2.new(0, cornerLength)
-    BottomLeftVertical.Color = Color
-    BottomLeftVertical.Thickness = thickness
-    BottomLeftVertical.Visible = true
-    
-    local BottomRight = Drawing.new("Line")
-    BottomRight.From = Position + Size
-    BottomRight.To = BottomRight.From - Vector2.new(cornerLength, 0)
-    BottomRight.Color = Color
-    BottomRight.Thickness = thickness
-    BottomRight.Visible = true
-    
-    local BottomRightVertical = Drawing.new("Line")
-    BottomRightVertical.From = Position + Size
-    BottomRightVertical.To = BottomRightVertical.From - Vector2.new(0, cornerLength)
-    BottomRightVertical.Color = Color
-    BottomRightVertical.Thickness = thickness
-    BottomRightVertical.Visible = true
-    
-    return {TopLeft, TopLeftVertical, TopRight, TopRightVertical, BottomLeft, BottomLeftVertical, BottomRight, BottomRightVertical}
+    return box
 end
 
 RunService.RenderStepped:Connect(function()
@@ -81,11 +40,51 @@ RunService.RenderStepped:Connect(function()
             local HeadPosition = Camera:WorldToViewportPoint(Head.Position + HeadOff)
             local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOff)
             
+            if not ESP_Boxes[v] then
+                ESP_Boxes[v] = CreateCornerBox()
+            end
+            
+            local box = ESP_Boxes[v]
+            
             if RootVis then
                 local BoxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                 local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
+                local cornerLength = BoxSize.X * 0.2
                 
-                DrawCornerBox(BoxPosition, BoxSize, Color3.fromRGB(255, 0, 0))
+                -- Atualiza posições das linhas
+                box.TopLeft.From = BoxPosition
+                box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
+                
+                box.TopLeftVertical.From = BoxPosition
+                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
+                
+                box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
+                
+                box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, cornerLength)
+                
+                box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
+                
+                box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.BottomLeftVertical.To = box.BottomLeftVertical.From - Vector2.new(0, cornerLength)
+                
+                box.BottomRight.From = BoxPosition + BoxSize
+                box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
+                
+                box.BottomRightVertical.From = BoxPosition + BoxSize
+                box.BottomRightVertical.To = box.BottomRightVertical.From - Vector2.new(0, cornerLength)
+                
+                -- Torna visível
+                for _, line in pairs(box) do
+                    line.Visible = true
+                end
+            else
+                -- Esconde as linhas quando o player não está visível
+                for _, line in pairs(box) do
+                    line.Visible = false
+                end
             end
         end
     end
