@@ -5,23 +5,24 @@ local LocalPlayer = Players.LocalPlayer
 
 local ESPBoxes = {}
 
--- Função para criar uma linha
+-- Criar uma linha
 local function CreateLine()
     local line = Drawing.new("Line")
     line.Thickness = 2
-    line.Color = Color3.fromRGB(255, 0, 0) -- Cor vermelha
+    line.Color = Color3.fromRGB(255, 0, 0) -- Vermelho
     line.Visible = false
     return line
 end
 
--- Função para desenhar a ESP 3D
+-- Criar ESP 3D
 local function CreateESP(player)
-    if player == LocalPlayer then return end -- Evita criar ESP para si mesmo
+    if player == LocalPlayer then return end -- Evita ESP para si mesmo
 
+    -- Criar 12 linhas para formar a caixa 3D
     ESPBoxes[player] = {
-        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Linhas superiores
-        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Linhas inferiores
-        CreateLine(), CreateLine(), CreateLine(), CreateLine()  -- Linhas verticais
+        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Topo
+        CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Base
+        CreateLine(), CreateLine(), CreateLine(), CreateLine()  -- Laterais
     }
 
     local function Update()
@@ -33,25 +34,24 @@ local function CreateESP(player)
         end
 
         local rootPart = player.Character.HumanoidRootPart
-        local size = Vector3.new(4, 6, 4) -- Tamanho da caixa ESP 3D
+        local size = Vector3.new(3, 6, 3) -- Tamanho do ESP Box
         local corners = {
-            rootPart.CFrame * CFrame.new(-size.X, size.Y, -size.Z),
-            rootPart.CFrame * CFrame.new(size.X, size.Y, -size.Z),
-            rootPart.CFrame * CFrame.new(size.X, size.Y, size.Z),
-            rootPart.CFrame * CFrame.new(-size.X, size.Y, size.Z),
+            rootPart.CFrame * CFrame.new(-size.X, size.Y, -size.Z), -- 1
+            rootPart.CFrame * CFrame.new(size.X, size.Y, -size.Z),  -- 2
+            rootPart.CFrame * CFrame.new(size.X, size.Y, size.Z),   -- 3
+            rootPart.CFrame * CFrame.new(-size.X, size.Y, size.Z),  -- 4
 
-            rootPart.CFrame * CFrame.new(-size.X, -size.Y, -size.Z),
-            rootPart.CFrame * CFrame.new(size.X, -size.Y, -size.Z),
-            rootPart.CFrame * CFrame.new(size.X, -size.Y, size.Z),
-            rootPart.CFrame * CFrame.new(-size.X, -size.Y, size.Z),
+            rootPart.CFrame * CFrame.new(-size.X, -size.Y, -size.Z), -- 5
+            rootPart.CFrame * CFrame.new(size.X, -size.Y, -size.Z),  -- 6
+            rootPart.CFrame * CFrame.new(size.X, -size.Y, size.Z),   -- 7
+            rootPart.CFrame * CFrame.new(-size.X, -size.Y, size.Z),  -- 8
         }
 
-        -- Converter para coordenadas de tela
-        local onScreenCorners = {}
-        local isVisible = false
+        -- Converter para coordenadas da tela
+        local screenCorners, isVisible = {}, false
         for i, corner in ipairs(corners) do
             local screenPos, onScreen = Camera:WorldToViewportPoint(corner.Position)
-            onScreenCorners[i] = Vector2.new(screenPos.X, screenPos.Y)
+            screenCorners[i] = Vector2.new(screenPos.X, screenPos.Y)
             if onScreen then
                 isVisible = true
             end
@@ -60,44 +60,44 @@ local function CreateESP(player)
         if isVisible then
             local lines = ESPBoxes[player]
 
-            -- Linhas superiores
-            lines[1].From = onScreenCorners[1]
-            lines[1].To = onScreenCorners[2]
+            -- Linhas do topo
+            lines[1].From = screenCorners[1]
+            lines[1].To = screenCorners[2]
 
-            lines[2].From = onScreenCorners[2]
-            lines[2].To = onScreenCorners[3]
+            lines[2].From = screenCorners[2]
+            lines[2].To = screenCorners[3]
 
-            lines[3].From = onScreenCorners[3]
-            lines[3].To = onScreenCorners[4]
+            lines[3].From = screenCorners[3]
+            lines[3].To = screenCorners[4]
 
-            lines[4].From = onScreenCorners[4]
-            lines[4].To = onScreenCorners[1]
+            lines[4].From = screenCorners[4]
+            lines[4].To = screenCorners[1]
 
-            -- Linhas inferiores
-            lines[5].From = onScreenCorners[5]
-            lines[5].To = onScreenCorners[6]
+            -- Linhas da base
+            lines[5].From = screenCorners[5]
+            lines[5].To = screenCorners[6]
 
-            lines[6].From = onScreenCorners[6]
-            lines[6].To = onScreenCorners[7]
+            lines[6].From = screenCorners[6]
+            lines[6].To = screenCorners[7]
 
-            lines[7].From = onScreenCorners[7]
-            lines[7].To = onScreenCorners[8]
+            lines[7].From = screenCorners[7]
+            lines[7].To = screenCorners[8]
 
-            lines[8].From = onScreenCorners[8]
-            lines[8].To = onScreenCorners[5]
+            lines[8].From = screenCorners[8]
+            lines[8].To = screenCorners[5]
 
             -- Linhas verticais
-            lines[9].From = onScreenCorners[1]
-            lines[9].To = onScreenCorners[5]
+            lines[9].From = screenCorners[1]
+            lines[9].To = screenCorners[5]
 
-            lines[10].From = onScreenCorners[2]
-            lines[10].To = onScreenCorners[6]
+            lines[10].From = screenCorners[2]
+            lines[10].To = screenCorners[6]
 
-            lines[11].From = onScreenCorners[3]
-            lines[11].To = onScreenCorners[7]
+            lines[11].From = screenCorners[3]
+            lines[11].To = screenCorners[7]
 
-            lines[12].From = onScreenCorners[4]
-            lines[12].To = onScreenCorners[8]
+            lines[12].From = screenCorners[4]
+            lines[12].To = screenCorners[8]
 
             -- Ativar visibilidade
             for _, line in ipairs(lines) do
@@ -113,20 +113,22 @@ local function CreateESP(player)
     RunService.RenderStepped:Connect(Update)
 end
 
--- Detectar novos jogadores
+-- Adicionar ESP para novos jogadores
 local function OnPlayerAdded(player)
     player.CharacterAdded:Connect(function()
-        wait(0.5) -- Pequeno delay para garantir que o Character carregue
+        wait(0.5) -- Espera carregar a Character
         CreateESP(player)
     end)
 end
 
+-- Aplicar ESP a jogadores existentes
 for _, player in ipairs(Players:GetPlayers()) do
     if player ~= LocalPlayer then
         OnPlayerAdded(player)
     end
 end
 
+-- Conectar eventos
 Players.PlayerAdded:Connect(OnPlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
     if ESPBoxes[player] then
