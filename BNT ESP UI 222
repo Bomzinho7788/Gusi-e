@@ -119,9 +119,9 @@ local function CreateCornerBox()
     }
     
     for _, line in pairs(box) do
-        line.Thickness = _G.thickness
-        line.Color = _G.color
-        line.Visible = false
+        line.Thickness = _G.thickness or 1
+        line.Color = _G.color or Color3.fromRGB(255, 0, 0)
+        line.Visible = _G.visible or false
     end
     
     return box
@@ -137,9 +137,11 @@ end
 
 local cornerBox = CreateCornerBox()
 
+
 game:GetService("RunService").RenderStepped:Connect(function()
     UpdateCornerBox(cornerBox)
 end)
+
 
 local function createDrawingObjects()
     local Box = Drawing.new("Square")
@@ -1375,7 +1377,6 @@ Tab1:CreateColorPicker({
     Callback = function(Value)
         _G.boxColor = Value
         _G.color = Value
-        UpdateCornerBox(cornerBox)
     end
 })
 
@@ -1522,7 +1523,6 @@ Tab1:CreateSlider({
     Callback = function(Value)
         _G.boxThickness = Value
         _G.thickness = Value
-        UpdateCornerBox(cornerBox)
     end,
 })
 
