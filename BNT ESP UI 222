@@ -51,29 +51,30 @@ RunService.RenderStepped:Connect(function()
                 local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                 local cornerLength = BoxSize.X * 0.2
                 
-                box.TopLeft.From = BoxPosition + Vector2.new(0, cornerLength)
-                box.TopLeft.To = BoxPosition
+                -- Ajuste das linhas para criar uma caixa de verdade
+                box.TopLeft.From = BoxPosition
+                box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
-                box.TopLeftVertical.From = BoxPosition + Vector2.new(cornerLength, 0)
-                box.TopLeftVertical.To = BoxPosition
+                box.TopLeftVertical.From = BoxPosition
+                box.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
                 
-                box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X - cornerLength, 0)
-                box.TopRight.To = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRight.To = box.TopRight.From - Vector2.new(cornerLength, 0)
                 
-                box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, cornerLength)
-                box.TopRightVertical.To = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                box.TopRightVertical.To = box.TopRightVertical.From + Vector2.new(0, cornerLength)
                 
                 box.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                box.BottomLeft.To = BoxPosition + Vector2.new(cornerLength, BoxSize.Y)
+                box.BottomLeft.To = box.BottomLeft.From + Vector2.new(cornerLength, 0)
                 
-                box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y - cornerLength)
-                box.BottomLeftVertical.To = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                box.BottomLeftVertical.To = box.BottomLeftVertical.From - Vector2.new(0, cornerLength)
                 
-                box.BottomRight.From = BoxPosition + Vector2.new(BoxSize.X, BoxSize.Y)
-                box.BottomRight.To = BoxPosition + Vector2.new(BoxSize.X - cornerLength, BoxSize.Y)
+                box.BottomRight.From = BoxPosition + BoxSize
+                box.BottomRight.To = box.BottomRight.From - Vector2.new(cornerLength, 0)
                 
-                box.BottomRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, BoxSize.Y)
-                box.BottomRightVertical.To = BoxPosition + Vector2.new(BoxSize.X, BoxSize.Y - cornerLength)
+                box.BottomRightVertical.From = BoxPosition + BoxSize
+                box.BottomRightVertical.To = box.BottomRightVertical.From - Vector2.new(0, cornerLength)
                 
                 for _, line in pairs(box) do
                     line.Visible = true
