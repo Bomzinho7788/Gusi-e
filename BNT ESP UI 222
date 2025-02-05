@@ -62,78 +62,40 @@ local function getHealthValues(player)
 end
 
 local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health, CornerBox)
-    if _G.BoxType == "Normal Box" then
-        local offset = isOutline and 6 or 4
-        local healthRatio = math.clamp(health / maxHealth, 0, 1)
+    local offset = isOutline and 6 or 4
+    local healthRatio = math.clamp(health / maxHealth, 0, 1)
 
-        if _G.HealthBarPosition == "Left" then
-            local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-            HealthBar.Size = Vector2.new(2, healthBarSize)
-            HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
+    if _G.HealthBarPosition == "Left" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
         
-            HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-            HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
+         HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
 
-        elseif _G.HealthBarPosition == "Right" then
-            local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-            HealthBar.Size = Vector2.new(2, healthBarSize)
-            HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+    elseif _G.HealthBarPosition == "Right" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
         
-            HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-            HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+         HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
 
-        elseif _G.HealthBarPosition == "Bottom" then
-            local healthBarSize = Box.Size.X * healthRatio
-            HealthBar.Size = Vector2.new(healthBarSize, 2)
-            HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset)
+    elseif _G.HealthBarPosition == "Bottom" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset)
         
-            HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
-            HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
+         HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
 
-        elseif _G.HealthBarPosition == "Top" then
-            local healthBarSize = Box.Size.X * healthRatio
-            HealthBar.Size = Vector2.new(healthBarSize, 2)
-            HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset)
+    elseif _G.HealthBarPosition == "Top" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset)
         
-            HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
-            HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
-        end
-    elseif _G.BoxType == "Corner Box" then
-        local offset = isOutline and 6 or 4
-        local healthRatio = math.clamp(health / maxHealth, 0, 1)
-
-        if _G.HealthBarPosition == "Left" then
-            local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-            HealthBar.Size = Vector2.new(2, healthBarSize)
-            HealthBar.Position = Vector2.new(CornerBox.Position.X - offset, CornerBox.Position.Y)
-        
-            HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-            HealthBarOutline.Position = Vector2.new(CornerBox.Position.X - offset, CornerBox.Position.Y) 
-
-        elseif _G.HealthBarPosition == "Right" then
-            local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-            HealthBar.Size = Vector2.new(2, healthBarSize)
-            HealthBar.Position = Vector2.new(CornerBox.Position.X + CornerBox.Size.X + offset - 2, CornerBox.Position.Y)
-        
-            HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-            HealthBarOutline.Position = Vector2.new(CornerBox.Position.X + CornerBox.Size.X + offset - 2, CornerBox.Position.Y)
-
-        elseif _G.HealthBarPosition == "Bottom" then
-            local healthBarSize = CornerBox.Size.X * healthRatio
-            HealthBar.Size = Vector2.new(healthBarSize, 2)
-            HealthBar.Position = Vector2.new(CornerBox.Position.X + (CornerBox.Size.X - healthBarSize), CornerBox.Position.Y + offset)
-        
-            HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
-            HealthBarOutline.Position = Vector2.new(CornerBox.Position.X, CornerBox.Position.Y + offset)
-
-        elseif _G.HealthBarPosition == "Top" then
-            local healthBarSize = CornerBox.Size.X * healthRatio
-            HealthBar.Size = Vector2.new(healthBarSize, 2)
-            HealthBar.Position = Vector2.new(CornerBox.Position.X + (CornerBox.Size.X - healthBarSize), CornerBox.Position.Y + CornerBox.Size.Y - offset)
-        
-            HealthBarOutline.Size = Vector2.new(CornerBox.Size.X, 2)
-            HealthBarOutline.Position = Vector2.new(CornerBox.Position.X, CornerBox.Position.Y + CornerBox.Size.Y - offset)
-        end
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
     end
 end
 
@@ -252,8 +214,11 @@ local function setupPlayerBox(v)
 
                 if _G.BoxType == "Normal Box" then
                     for _, line in pairs(CornerBox) do
-                        line.Visible = false
+                        line.Transparency = 0
                     end
+
+                    Box.Transparency = 1
+                    BoxFilled.Transparency = 0.5
 
                     Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
@@ -266,9 +231,11 @@ local function setupPlayerBox(v)
                     local BoxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                     local cornerLength = BoxSize.X * 0.2
-
-                    Box.Visible = false
-                    BoxFilled.Visible = false
+                    for _, line in pairs(CornerBox) do
+                        line.Transparency = 1
+                    end
+                    Box.Transparency = 0
+                    BoxFilled.Transparency = 0
                     
                     CornerBox.TopLeft.From = BoxPosition
                     CornerBox.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
