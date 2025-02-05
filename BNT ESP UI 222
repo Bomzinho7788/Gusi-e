@@ -61,6 +61,44 @@ local function getHealthValues(player)
     return maxHealth, health
 end
 
+local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
+    local offset = isOutline and 6 or 4
+    local healthRatio = math.clamp(health / maxHealth, 0, 1)
+
+    if _G.HealthBarPosition == "Left" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) -- Começa de cima e desce
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
+
+    elseif _G.HealthBarPosition == "Right" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y) -- Começa de cima e desce
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+
+    elseif _G.HealthBarPosition == "Bottom" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset) -- Começa da direita e diminui para a esquerda
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
+
+    elseif _G.HealthBarPosition == "Top" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset) -- Começa da direita e diminui para a esquerda
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
+    end
+end
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
@@ -155,44 +193,6 @@ local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBar
     Tracer.Color = _G.TracerColor
 end
 
-local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health)
-    local offset = isOutline and 6 or 4
-    local healthRatio = math.clamp(health / maxHealth, 0, 1)
-
-    if _G.HealthBarPosition == "Left" then
-        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-        HealthBar.Size = Vector2.new(2, healthBarSize)
-        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
-        
-        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-        HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
-
-    elseif _G.HealthBarPosition == "Right" then
-        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
-        HealthBar.Size = Vector2.new(2, healthBarSize)
-        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
-        
-        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-        HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
-
-    elseif _G.HealthBarPosition == "Bottom" then
-        local healthBarSize = Box.Size.X * healthRatio
-        HealthBar.Size = Vector2.new(healthBarSize, 2)
-        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset)
-        
-        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
-        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
-
-    elseif _G.HealthBarPosition == "Top" then
-        local healthBarSize = Box.Size.X * healthRatio
-        HealthBar.Size = Vector2.new(healthBarSize, 2)
-        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset)
-        
-        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
-        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
-    end
-end
-
 local function setupPlayerBox(v)
     local Box, BoxFilled, HealthBar, Tracer, HealthBarOutline = createDrawingObjects()
     local CornerBox = CreateCornerBox()
@@ -213,6 +213,10 @@ local function setupPlayerBox(v)
                 local maxHealth, health = getHealthValues(v)
 
                 if _G.BoxType == "Normal Box" then
+                    for _, line in pairs(CornerBox) do
+                        line.Visible = false
+                    end
+
                     Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = _G.boxVisible
@@ -220,74 +224,86 @@ local function setupPlayerBox(v)
                     BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     BoxFilled.Visible = _G.boxFilledVisible
-
-                    updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
                 elseif _G.BoxType == "Corner Box" then
                     local BoxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
                     local cornerLength = BoxSize.X * 0.2
+
+                    Box.Visible = false
+                    BoxFilled.Visible = false
                     
                     CornerBox.TopLeft.From = BoxPosition
                     CornerBox.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
-                    
+                
                     CornerBox.TopLeftVertical.From = BoxPosition
-                    CornerBox.TopLeftVertical.To = BoxPosition + Vector2.new(0, cornerLength)
-                    
+                    CornerBox.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
+                
                     CornerBox.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                     CornerBox.TopRight.To = CornerBox.TopRight.From - Vector2.new(cornerLength, 0)
-                    
+                
                     CornerBox.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
-                    CornerBox.TopRightVertical.To = CornerBox.TopRightVertical.From + Vector2.new(0, cornerLength)
-                    
+                    CornerBox.TopRightVertical.To = CornerBox.TopRightVertical.From + Vector2.new(0, -cornerLength)
+                
                     CornerBox.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
                     CornerBox.BottomLeft.To = CornerBox.BottomLeft.From + Vector2.new(cornerLength, 0)
-                    
+                
                     CornerBox.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
-                    CornerBox.BottomLeftVertical.To = CornerBox.BottomLeftVertical.From - Vector2.new(0, cornerLength)
-                    
+                    CornerBox.BottomLeftVertical.To = CornerBox.BottomLeftVertical.From + Vector2.new(0, cornerLength)
+                
                     CornerBox.BottomRight.From = BoxPosition + BoxSize
                     CornerBox.BottomRight.To = CornerBox.BottomRight.From - Vector2.new(cornerLength, 0)
-                    
+                
                     CornerBox.BottomRightVertical.From = BoxPosition + BoxSize
-                    CornerBox.BottomRightVertical.To = CornerBox.BottomRightVertical.From - Vector2.new(0, cornerLength)
+                    CornerBox.BottomRightVertical.To = CornerBox.BottomRightVertical.From + Vector2.new(0, cornerLength)
                     
                     for _, line in pairs(CornerBox) do
-                        line.Visible = true
+                        line.Visible = _G.boxVisible
                     end
-
-                    updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, true, maxHealth, health)
                 end
 
-                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) * healthRatio)
+                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
                 HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+                updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
                 HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
                 HealthBar.Visible = _G.HealthBarVisible
-                HealthBarOutline.Visible = _G.HealthBarVisible
+                HealthBarOutline.Visible = false
 
                 Tracer.From = getTracerFromPosition()
                 Tracer.To = Vector2.new(Vector.X, Vector.Y)
 
                 if _G.teamcheck == true then
-                    if _G.teamcheckmode == "colors" then
+                    if _G.temcheckmode == "colors" then
                         if v.TeamColor == LocalPlayer.TeamColor then
                             Box.Color = _G.teamcolor
                             BoxFilled.Color = _G.teamcolor
                             Tracer.Color = _G.teamcolor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.teamcolor
+                            end
                         else
                             Box.Color = _G.enemycolor
                             BoxFilled.Color = _G.enemycolor
                             Tracer.Color = _G.enemycolor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.enemycolor
+                            end
                         end
-                    elseif _G.teamcheckmode == "invisible" then
+                    elseif _G.temcheckmode == "invisible" then
                         if v.TeamColor == LocalPlayer.TeamColor then
                             Box.Visible = false
                             BoxFilled.Visible = false
                             HealthBar.Visible = false
                             Tracer.Visible = false
+                            for _, line in pairs(CornerBox) do
+                                line.Visible = false
+                            end
                         else
                             Box.Color = _G.boxColor
                             BoxFilled.Color = _G.boxFilledColor
                             Tracer.Color = _G.TracerColor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.boxColor
+                            end
                         end
                     end
                 end
