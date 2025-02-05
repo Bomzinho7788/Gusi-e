@@ -55,7 +55,7 @@ RunService.RenderStepped:Connect(function()
                 box.TopLeft.From = BoxPosition
                 box.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
                 
-                box.TopLeftVertical.From = BoxPosition
+                box.TopLeftVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
                 box.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
                 
                 box.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
