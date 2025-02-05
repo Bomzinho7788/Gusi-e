@@ -1,151 +1,191 @@
--- Inicializa a OrionLib
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local EggName = ""
+local TripleEggs = true
+local running = false
+local stopLoop = false
 
-local Window = Rayfield:CreateWindow({
-    Name = "Player HUB",
-    Icon = 0,
-    LoadingTitle = "By Bomzinho",
-    LoadingSubtitle = "Loading...",
-    Theme = "Amethyst",
-
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false,
-
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil,
-        FileName = "ESPP"
-    },
-
-    Discord = {
-        Enabled = false,
-        Invite = "",
-        RememberJoins = true
-    },
-
-    KeySystem = true,
-    KeySettings = {
-        Title = "PLAYER HUB",
-        Subtitle = "Key System",
-        Note = "No method of obtaining the key is provided",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = {"yh776"}
+local args = {
+    [1] = {
+        [1] = {
+            [1] = EggName,
+            [2] = TripleEggs,
+            [3] = false
+        },
+        [2] = {
+            [1] = false,
+            [2] = false,
+            [3] = false
+        }
     }
-})
+}
 
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
--- Função para atualizar a velocidade do jogador
-local function updateSpeed(speedValue)
-    humanoid.WalkSpeed = speedValue
+local function updateArgs()
+    args[1][1][1] = EggName
+    args[1][1][2] = TripleEggs
 end
 
--- Função para atualizar o jump power do jogador
-local function updateJumpPower(jumpValue)
-    humanoid.JumpPower = jumpValue
-end
-
--- Função para resetar o jump power para o valor padrão
-local function resetJumpPower()
-    humanoid.JumpPower = 50 -- valor padrão do jump power
-end
-
--- Função para alternar o Infinite Jump (modo pulo infinito)
-local function toggleInfiniteJump(enable)
-    if enable then
-        humanoid.JumpHeight = 100  -- Pulo infinito
-        humanoid.MaxSlope = 0
-    else
-        humanoid.JumpHeight = 50  -- Valor padrão
-        humanoid.MaxSlope = 45
+local function startOpeningEggs()
+    while not stopLoop do
+        game:GetService("TextChatService"):WaitForChild("__REMOTES"):WaitForChild("buyx egg"):InvokeServer(unpack(args))
+        wait()
     end
 end
 
--- Criando o menu com OrionLib
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.Name = "EggOpenerGui"
+ScreenGui.ResetOnSpawn = false
 
-local tab = Window:CreateTab("Configs", 4483362458)
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(0, 400, 0, 40)
+topBar.Position = UDim2.new(0.5, -200, 0.5, -145)
+topBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+topBar.BorderSizePixel = 0
+topBar.Parent = ScreenGui
+topBar.Active = true
+topBar.Draggable = true
 
--- Slider para controlar a velocidade do jogador
-tab:CreateSlider({
-    Name = "Walk Speed",
-    Range = {16, 100},
-    Increment = 1,
-    Suffix = "",
-    CurrentValue = humanoid.WalkSpeed,
-    Flag = "Fov Transparency",
-    Callback = function(Value)
-        updateSpeed(Value)
-    end,
-})
+-- TÃƒÂ­tulo
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -80, 1, 0)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.Text = "Egg Opener"
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
 
-tab:CreateSlider({
-    Name = "Jump Power",
-    Range = {50, 200},
-    Increment = 1,
-    Suffix = "",
-    CurrentValue = humanoid.JumpPower,
-    Flag = "Fov Transparency",
-    Callback = function(Value)
-        updateJumpPower(Value)
-    end,
-})
+-- BotÃƒÂ£o de fechar
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 5)
+closeButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Text = "X"
+closeButton.Parent = topBar
 
-tab:CreateToggle({
-    Name = "Reset Jump Power",
-    Flag = "Enable Aimbot",
-    Callback = function()
-        resetJumpPower()
-        jumpSlider:Set(50)
-    end,
-})
+-- BotÃƒÂ£o de minimizar
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -70, 0, 5)
+minimizeButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.Text = "-"
+minimizeButton.Parent = topBar
 
-tab:CreateToggle({
-    Name = "Reset Speed",
-    Flag = "Enable Aimbot",
-    Callback = function()
-        resetJumpPower()
-        speedSlider:Set(16)
-    end,
-})
+-- Frame principal como ScrollingFrame
+local pintoftame = Instance.new("ScrollingFrame")
+pintoftame.Size = UDim2.new(0, 400, 0, 260)
+pintoftame.Position = UDim2.new(0, 0, 1, 0)
+pintoftame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+pintoftame.BorderSizePixel = 0
+pintoftame.Parent = topBar
+pintoftame.CanvasSize = UDim2.new(0, 0, 2, 0) -- Exemplo de CanvasSize
+pintoftame.ScrollBarThickness = 6
+pintoftame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+pintoftame.ClipsDescendants = true
 
-local infj = false
-game:GetService("UserInputService").JumpRequest:Connect(function()
-	if infj then
-		game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-	end
+-- Adicionando UIListLayout
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Parent = pintoftame
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+uiListLayout.Padding = UDim.new(0, 10) -- EspaÃƒÂ§o entre os elementos
+
+-- Adicionando os elementos ao pintoftame
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(1, 0, 0, 30)
+toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Text = "Egg Opener: Off"
+toggleButton.LayoutOrder = 1
+toggleButton.Parent = pintoftame
+
+local eggNameBox = Instance.new("TextBox")
+eggNameBox.Size = UDim2.new(1, 0, 0, 30)
+eggNameBox.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+eggNameBox.TextColor3 = Color3.new(1, 1, 1)
+eggNameBox.PlaceholderText = "Digite o nome do ovo"
+eggNameBox.Text = EggName
+eggNameBox.LayoutOrder = 2
+eggNameBox.Parent = pintoftame
+
+local tripleToggle = Instance.new("TextButton")
+tripleToggle.Size = UDim2.new(1, 0, 0, 30)
+tripleToggle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+tripleToggle.TextColor3 = Color3.new(1, 1, 1)
+tripleToggle.Text = TripleEggs and "Triple Eggs: On" or "Triple Eggs: Off"
+tripleToggle.LayoutOrder = 3
+tripleToggle.Parent = pintoftame
+
+local eggNameLabel = Instance.new("TextLabel")
+eggNameLabel.Size = UDim2.new(1, 0, 0, 30)
+eggNameLabel.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+eggNameLabel.TextColor3 = Color3.new(1, 1, 1)
+eggNameLabel.Text = "Egg Atual: " .. EggName
+eggNameLabel.LayoutOrder = 4
+eggNameLabel.Parent = pintoftame
+
+local statusText = Instance.new("TextLabel")
+statusText.Size = UDim2.new(1, 0, 0, 30)
+statusText.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+statusText.TextColor3 = Color3.new(1, 1, 1)
+statusText.Text = "Modo: " .. (TripleEggs and "Triple Eggs" or "One Egg")
+statusText.LayoutOrder = 5
+statusText.Parent = pintoftame
+
+local isMinimized = false
+
+local function animateFrameSize(targetSize, topBarSize)
+    local tweenService = game:GetService("TweenService")
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    
+    local frameTween = tweenService:Create(pintoftame, tweenInfo, {Size = targetSize})
+    local topBarTween = tweenService:Create(topBar, tweenInfo, {Size = topBarSize})
+    
+    frameTween:Play()
+    topBarTween:Play()
+    
+    frameTween.Completed:Wait()
+    topBarTween.Completed:Wait()
+end
+
+local function toggleEggOpener()
+    running = not running
+    toggleButton.Text = running and "Egg Opener: On" or "Egg Opener: Off"
+
+    if running then
+        stopLoop = false
+        startOpeningEggs()
+    else
+        stopLoop = true
+    end
+end
+
+local function toggleTripleEggs()
+    TripleEggs = not TripleEggs
+    tripleToggle.Text = TripleEggs and "Triple Eggs: On" or "Triple Eggs: Off"
+    updateArgs()
+    statusText.Text = "Modo: " .. (TripleEggs and "Triple Eggs" or "One Egg")
+end
+
+eggNameBox.FocusLost:Connect(function()
+    EggName = eggNameBox.Text
+    updateArgs()
+    eggNameLabel.Text = "Egg Atual: " .. EggName
 end)
 
-tab:CreateToggle({
-    Name = "Inf Jump",
-    CurrentValue = false,
-    Flag = "Enable Aimbot",
-    Callback = function(Value)
-        infj = Value
-    end,
-})
+toggleButton.MouseButton1Click:Connect(toggleEggOpener)
+tripleToggle.MouseButton1Click:Connect(toggleTripleEggs)
 
-tab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Flag = "Enable Aimbot",
-    Callback = function(Value)
-    	noclip = Value
-    end,
-})
-
-noclip = false
-game:GetService('RunService').Stepped:connect(function()
-if noclip then
-game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
-end
+closeButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
-plr = game.Players.LocalPlayer
- 
 
-if noclip then
-    game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
-end
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        animateFrameSize(UDim2.new(0, 250, 0, 0), UDim2.new(0, 250, 0, 40))
+    else
+        animateFrameSize(UDim2.new(0, 400, 0, 260), UDim2.new(0, 400, 0, 40))
+    end
+end)
