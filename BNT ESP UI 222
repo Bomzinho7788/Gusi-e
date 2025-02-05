@@ -9,23 +9,22 @@ local ESPBoxes = {}
 local function CreateLine()
     local line = Drawing.new("Line")
     line.Thickness = 2
-    line.Color = Color3.fromRGB(255, 0, 0) -- Vermelho
+    line.Color = Color3.fromRGB(0, 255, 0) -- Verde
     line.Visible = false
     return line
 end
 
--- Criar ESP 3D
+-- Criar ESP 3D para um jogador
 local function CreateESP(player)
-    if player == LocalPlayer then return end -- Evita ESP para si mesmo
+    if ESPBoxes[player] then return end
 
-    -- Criar 12 linhas para formar a caixa 3D
     ESPBoxes[player] = {
         CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Topo
         CreateLine(), CreateLine(), CreateLine(), CreateLine(), -- Base
         CreateLine(), CreateLine(), CreateLine(), CreateLine()  -- Laterais
     }
 
-    local function Update()
+    local function UpdateESP()
         if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
             for _, line in ipairs(ESPBoxes[player]) do
                 line.Visible = false
@@ -34,7 +33,12 @@ local function CreateESP(player)
         end
 
         local rootPart = player.Character.HumanoidRootPart
-        local size = Vector3.new(3, 6, 3) -- Tamanho do ESP Box
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+
+        local size = Vector3.new(humanoid.HipHeight * 1.5, humanoid.HipHeight * 2, humanoid.HipHeight * 1.5)
+
+        -- Criar os 8 pontos da caixa 3D
         local corners = {
             rootPart.CFrame * CFrame.new(-size.X, size.Y, -size.Z), -- 1
             rootPart.CFrame * CFrame.new(size.X, size.Y, -size.Z),  -- 2
@@ -110,7 +114,7 @@ local function CreateESP(player)
         end
     end
 
-    RunService.RenderStepped:Connect(Update)
+    RunService.RenderStepped:Connect(UpdateESP)
 end
 
 -- Adicionar ESP para novos jogadores
