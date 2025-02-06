@@ -4,6 +4,8 @@ local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
 local ESP_Boxes = {}
+local Tracers = {}
+local HealthBars = {}
 
 -- Deslocamentos para cabeça e pernas
 local HeadOff = Vector3.new(0, 0.5, 0)
@@ -27,6 +29,50 @@ function RemoveBox(Player)
     end
 end
 
+function CreateTracer(Player)
+    if not Tracers[Player] then
+        local Tracer = Drawing.new("Line")
+        Tracer.Visible = false
+        Tracer.Color = Color3.fromRGB(255, 0, 0) -- Vermelho
+        Tracer.Thickness = 1
+        Tracer.Transparency = 1
+        Tracers[Player] = Tracer
+    end
+end
+
+function RemoveTracer(Player)
+    if Tracers[Player] then
+        Tracers[Player]:Remove()
+        Tracers[Player] = nil
+    end
+end
+
+function CreateHealthBar(Player)
+    if not HealthBars[Player] then
+        local HealthBarOutline = Drawing.new("Square")
+        HealthBarOutline.Visible = false
+        HealthBarOutline.Color = Color3.fromRGB(0, 0, 0) -- Preto
+        HealthBarOutline.Thickness = 1
+        HealthBarOutline.Filled = false
+
+        local HealthBar = Drawing.new("Square")
+        HealthBar.Visible = false
+        HealthBar.Color = Color3.fromRGB(0, 255, 0) -- Verde
+        HealthBar.Thickness = 1
+        HealthBar.Filled = true
+
+        HealthBars[Player] = {Outline = HealthBarOutline, Bar = HealthBar}
+    end
+end
+
+function RemoveHealthBar(Player)
+    if HealthBars[Player] then
+        HealthBars[Player].Outline:Remove()
+        HealthBars[Player].Bar:Remove()
+        HealthBars[Player] = nil
+    end
+end
+
 function UpdateESP()
     for _, Player in pairs(Players:GetPlayers()) do
         if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character:FindFirstChild("Head") then
@@ -44,9 +90,41 @@ function UpdateESP()
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                 end
+
+                local Tracer = Tracers[Player]
+                if Tracer then
+                    Tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+                    Tracer.To = Vector2.new(RootPosition.X, RootPosition.Y)
+                    Tracer.Visible = true
+                end
+
+                local HealthBar = HealthBars[Player]
+                if HealthBar then
+                    local Health = Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health or 0
+                    local MaxHealth = Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.MaxHealth or 100
+                    local HealthPercentage = Health / MaxHealth
+                    local HealthBarHeight = HeadPosition.Y - LegPosition.Y
+                    local HealthBarWidth = 5
+                    local HealthBarY = HeadPosition.Y + (HealthBarHeight * (1 - HealthPercentage))
+
+                    HealthBar.Outline.Size = Vector2.new(HealthBarWidth, HealthBarHeight)
+                    HealthBar.Outline.Position = Vector2.new(RootPosition.X - HealthBarWidth / 2, RootPosition.Y - HealthBarHeight / 2)
+                    HealthBar.Outline.Visible = true
+
+                    HealthBar.Bar.Size = Vector2.new(HealthBarWidth, HealthBarHeight * HealthPercentage)
+                    HealthBar.Bar.Position = Vector2.new(RootPosition.X - HealthBarWidth / 2, HealthBarY)
+                    HealthBar.Bar.Visible = true
+                end
             else
                 if ESP_Boxes[Player] then
                     ESP_Boxes[Player].Visible = false
+                end
+                if Tracers[Player] then
+                    Tracers[Player].Visible = false
+                end
+                if HealthBars[Player] then
+                    HealthBars[Player].Outline.Visible = false
+                    HealthBars[Player].Bar.Visible = false
                 end
             end
         end
@@ -56,17 +134,23 @@ end
 for _, Player in pairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
         CreateBox(Player)
+        CreateTracer(Player)
+        CreateHealthBar(Player)
     end
 end
 
 Players.PlayerAdded:Connect(function(Player)
     if Player ~= LocalPlayer then
         CreateBox(Player)
+        CreateTracer(Player)
+        CreateHealthBar(Player)
     end
 end)
 
 Players.PlayerRemoving:Connect(function(Player)
     RemoveBox(Player)
+    RemoveTracer(Player)
+    RemoveHealthBar(Player)
 end)
 
 RunService.RenderStepped:Connect(UpdateESP)
