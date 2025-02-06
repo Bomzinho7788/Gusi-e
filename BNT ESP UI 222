@@ -5,120 +5,68 @@ local LocalPlayer = Players.LocalPlayer
 
 local ESP_Boxes = {}
 
--- Função para criar uma tabela de linhas para cada jogador
-local function CreateBox(Player)
+-- Deslocamentos para cabeça e pernas
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
+
+function CreateBox(Player)
     if not ESP_Boxes[Player] then
-        local lines = {}
-        for i = 1, 4 do
-            lines[i] = Drawing.new("Line")
-            lines[i].Visible = false
-            lines[i].Color = Color3.fromRGB(255, 0, 0) -- Vermelho
-            lines[i].Thickness = 2
-        end
-        -- Linhas para os cantos arredondados
-        for i = 5, 44 do
-            lines[i] = Drawing.new("Line")
-            lines[i].Visible = false
-            lines[i].Color = Color3.fromRGB(255, 0, 0)
-            lines[i].Thickness = 2
-        end
-        ESP_Boxes[Player] = lines
+        local Box = Drawing.new("Square")
+        Box.Visible = false
+        Box.Color = Color3.fromRGB(255, 0, 0) -- Vermelho
+        Box.Thickness = 2
+        Box.Filled = false
+        ESP_Boxes[Player] = Box
     end
 end
 
--- Função para remover as linhas de um jogador
-local function RemoveBox(Player)
+function RemoveBox(Player)
     if ESP_Boxes[Player] then
-        for _, line in pairs(ESP_Boxes[Player]) do
-            line:Remove()
-        end
+        ESP_Boxes[Player]:Remove()
         ESP_Boxes[Player] = nil
     end
 end
 
--- Função para atualizar o ESP
-local function UpdateESP()
+function UpdateESP()
     for _, Player in pairs(Players:GetPlayers()) do
-        if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character:FindFirstChild("Head") then
             local RootPart = Player.Character.HumanoidRootPart
-            local RootPosition, onScreen = Camera:WorldToViewportPoint(RootPart.Position)
+            local Head = Player.Character.Head
 
-            if onScreen then
-                local HeadPosition = Camera:WorldToViewportPoint(RootPart.Position + Vector3.new(0, 3, 0))
-                local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0))
+            local RootPosition, RootVis = Camera:WorldToViewportPoint(RootPart.Position)
+            local HeadPosition = Camera:WorldToViewportPoint(Head.Position + HeadOff)
+            local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOff)
 
-                local boxHeight = HeadPosition.Y - LegPosition.Y
-                local boxWidth = boxHeight / 2
-                local boxSize = Vector2.new(boxWidth, boxHeight)
-                local boxPosition = Vector2.new(RootPosition.X - boxWidth / 2, RootPosition.Y - boxHeight / 2)
-
-                local lines = ESP_Boxes[Player]
-                if lines then
-                    -- Desenhar os lados da caixa
-                    lines[1].From = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight * 0.2)
-                    lines[1].To = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight * 0.8)
-                    lines[1].Visible = true
-
-                    lines[2].From = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight * 0.2)
-                    lines[2].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight * 0.8)
-                    lines[2].Visible = true
-
-                    lines[3].From = Vector2.new(boxPosition.X + boxWidth * 0.2, boxPosition.Y)
-                    lines[3].To = Vector2.new(boxPosition.X + boxWidth * 0.8, boxPosition.Y)
-                    lines[3].Visible = true
-
-                    lines[4].From = Vector2.new(boxPosition.X + boxWidth * 0.2, boxPosition.Y + boxHeight)
-                    lines[4].To = Vector2.new(boxPosition.X + boxWidth * 0.8, boxPosition.Y + boxHeight)
-                    lines[4].Visible = true
-
-                    -- Desenhar os cantos arredondados
-                    local cornerRadius = boxWidth * 0.2
-                    local segments = 10 -- Número de segmentos para cada canto
-                    local angleStep = math.pi / 2 / segments
-
-                    local function DrawCorner(startAngle, center, startIndex)
-                        for i = 0, segments - 1 do
-                            local angle1 = startAngle + i * angleStep
-                            local angle2 = startAngle + (i + 1) * angleStep
-
-                            local point1 = Vector2.new(math.cos(angle1), math.sin(angle1)) * cornerRadius + center
-                            local point2 = Vector2.new(math.cos(angle2), math.sin(angle2)) * cornerRadius + center
-
-                            local line = lines[startIndex + i]
-                            line.From = point1
-                            line.To = point2
-                            line.Visible = true
-                        end
-                    end
-
-                    -- Canto superior esquerdo
-                    DrawCorner(math.pi, boxPosition + Vector2.new(cornerRadius, cornerRadius), 5)
-                    -- Canto superior direito
-                    DrawCorner(-math.pi / 2, boxPosition + Vector2.new(boxWidth - cornerRadius, cornerRadius), 9)
-                    -- Canto inferior esquerdo
-                    DrawCorner(math.pi / 2, boxPosition + Vector2.new(cornerRadius, boxHeight - cornerRadius), 13)
-                    -- Canto inferior direito
-                    DrawCorner(0, boxPosition + Vector2.new(boxWidth - cornerRadius, boxHeight - cornerRadius), 17)
+            if RootVis then
+                local Box = ESP_Boxes[Player]
+                if Box then
+                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
                 end
             else
                 if ESP_Boxes[Player] then
-                    for _, line in pairs(ESP_Boxes[Player]) do
-                        line.Visible = false
-                    end
+                    ESP_Boxes[Player].Visible = false
                 end
             end
         end
     end
 end
 
--- Conectar eventos
-Players.PlayerAdded:Connect(CreateBox)
-Players.PlayerRemoving:Connect(RemoveBox)
-RunService.RenderStepped:Connect(UpdateESP)
-
--- Criar ESP para jogadores existentes
 for _, Player in pairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
         CreateBox(Player)
     end
 end
+
+Players.PlayerAdded:Connect(function(Player)
+    if Player ~= LocalPlayer then
+        CreateBox(Player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(Player)
+    RemoveBox(Player)
+end)
+
+RunService.RenderStepped:Connect(UpdateESP)
