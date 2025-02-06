@@ -9,7 +9,6 @@ local ESP_Boxes = {}
 local function CreateBox(Player)
     if not ESP_Boxes[Player] then
         local lines = {}
-        -- Linhas para os lados da caixa
         for i = 1, 4 do
             lines[i] = Drawing.new("Line")
             lines[i].Visible = false
@@ -17,7 +16,7 @@ local function CreateBox(Player)
             lines[i].Thickness = 2
         end
         -- Linhas para os cantos arredondados
-        for i = 5, 104 do
+        for i = 5, 44 do
             lines[i] = Drawing.new("Line")
             lines[i].Visible = false
             lines[i].Color = Color3.fromRGB(255, 0, 0)
@@ -74,7 +73,7 @@ local function UpdateESP()
 
                     -- Desenhar os cantos arredondados
                     local cornerRadius = boxWidth * 0.2
-                    local segments = 25 -- Número de segmentos para cada canto
+                    local segments = 10 -- Número de segmentos para cada canto
                     local angleStep = math.pi / 2 / segments
 
                     local function DrawCorner(startAngle, center, startIndex)
@@ -95,11 +94,11 @@ local function UpdateESP()
                     -- Canto superior esquerdo
                     DrawCorner(math.pi, boxPosition + Vector2.new(cornerRadius, cornerRadius), 5)
                     -- Canto superior direito
-                    DrawCorner(-math.pi / 2, boxPosition + Vector2.new(boxWidth - cornerRadius, cornerRadius), 105)
+                    DrawCorner(-math.pi / 2, boxPosition + Vector2.new(boxWidth - cornerRadius, cornerRadius), 9)
                     -- Canto inferior esquerdo
-                    DrawCorner(math.pi / 2, boxPosition + Vector2.new(cornerRadius, boxHeight - cornerRadius), 205)
+                    DrawCorner(math.pi / 2, boxPosition + Vector2.new(cornerRadius, boxHeight - cornerRadius), 13)
                     -- Canto inferior direito
-                    DrawCorner(0, boxPosition + Vector2.new(boxWidth - cornerRadius, boxHeight - cornerRadius), 305)
+                    DrawCorner(0, boxPosition + Vector2.new(boxWidth - cornerRadius, boxHeight - cornerRadius), 17)
                 end
             else
                 if ESP_Boxes[Player] then
