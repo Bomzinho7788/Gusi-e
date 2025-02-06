@@ -107,12 +107,13 @@ function UpdateESP()
                     local HealthBarWidth = 5
                     local HealthBarY = HeadPosition.Y + (HealthBarHeight * (1 - HealthPercentage))
 
+                    -- Posicionando a barra de saúde ao lado da caixa
                     HealthBar.Outline.Size = Vector2.new(HealthBarWidth, HealthBarHeight)
-                    HealthBar.Outline.Position = Vector2.new(RootPosition.X - HealthBarWidth / 2, RootPosition.Y - HealthBarHeight / 2)
+                    HealthBar.Outline.Position = Vector2.new(RootPosition.X + Box.Size.X / 2 + 2, RootPosition.Y - HealthBarHeight / 2)
                     HealthBar.Outline.Visible = true
 
                     HealthBar.Bar.Size = Vector2.new(HealthBarWidth, HealthBarHeight * HealthPercentage)
-                    HealthBar.Bar.Position = Vector2.new(RootPosition.X - HealthBarWidth / 2, HealthBarY)
+                    HealthBar.Bar.Position = Vector2.new(RootPosition.X + Box.Size.X / 2 + 2, HealthBarY)
                     HealthBar.Bar.Visible = true
                 end
             else
