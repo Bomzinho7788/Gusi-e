@@ -17,7 +17,7 @@ local function CreateBox(Player)
             lines[i].Thickness = 2
         end
         -- Linhas para os cantos arredondados
-        for i = 5, 404 do
+        for i = 5, 104 do
             lines[i] = Drawing.new("Line")
             lines[i].Visible = false
             lines[i].Color = Color3.fromRGB(255, 0, 0)
@@ -74,7 +74,7 @@ local function UpdateESP()
 
                     -- Desenhar os cantos arredondados
                     local cornerRadius = boxWidth * 0.2
-                    local segments = 100 -- Número de segmentos para cada canto
+                    local segments = 25 -- Número de segmentos para cada canto
                     local angleStep = math.pi / 2 / segments
 
                     local function DrawCorner(startAngle, center, startIndex)
