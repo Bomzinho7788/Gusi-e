@@ -119,9 +119,9 @@ local function CreateCornerBox()
     }
     
     for _, line in pairs(box) do
-        line.Thickness = _G.thickness or 1
-        line.Color = _G.color or Color3.fromRGB(255, 0, 0)
-        line.Visible = _G.visible or false
+        line.Thickness = _G.boxThickness
+        line.Color = _G.boxColor
+        line.Visible = _G.boxVisible
     end
     
     return box
@@ -129,9 +129,9 @@ end
 
 local function UpdateCornerBox(box)
     for _, line in pairs(box) do
-        line.Thickness = _G.thickness
-        line.Color = _G.color
-        line.Visible = false
+        line.Thickness = _G.boxThickness
+        line.Color = _G.boxColor
+        line.Visible = _G.boxVisible
     end
 end
 
