@@ -5,28 +5,29 @@ local LocalPlayer = Players.LocalPlayer
 
 local ESP_Boxes = {}
 
--- Função para criar linhas de canto
-local function CreateCornerLines()
-    local lines = {}
-    for i = 1, 8 do
-        local line = Drawing.new("Line")
-        line.Visible = false
-        line.Color = Color3.fromRGB(255, 0, 0) -- Vermelho
-        line.Thickness = 2
-        table.insert(lines, line)
-    end
-    return lines
-end
-
--- Função para criar o ESP para um jogador
-local function CreateESP(Player)
+-- Função para criar uma tabela de linhas para cada jogador
+local function CreateBox(Player)
     if not ESP_Boxes[Player] then
-        ESP_Boxes[Player] = CreateCornerLines()
+        local lines = {}
+        for i = 1, 4 do
+            lines[i] = Drawing.new("Line")
+            lines[i].Visible = false
+            lines[i].Color = Color3.fromRGB(255, 0, 0) -- Vermelho
+            lines[i].Thickness = 2
+        end
+        -- Linhas para os cantos arredondados
+        for i = 5, 20 do
+            lines[i] = Drawing.new("Line")
+            lines[i].Visible = false
+            lines[i].Color = Color3.fromRGB(255, 0, 0)
+            lines[i].Thickness = 2
+        end
+        ESP_Boxes[Player] = lines
     end
 end
 
--- Função para remover o ESP de um jogador
-local function RemoveESP(Player)
+-- Função para remover as linhas de um jogador
+local function RemoveBox(Player)
     if ESP_Boxes[Player] then
         for _, line in pairs(ESP_Boxes[Player]) do
             line:Remove()
@@ -53,42 +54,51 @@ local function UpdateESP()
 
                 local lines = ESP_Boxes[Player]
                 if lines then
-                    -- Tamanho do canto
-                    local cornerSize = boxWidth * 0.2
-
-                    -- Linhas superiores
-                    lines[1].From = Vector2.new(boxPosition.X, boxPosition.Y + cornerSize)
-                    lines[1].To = Vector2.new(boxPosition.X, boxPosition.Y)
+                    -- Desenhar os lados da caixa
+                    lines[1].From = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight * 0.2)
+                    lines[1].To = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight * 0.8)
                     lines[1].Visible = true
 
-                    lines[2].From = Vector2.new(boxPosition.X, boxPosition.Y)
-                    lines[2].To = Vector2.new(boxPosition.X + cornerSize, boxPosition.Y)
+                    lines[2].From = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight * 0.2)
+                    lines[2].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight * 0.8)
                     lines[2].Visible = true
 
-                    lines[3].From = Vector2.new(boxPosition.X + boxWidth - cornerSize, boxPosition.Y)
-                    lines[3].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y)
+                    lines[3].From = Vector2.new(boxPosition.X + boxWidth * 0.2, boxPosition.Y)
+                    lines[3].To = Vector2.new(boxPosition.X + boxWidth * 0.8, boxPosition.Y)
                     lines[3].Visible = true
 
-                    lines[4].From = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y)
-                    lines[4].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + cornerSize)
+                    lines[4].From = Vector2.new(boxPosition.X + boxWidth * 0.2, boxPosition.Y + boxHeight)
+                    lines[4].To = Vector2.new(boxPosition.X + boxWidth * 0.8, boxPosition.Y + boxHeight)
                     lines[4].Visible = true
 
-                    -- Linhas inferiores
-                    lines[5].From = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight - cornerSize)
-                    lines[5].To = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight)
-                    lines[5].Visible = true
+                    -- Desenhar os cantos arredondados
+                    local cornerRadius = boxWidth * 0.2
+                    local segments = 4 -- Número de segmentos para cada canto
+                    local angleStep = math.pi / 2 / segments
 
-                    lines[6].From = Vector2.new(boxPosition.X, boxPosition.Y + boxHeight)
-                    lines[6].To = Vector2.new(boxPosition.X + cornerSize, boxPosition.Y + boxHeight)
-                    lines[6].Visible = true
+                    local function DrawCorner(startAngle, center, startIndex)
+                        for i = 0, segments - 1 do
+                            local angle1 = startAngle + i * angleStep
+                            local angle2 = startAngle + (i + 1) * angleStep
 
-                    lines[7].From = Vector2.new(boxPosition.X + boxWidth - cornerSize, boxPosition.Y + boxHeight)
-                    lines[7].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight)
-                    lines[7].Visible = true
+                            local point1 = Vector2.new(math.cos(angle1), math.sin(angle1)) * cornerRadius + center
+                            local point2 = Vector2.new(math.cos(angle2), math.sin(angle2)) * cornerRadius + center
 
-                    lines[8].From = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight)
-                    lines[8].To = Vector2.new(boxPosition.X + boxWidth, boxPosition.Y + boxHeight - cornerSize)
-                    lines[8].Visible = true
+                            local line = lines[startIndex + i]
+                            line.From = point1
+                            line.To = point2
+                            line.Visible = true
+                        end
+                    end
+
+                    -- Canto superior esquerdo
+                    DrawCorner(math.pi, boxPosition + Vector2.new(cornerRadius, cornerRadius), 5)
+                    -- Canto superior direito
+                    DrawCorner(-math.pi / 2, boxPosition + Vector2.new(boxWidth - cornerRadius, cornerRadius), 9)
+                    -- Canto inferior esquerdo
+                    DrawCorner(math.pi / 2, boxPosition + Vector2.new(cornerRadius, boxHeight - cornerRadius), 13)
+                    -- Canto inferior direito
+                    DrawCorner(0, boxPosition + Vector2.new(boxWidth - cornerRadius, boxHeight - cornerRadius), 17)
                 end
             else
                 if ESP_Boxes[Player] then
@@ -102,13 +112,13 @@ local function UpdateESP()
 end
 
 -- Conectar eventos
-Players.PlayerAdded:Connect(CreateESP)
-Players.PlayerRemoving:Connect(RemoveESP)
+Players.PlayerAdded:Connect(CreateBox)
+Players.PlayerRemoving:Connect(RemoveBox)
 RunService.RenderStepped:Connect(UpdateESP)
 
 -- Criar ESP para jogadores existentes
 for _, Player in pairs(Players:GetPlayers()) do
     if Player ~= LocalPlayer then
-        CreateESP(Player)
+        CreateBox(Player)
     end
 end
