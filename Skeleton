@@ -1,4 +1,4 @@
-local EggName = "Ultra Sigma Egg"
+local EggName = "Ultra Sigma  Egg"
 local TripleEggs = false
 local OctupleEggs = true
 local running = false
