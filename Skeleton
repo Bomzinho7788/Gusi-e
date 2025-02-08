@@ -73,7 +73,7 @@ minimizeButton.Text = "-"
 minimizeButton.Parent = topBar
 
 local mainFrame = Instance.new("ScrollingFrame")
-mainFrame.Size = UDim2.new(0, 400, 0, 260)
+mainFrame.Size = UDim2.new(0, 400, 0, 290)
 mainFrame.Position = UDim2.new(0, 0, 1, 0)
 mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 mainFrame.BorderSizePixel = 0
