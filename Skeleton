@@ -1,5 +1,6 @@
-local EggName = ""
-local TripleEggs = true
+local EggName = "Ultra Sigma Egg"
+local TripleEggs = false
+local OctupleEggs = true
 local running = false
 local stopLoop = false
 
@@ -8,7 +9,7 @@ local args = {
         [1] = {
             [1] = EggName,
             [2] = TripleEggs,
-            [3] = false
+            [3] = OctupleEggs
         },
         [2] = {
             [1] = false,
@@ -21,11 +22,12 @@ local args = {
 local function updateArgs()
     args[1][1][1] = EggName
     args[1][1][2] = TripleEggs
+    args[1][1][3] = OctupleEggs
 end
 
 local function startOpeningEggs()
     while not stopLoop do
-        game:GetService("TextChatService"):WaitForChild("__REMOTES"):WaitForChild("buyx egg"):InvokeServer(unpack(args))
+         workspace:WaitForChild("__THINGS"):WaitForChild("__REMOTES"):WaitForChild("buy egg"):InvokeServer(unpack(args))
         wait()
     end
 end
@@ -44,7 +46,6 @@ topBar.Parent = ScreenGui
 topBar.Active = true
 topBar.Draggable = true
 
--- TÃƒÂ­tulo
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -80, 1, 0)
 titleLabel.Position = UDim2.new(0, 10, 0, 0)
@@ -55,7 +56,6 @@ titleLabel.TextSize = 18
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = topBar
 
--- BotÃƒÂ£o de fechar
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 30, 0, 30)
 closeButton.Position = UDim2.new(1, -35, 0, 5)
@@ -64,7 +64,6 @@ closeButton.TextColor3 = Color3.new(1, 1, 1)
 closeButton.Text = "X"
 closeButton.Parent = topBar
 
--- BotÃƒÂ£o de minimizar
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0, 30, 0, 30)
 minimizeButton.Position = UDim2.new(1, -70, 0, 5)
@@ -73,32 +72,29 @@ minimizeButton.TextColor3 = Color3.new(1, 1, 1)
 minimizeButton.Text = "-"
 minimizeButton.Parent = topBar
 
--- Frame principal como ScrollingFrame
-local pintoftame = Instance.new("ScrollingFrame")
-pintoftame.Size = UDim2.new(0, 400, 0, 260)
-pintoftame.Position = UDim2.new(0, 0, 1, 0)
-pintoftame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-pintoftame.BorderSizePixel = 0
-pintoftame.Parent = topBar
-pintoftame.CanvasSize = UDim2.new(0, 0, 2, 0) -- Exemplo de CanvasSize
-pintoftame.ScrollBarThickness = 6
-pintoftame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
-pintoftame.ClipsDescendants = true
+local mainFrame = Instance.new("ScrollingFrame")
+mainFrame.Size = UDim2.new(0, 400, 0, 260)
+mainFrame.Position = UDim2.new(0, 0, 1, 0)
+mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = topBar
+mainFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+mainFrame.ScrollBarThickness = 6
+mainFrame.ScrollBarImageColor3 = Color3.new(0.7, 0.7, 0.7)
+mainFrame.ClipsDescendants = true
 
--- Adicionando UIListLayout
 local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.Parent = pintoftame
+uiListLayout.Parent = mainFrame
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-uiListLayout.Padding = UDim.new(0, 10) -- EspaÃƒÂ§o entre os elementos
+uiListLayout.Padding = UDim.new(0, 10)
 
--- Adicionando os elementos ao pintoftame
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, 0, 0, 30)
 toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
 toggleButton.Text = "Egg Opener: Off"
 toggleButton.LayoutOrder = 1
-toggleButton.Parent = pintoftame
+toggleButton.Parent = mainFrame
 
 local eggNameBox = Instance.new("TextBox")
 eggNameBox.Size = UDim2.new(1, 0, 0, 30)
@@ -107,7 +103,7 @@ eggNameBox.TextColor3 = Color3.new(1, 1, 1)
 eggNameBox.PlaceholderText = "Digite o nome do ovo"
 eggNameBox.Text = EggName
 eggNameBox.LayoutOrder = 2
-eggNameBox.Parent = pintoftame
+eggNameBox.Parent = mainFrame
 
 local tripleToggle = Instance.new("TextButton")
 tripleToggle.Size = UDim2.new(1, 0, 0, 30)
@@ -115,7 +111,7 @@ tripleToggle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 tripleToggle.TextColor3 = Color3.new(1, 1, 1)
 tripleToggle.Text = TripleEggs and "Triple Eggs: On" or "Triple Eggs: Off"
 tripleToggle.LayoutOrder = 3
-tripleToggle.Parent = pintoftame
+tripleToggle.Parent = mainFrame
 
 local eggNameLabel = Instance.new("TextLabel")
 eggNameLabel.Size = UDim2.new(1, 0, 0, 30)
@@ -123,7 +119,7 @@ eggNameLabel.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 eggNameLabel.TextColor3 = Color3.new(1, 1, 1)
 eggNameLabel.Text = "Egg Atual: " .. EggName
 eggNameLabel.LayoutOrder = 4
-eggNameLabel.Parent = pintoftame
+eggNameLabel.Parent = mainFrame
 
 local statusText = Instance.new("TextLabel")
 statusText.Size = UDim2.new(1, 0, 0, 30)
@@ -131,7 +127,15 @@ statusText.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 statusText.TextColor3 = Color3.new(1, 1, 1)
 statusText.Text = "Modo: " .. (TripleEggs and "Triple Eggs" or "One Egg")
 statusText.LayoutOrder = 5
-statusText.Parent = pintoftame
+statusText.Parent = mainFrame
+
+local octupleToggle = Instance.new("TextButton")
+octupleToggle.Size = UDim2.new(1, 0, 0, 30)
+octupleToggle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+octupleToggle.TextColor3 = Color3.new(1, 1, 1)
+octupleToggle.Text = OctupleEggs and "Octuple Eggs: On" or "Octuple Eggs: Off"
+octupleToggle.LayoutOrder = 6
+octupleToggle.Parent = mainFrame
 
 local isMinimized = false
 
@@ -139,7 +143,7 @@ local function animateFrameSize(targetSize, topBarSize)
     local tweenService = game:GetService("TweenService")
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     
-    local frameTween = tweenService:Create(pintoftame, tweenInfo, {Size = targetSize})
+    local frameTween = tweenService:Create(mainFrame, tweenInfo, {Size = targetSize})
     local topBarTween = tweenService:Create(topBar, tweenInfo, {Size = topBarSize})
     
     frameTween:Play()
@@ -166,6 +170,17 @@ local function toggleTripleEggs()
     tripleToggle.Text = TripleEggs and "Triple Eggs: On" or "Triple Eggs: Off"
     updateArgs()
     statusText.Text = "Modo: " .. (TripleEggs and "Triple Eggs" or "One Egg")
+    OctupleEggs = false
+    octupleToggle.Text = "Octuple Eggs: Off"
+end
+
+local function toggleOctupleEggs()
+    OctupleEggs = not OctupleEggs
+    octupleToggle.Text = OctupleEggs and "Octuple Eggs: On" or "Octuple Eggs: Off"
+    updateArgs()
+    statusText.Text = "Modo: " .. (OctupleEggs and "Octuple Eggs" or "One Egg")
+    TripleEggs = false
+    tripleToggle.Text = "Triple Eggs: Off"
 end
 
 eggNameBox.FocusLost:Connect(function()
@@ -176,6 +191,7 @@ end)
 
 toggleButton.MouseButton1Click:Connect(toggleEggOpener)
 tripleToggle.MouseButton1Click:Connect(toggleTripleEggs)
+octupleToggle.MouseButton1Click:Connect(toggleOctupleEggs)
 
 closeButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
