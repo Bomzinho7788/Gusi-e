@@ -1,70 +1,1611 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local currentCamera = workspace.CurrentCamera
+local worldToViewportPoint = currentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0, 3, 0)
+
+_G.temcheck = false
+_G.temcheckmode = "colors"
+_G.teamcolor = Color3.new(0, 1, 0)
+_G.enemycolor = Color3.new(1, 0, 0)
+
+_G.boxColor = Color3.new(0, 0, 0)
+_G.boxThickness = 1
+_G.boxTransparency = 1
+_G.boxVisible = false
+
+_G.boxFilledColor = Color3.new(0, 0, 0)
+_G.boxFilledTransparency = 0.5
+_G.boxFilledVisible = false
+
+_G.HealthBarThickness = 1
+_G.HealthBarVisible = false
+_G.HealthBarTransparency = 1
+_G.HealthBarColor = Color3.new(0, 1, 0)
+_G.HealthBarFilled = true
+
+_G.HealthBarPosition = "Left"
+
+_G.TracerVisible = false
+_G.TracerThickness = 1.5
+_G.TracerTransparency = 1
+_G.TracerColor = Color3.new(0, 0, 0)
+
+_G.TracerFrom = "Bottom"
+
+_G.BoxType = "Normal Box"
+
+local function getTracerFromPosition()
+    if _G.TracerFrom == "Bottom" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+    elseif _G.TracerFrom == "Middle" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif _G.TracerFrom == "Top" then
+        return Vector2.new(camera.ViewportSize.X / 2, 0)
+    end
+end
+
+local function getHealthValues(player)
+    local maxHealth, health
+    if player:FindFirstChild("NRPBS") then
+        maxHealth = player.NRPBS["MaxHealth"].Value
+        health = player.NRPBS["Health"].Value
+    else
+        maxHealth = player.Character.Humanoid.MaxHealth
+        health = player.Character.Humanoid.Health
+    end
+    return maxHealth, health
+end
+
+local function updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, isOutline, maxHealth, health, CornerBox, BoxPosition)
+    local offset = isOutline and 6 or 4
+    local healthRatio = math.clamp(health / maxHealth, 0, 1)
+
+    if _G.HealthBarPosition == "Left" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y)
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X - offset, Box.Position.Y) 
+
+    elseif _G.HealthBarPosition == "Right" then
+        local healthBarSize = (HeadPosition.Y - LegPosition.Y) * healthRatio
+        HealthBar.Size = Vector2.new(2, healthBarSize)
+        HealthBar.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+        
+        HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X + Box.Size.X + offset - 2, Box.Position.Y)
+
+    elseif _G.HealthBarPosition == "Bottom" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + offset)
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + offset)
+
+    elseif _G.HealthBarPosition == "Top" then
+        local healthBarSize = Box.Size.X * healthRatio
+        HealthBar.Size = Vector2.new(healthBarSize, 2)
+        HealthBar.Position = Vector2.new(Box.Position.X + (Box.Size.X - healthBarSize), Box.Position.Y + Box.Size.Y - offset)
+        
+        HealthBarOutline.Size = Vector2.new(Box.Size.X, 2)
+        HealthBarOutline.Position = Vector2.new(Box.Position.X, Box.Position.Y + Box.Size.Y - offset)
+    end
+end
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
+local Camera = game.Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local ESP_Arrows = {}
+local ESP_Boxes = {}
 
-function CreateArrow(Player)
-    if not ESP_Arrows[Player] then
-        local Arrow = Instance.new("Frame")
-        Arrow.Visible = false
-        Arrow.Size = UDim2.new(0, 20, 0, 20) -- Tamanho da seta
-        Arrow.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Vermelho
-        Arrow.AnchorPoint = Vector2.new(0.5, 0.5)
-        Arrow.Rotation = 0
-        Arrow.Parent = LocalPlayer.PlayerGui
-        ESP_Arrows[Player] = Arrow
+local function CreateCornerBox()
+    local box = {
+        TopLeft = Drawing.new("Line"),
+        TopLeftVertical = Drawing.new("Line"),
+        TopRight = Drawing.new("Line"),
+        TopRightVertical = Drawing.new("Line"),
+        BottomLeft = Drawing.new("Line"),
+        BottomLeftVertical = Drawing.new("Line"),
+        BottomRight = Drawing.new("Line"),
+        BottomRightVertical = Drawing.new("Line")
+    }
+    
+    for _, line in pairs(box) do
+        line.Thickness = _G.thickness
+        line.Color = Color3.new(0, 0, 0)
+        line.Visible = false
+    end
+    
+    return box
+end
+
+local function UpdateCornerBox(box)
+    for _, line in pairs(box) do
+        line.Thickness = _G.thickness
+        line.Color = Color3.new(0, 0, 0)
+        line.Visible = false
     end
 end
 
-function RemoveArrow(Player)
-    if ESP_Arrows[Player] then
-        ESP_Arrows[Player]:Destroy()
-        ESP_Arrows[Player] = nil
-    end
+local cornerBox = CreateCornerBox()
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    UpdateCornerBox(cornerBox)
+end)
+
+local function createDrawingObjects()
+    local Box = Drawing.new("Square")
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Filled = false
+    Box.Visible = _G.boxVisible
+
+    local BoxFilled = Drawing.new("Square")
+    BoxFilled.Visible = _G.boxFilledVisible
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Filled = true
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Visible = false
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Color = Color3.new(0, 0, 0)
+    HealthBarOutline.Filled = true
+
+    local Tracer = Drawing.new("Line")
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+
+    return Box, BoxFilled, HealthBar, Tracer, HealthBarOutline
 end
 
-function UpdateESP()
-    for _, Player in pairs(Players:GetPlayers()) do
-        if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-            local RootPart = Player.Character.HumanoidRootPart
+local function updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBarOutline)
+    Box.Color = _G.boxColor
+    Box.Thickness = _G.boxThickness
+    Box.Transparency = _G.boxTransparency
+    Box.Visible = _G.boxVisible
+
+    BoxFilled.Color = _G.boxFilledColor
+    BoxFilled.Transparency = _G.boxFilledTransparency
+    BoxFilled.Visible = _G.boxFilledVisible
+
+    HealthBar.Thickness = _G.HealthBarThickness
+    HealthBar.Visible = _G.HealthBarVisible
+    HealthBar.Transparency = _G.HealthBarTransparency
+    HealthBar.Color = _G.HealthBarColor
+    HealthBar.Filled = _G.HealthBarFilled
+
+    HealthBarOutline.Thickness = (_G.HealthBarThickness + 1)
+    HealthBarOutline.Visible = false
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Color = Color3.new(0, 0, 0)
+    HealthBarOutline.Filled = true
+
+    Tracer.Visible = _G.TracerVisible
+    Tracer.Thickness = _G.TracerThickness
+    Tracer.Transparency = _G.TracerTransparency
+    Tracer.Color = _G.TracerColor
+end
+
+local function setupPlayerBox(v)
+    local Box, BoxFilled, HealthBar, Tracer, HealthBarOutline = createDrawingObjects()
+    local CornerBox = CreateCornerBox()
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateDrawingObjects(Box, BoxFilled, HealthBar, Tracer, HealthBarOutline)
+
+        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= LocalPlayer and v.Character.Humanoid.Health > 0 then
+            local Vector, onScreen = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+            local RootPart = v.Character.HumanoidRootPart
+            local Head = v.Character.Head
             local RootPosition, RootVis = Camera:WorldToViewportPoint(RootPart.Position)
+            local HeadPosition = Camera:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.5, 0))
+            local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0))
 
-            if RootVis then
-                local Arrow = ESP_Arrows[Player]
-                if Arrow then
-                    local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                    local Direction = (Vector2.new(RootPosition.X, RootPosition.Y) - ScreenCenter).unit
-                    local Angle = math.deg(math.atan2(Direction.Y, Direction.X))
+            if onScreen then
+                local maxHealth, health = getHealthValues(v)
 
-                    Arrow.Position = UDim2.new(0, ScreenCenter.X, 0, ScreenCenter.Y)
-                    Arrow.Rotation = Angle
-                    Arrow.Visible = true
+                Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                Box.Visible = _G.boxVisible
+
+                BoxFilled.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                BoxFilled.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                BoxFilled.Visible = _G.boxFilledVisible
+
+                if _G.BoxType == "Normal Box" then
+                    for _, line in pairs(CornerBox) do
+                        line.Transparency = 0
+                    end
+
+                    Box.Transparency = _G.boxTransparency
+                    BoxFilled.Transparency = _G.boxFilledTransparency
+
+                elseif _G.BoxType == "Corner Box" then
+                    local BoxSize = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    local BoxPosition = Vector2.new(RootPosition.X - BoxSize.X / 2, RootPosition.Y - BoxSize.Y / 2)
+                    local cornerLength = BoxSize.X * 0.2
+                    for _, line in pairs(CornerBox) do
+                        line.Transparency = _G.boxTransparency
+                    end
+                    Box.Transparency = 0
+                    BoxFilled.Transparency = 0
+                    
+                    CornerBox.TopLeft.From = BoxPosition
+                    CornerBox.TopLeft.To = BoxPosition + Vector2.new(cornerLength, 0)
+                
+                    CornerBox.TopLeftVertical.From = BoxPosition
+                    CornerBox.TopLeftVertical.To = BoxPosition + Vector2.new(0, -cornerLength)
+                
+                    CornerBox.TopRight.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                    CornerBox.TopRight.To = CornerBox.TopRight.From - Vector2.new(cornerLength, 0)
+                
+                    CornerBox.TopRightVertical.From = BoxPosition + Vector2.new(BoxSize.X, 0)
+                    CornerBox.TopRightVertical.To = CornerBox.TopRightVertical.From + Vector2.new(0, -cornerLength)
+                
+                    CornerBox.BottomLeft.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                    CornerBox.BottomLeft.To = CornerBox.BottomLeft.From + Vector2.new(cornerLength, 0)
+                
+                    CornerBox.BottomLeftVertical.From = BoxPosition + Vector2.new(0, BoxSize.Y)
+                    CornerBox.BottomLeftVertical.To = CornerBox.BottomLeftVertical.From + Vector2.new(0, cornerLength)
+                
+                    CornerBox.BottomRight.From = BoxPosition + BoxSize
+                    CornerBox.BottomRight.To = CornerBox.BottomRight.From - Vector2.new(cornerLength, 0)
+                
+                    CornerBox.BottomRightVertical.From = BoxPosition + BoxSize
+                    CornerBox.BottomRightVertical.To = CornerBox.BottomRightVertical.From + Vector2.new(0, cornerLength)
+                    
+                    for _, line in pairs(CornerBox) do
+                        line.Visible = _G.boxVisible
+                    end
+                end
+
+                HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+                HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+                updateHealthBarPosition(HealthBar, HealthBarOutline, Box, HeadPosition, LegPosition, RootPosition, false, maxHealth, health)
+                HealthBar.Color = Color3.fromRGB(255 - 255 / (maxHealth / health), 255 / (maxHealth / health), 0)
+                HealthBar.Visible = _G.HealthBarVisible
+                HealthBarOutline.Visible = false
+
+                Tracer.From = getTracerFromPosition()
+                Tracer.To = Vector2.new(Vector.X, Vector.Y)
+
+                if _G.teamcheck == true then
+                    if _G.temcheckmode == "colors" then
+                        if v.TeamColor == LocalPlayer.TeamColor then
+                            Box.Color = _G.teamcolor
+                            BoxFilled.Color = _G.teamcolor
+                            Tracer.Color = _G.teamcolor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.teamcolor
+                            end
+                        else
+                            Box.Color = _G.enemycolor
+                            BoxFilled.Color = _G.enemycolor
+                            Tracer.Color = _G.enemycolor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.enemycolor
+                            end
+                        end
+                    elseif _G.temcheckmode == "invisible" then
+                        if v.TeamColor == LocalPlayer.TeamColor then
+                            Box.Visible = false
+                            BoxFilled.Visible = false
+                            HealthBar.Visible = false
+                            Tracer.Visible = false
+                            for _, line in pairs(CornerBox) do
+                                line.Visible = false
+                            end
+                        else
+                            Box.Color = _G.boxColor
+                            BoxFilled.Color = _G.boxFilledColor
+                            Tracer.Color = _G.TracerColor
+                            for _, line in pairs(CornerBox) do
+                                line.Color = _G.boxColor
+                            end
+                        end
+                    end
                 end
             else
-                if ESP_Arrows[Player] then
-                    ESP_Arrows[Player].Visible = false
+                Box.Visible = false
+                BoxFilled.Visible = false
+                HealthBar.Visible = false
+                Tracer.Visible = false
+                for _, line in pairs(CornerBox) do
+                    line.Visible = false
                 end
+            end
+        else
+            Box.Visible = false
+            BoxFilled.Visible = false
+            HealthBar.Visible = false
+            Tracer.Visible = false
+            for _, line in pairs(CornerBox) do
+                line.Visible = false
+            end
+        end
+    end)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        setupPlayerBox(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        setupPlayerBox(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    if ESP_Boxes[player] then
+        for _, line in pairs(ESP_Boxes[player]) do
+            line.Visible = false
+            line:Remove()
+        end
+        ESP_Boxes[player] = nil
+    end
+end)
+
+local SilentAimEnabled = false
+local WallCheckEnabled = false
+local FOV = 75
+local FOVVisible = false
+local FOVPosition = "Center"
+local FOVCircle = Drawing.new("Circle")
+local TeamCheckEnabled = false
+_G.targetPart = "Head"
+
+FOVCircle.Radius = FOV
+FOVCircle.Thickness = 1
+FOVCircle.Color = Color3.new(1, 1, 1)
+FOVCircle.Transparency = 1
+FOVCircle.Visible = FOVVisible
+FOVCircle.Filled = false
+FOVCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+
+local function getFOVPosition()
+    local camera = workspace.CurrentCamera
+    if FOVPosition == "Center" then
+        return Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    elseif FOVPosition == "Mouse" then
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        return Vector2.new(mouse.X, mouse.Y)
+    end
+end
+
+local function isPlayerInFOV(player)
+    local mousePos = getFOVPosition()
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
+        local charPart = player.Character:FindFirstChild(_G.targetPart)
+        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+        return distance <= FOV
+    end
+    return false
+end
+
+local function isVisible(target)
+    if WallCheckEnabled then
+        if not target or not target.Character or not target.Character:FindFirstChild(_G.targetPart) then
+            return false
+        end
+
+        local camera = workspace.CurrentCamera
+        local targetPartPos = target.Character:FindFirstChild(_G.targetPart).Position
+        local rayOrigin = camera.CFrame.Position
+        local rayDirection = (targetPartPos - rayOrigin).Unit * (targetPartPos - rayOrigin).Magnitude
+
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+        local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+        if raycastResult and raycastResult.Instance then
+            return raycastResult.Instance:IsDescendantOf(target.Character)
+        end
+    end
+    return true
+end
+
+local function isInFrontOfCamera(player)
+    if player.Character and player.Character:FindFirstChild(_G.targetPart) then
+        local camera = workspace.CurrentCamera
+        local targetPartPos = player.Character:FindFirstChild(_G.targetPart).Position
+        local cameraDirection = camera.CFrame.LookVector
+        local directionToPlayer = (targetPartPos - camera.CFrame.Position).Unit
+
+        local dotProduct = cameraDirection:Dot(directionToPlayer)
+        return dotProduct > 0
+    end
+    return false
+end
+
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local players = game.Players:GetPlayers()
+    local closestDistance = math.huge
+    local mousePos = getFOVPosition()
+
+    for _, player in pairs(players) do
+        if player ~= game.Players.LocalPlayer and isVisible(player) then
+            if TeamCheckEnabled and player.Team == game.Players.LocalPlayer.Team then
+                continue
+            end
+
+            if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+                if isPlayerInFOV(player) and isInFrontOfCamera(player) then
+                    local charPart = player.Character:FindFirstChild(_G.targetPart)
+                    if charPart then
+                        local screenPos = workspace.CurrentCamera:WorldToViewportPoint(charPart.Position)
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                        if distance < closestDistance then
+                            closestDistance = distance
+                            closestPlayer = player
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function aimAt(target)
+    if target and target.Character then
+        if target.Character:FindFirstChild(_G.targetPart) then
+            local camera = workspace.CurrentCamera
+            local aimPosition = target.Character[_G.targetPart].Position
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+        end
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if SilentAimEnabled then
+        local target = getClosestPlayer()
+        if target then
+            aimAt(target)
+        end
+    end
+
+    FOVCircle.Position = getFOVPosition()
+    FOVCircle.Radius = FOV
+    FOVCircle.Visible = FOVVisible
+end)
+
+local targetPart = "Head"
+
+local function toggleParts()
+    local character = game.Players.LocalPlayer.Character
+    if not character then return end
+    
+    local head = character:FindFirstChild("Head")
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if head and humanoidRootPart then
+        if _G.targetPart == "Head" then
+            _G.targetPart = "HumanoidRootPart"
+        elseif _G.targetPart == "HumanoidRootPart" then
+            _G.targetPart = "Head"
+        end
+    else
+        warn("Head ou HumanoidRootPart não encontrados!")
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        toggleParts()
+    end
+end)
+
+local camera = workspace.CurrentCamera
+local entities = game:GetService("Players")
+local LocalPlayer = entities.LocalPlayer
+local runservice = game:GetService("RunService")
+
+_G.EspSkeleton = true
+_G.SkeletonColor = Color3.new(1, 0, 0)
+_G.SkeletonTransparency = 1
+_G.SkeletonThickness = 1.5
+
+local function draw6(player, character)
+    local skel_head = Drawing.new("Line")
+    local skel_torso = Drawing.new("Line")
+    local skel_right_lower_arm = Drawing.new("Line")
+    local skel_left_lower_arm = Drawing.new("Line")
+    local skel_right_lower_leg = Drawing.new("Line")
+    local skel_left_lower_leg = Drawing.new("Line")
+
+    skel_head.Visible = _G.EspSkeleton
+    skel_torso.Visible = _G.EspSkeleton
+    skel_left_lower_arm.Visible = _G.EspSkeleton
+    skel_right_lower_arm.Visible = _G.EspSkeleton
+    skel_left_lower_leg.Visible = _G.EspSkeleton
+    skel_right_lower_leg.Visible = _G.EspSkeleton
+
+    skel_head.Color = _G.SkeletonColor
+    skel_torso.Color = _G.SkeletonColor
+    skel_left_lower_arm.Color = _G.SkeletonColor
+    skel_right_lower_arm.Color = _G.SkeletonColor
+    skel_left_lower_leg.Color = _G.SkeletonColor
+    skel_right_lower_leg.Color = _G.SkeletonColor
+    
+    skel_head.Transparency = _G.SkeletonTransparency
+    skel_torso.Transparency = _G.SkeletonTransparency
+    skel_left_lower_arm.Transparency = _G.SkeletonTransparency
+    skel_right_lower_arm.Transparency = _G.SkeletonTransparency
+    skel_left_lower_leg.Transparency = _G.SkeletonTransparency
+    skel_right_lower_leg.Transparency = _G.SkeletonTransparency
+
+    skel_head.Thickness = _G.SkeletonThickness
+    skel_torso.Thickness = _G.SkeletonThickness
+    skel_left_lower_arm.Thickness = _G.SkeletonThickness
+    skel_right_lower_arm.Thickness = _G.SkeletonThickness
+    skel_left_lower_leg.Thickness = _G.SkeletonThickness
+    skel_right_lower_leg.Thickness = _G.SkeletonThickness
+
+    local function update6()
+        local connection
+        connection = runservice.RenderStepped:Connect(function()
+            if game.workspace:FindFirstChild(character.Name) and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character:FindFirstChild("Humanoid").Health > 0 then
+                local character_rootpart_3d = character.HumanoidRootPart.Position
+                local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
+
+                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
+                    local head_2d = camera:WorldToViewportPoint(character.Head.Position)
+                    local torso_upper_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, 0.75, 0))
+                    local torso_lower_2d = camera:WorldToViewportPoint(character.Torso.Position + Vector3.new(0, -0.75, 0))
+
+                    local rightarmlower_2d = camera:WorldToViewportPoint(character["Right Arm"].Position + Vector3.new(0, -0.75, 0))
+                    local rightarmupper_2d = camera:WorldToViewportPoint(character["Right Arm"].Position + Vector3.new(0, 0.1625, 0))
+                    local leftarmupper_2d = camera:WorldToViewportPoint(character["Left Arm"].Position + Vector3.new(0, 0.1625, 0))
+                    local leftarmlower_2d = camera:WorldToViewportPoint(character["Left Arm"].Position + Vector3.new(0, -0.75, 0))
+                    local rightleglower_2d = camera:WorldToViewportPoint(character["Right Leg"].Position + Vector3.new(0, -1.1, 0))
+                    local leftleglower_2d = camera:WorldToViewportPoint(character["Left Leg"].Position + Vector3.new(0, -1.1, 0))
+
+                    skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
+                    skel_head.To = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+
+                    skel_torso.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_torso.To = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
+
+                    skel_left_lower_arm.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_left_lower_arm.To = Vector2.new(leftarmlower_2d.X, leftarmlower_2d.Y)
+
+                    skel_right_lower_arm.From = Vector2.new(torso_upper_2d.X, torso_upper_2d.Y)
+                    skel_right_lower_arm.To = Vector2.new(rightarmlower_2d.X, rightarmlower_2d.Y)
+
+                    skel_left_lower_leg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
+                    skel_left_lower_leg.To = Vector2.new(leftleglower_2d.X, leftleglower_2d.Y)
+
+                    skel_right_lower_leg.From = Vector2.new(torso_lower_2d.X, torso_lower_2d.Y)
+                    skel_right_lower_leg.To = Vector2.new(rightleglower_2d.X, rightleglower_2d.Y)
+
+                    if _G.teamcheck then
+                        if _G.teamcheckmode == "colors" then
+                            if player.TeamColor == LocalPlayer.TeamColor then
+                                skel_head.Color = _G.teamcolor
+                                skel_torso.Color = _G.teamcolor
+                                skel_left_lower_arm.Color = _G.teamcolor
+                                skel_right_lower_arm.Color = _G.teamcolor
+                                skel_left_lower_leg.Color = _G.teamcolor
+                                skel_right_lower_leg.Color = _G.teamcolor
+                            else
+                                skel_head.Color = _G.enemycolor
+                                skel_torso.Color = _G.enemycolor
+                                skel_left_lower_arm.Color = _G.enemycolor
+                                skel_right_lower_arm.Color = _G.enemycolor
+                                skel_left_lower_leg.Color = _G.enemycolor
+                                skel_right_lower_leg.Color = _G.enemycolor
+                            end
+                        elseif _G.teamcheckmode == "invisible" then
+                            if player.TeamColor == LocalPlayer.TeamColor then
+                                skel_head.Visible = false
+                                skel_torso.Visible = false
+                                skel_left_lower_arm.Visible = false
+                                skel_right_lower_arm.Visible = false
+                                skel_left_lower_leg.Visible = false
+                                skel_right_lower_leg.Visible = false
+                            else
+                                skel_head.Visible = true
+                                skel_torso.Visible = true
+                                skel_left_lower_arm.Visible = true
+                                skel_right_lower_arm.Visible = true
+                                skel_left_lower_leg.Visible = true
+                                skel_right_lower_leg.Visible = true
+                            end
+                        end
+                    end
+                else
+                    skel_head.Visible = false
+                    skel_torso.Visible = false
+                    skel_left_lower_arm.Visible = false
+                    skel_right_lower_arm.Visible = false
+                    skel_left_lower_leg.Visible = false
+                    skel_right_lower_leg.Visible = false
+                end
+            else
+                if player == nil then
+                    connection:Disconnect()
+                    connection = nil
+                end
+
+                skel_head.Visible = false
+                skel_torso.Visible = false
+                skel_left_lower_arm.Visible = false
+                skel_right_lower_arm.Visible = false
+                skel_left_lower_leg.Visible = false
+                skel_right_lower_leg.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(update6)()
+    return skel_head, skel_torso, skel_left_upper_arm, skel_right_upper_arm, skel_left_lower_arm, skel_right_lower_arm, skel_left_upper_leg, skel_right_upper_leg, skel_left_lower_leg, skel_right_lower_leg
+end
+
+local function draw15(player, character)
+    local skel_head = Drawing.new("Line")
+    local skel_upperTorso = Drawing.new("Line")
+    local skel_lowerTorso = Drawing.new("Line")
+    local skel_rightUpperArm = Drawing.new("Line")
+    local skel_rightLowerArm = Drawing.new("Line")
+    local skel_rightHand = Drawing.new("Line")
+    local skel_leftUpperArm = Drawing.new("Line")
+    local skel_leftLowerArm = Drawing.new("Line")
+    local skel_leftHand = Drawing.new("Line")
+    local skel_rightUpperLeg = Drawing.new("Line")
+    local skel_rightLowerLeg = Drawing.new("Line")
+    local skel_rightFoot = Drawing.new("Line")
+    local skel_leftUpperLeg = Drawing.new("Line")
+    local skel_leftLowerLeg = Drawing.new("Line")
+    local skel_leftFoot = Drawing.new("Line")
+
+    skel_head.Visible = _G.EspSkeleton
+    skel_upperTorso.Visible = _G.EspSkeleton
+    skel_lowerTorso.Visible = _G.EspSkeleton
+    skel_leftUpperArm.Visible = _G.EspSkeleton
+    skel_leftLowerArm.Visible = _G.EspSkeleton
+    skel_leftHand.Visible = _G.EspSkeleton
+    skel_rightUpperArm.Visible = _G.EspSkeleton
+    skel_rightLowerArm.Visible = _G.EspSkeleton
+    skel_rightHand.Visible = _G.EspSkeleton
+    skel_leftUpperLeg.Visible = _G.EspSkeleton
+    skel_leftLowerLeg.Visible = _G.EspSkeleton
+    skel_leftFoot.Visible = _G.EspSkeleton
+    skel_rightUpperLeg.Visible = _G.EspSkeleton
+    skel_rightLowerLeg.Visible = _G.EspSkeleton
+    skel_rightFoot.Visible = _G.EspSkeleton
+
+    skel_head.Color = _G.SkeletonColor
+    skel_upperTorso.Color = _G.SkeletonColor
+    skel_lowerTorso.Color = _G.SkeletonColor
+    skel_leftUpperArm.Color = _G.SkeletonColor
+    skel_leftLowerArm.Color = _G.SkeletonColor
+    skel_leftHand.Color = _G.SkeletonColor
+    skel_rightUpperArm.Color = _G.SkeletonColor
+    skel_rightLowerArm.Color = _G.SkeletonColor
+    skel_rightHand.Color = _G.SkeletonColor
+    skel_leftUpperLeg.Color = _G.SkeletonColor
+    skel_leftLowerLeg.Color = _G.SkeletonColor
+    skel_leftFoot.Color = _G.SkeletonColor
+    skel_rightUpperLeg.Color = _G.SkeletonColor
+    skel_rightLowerLeg.Color = _G.SkeletonColor
+    skel_rightFoot.Color = _G.SkeletonColor
+
+    skel_head.Transparency = _G.SkeletonTransparency
+    skel_upperTorso.Transparency = _G.SkeletonTransparency
+    skel_lowerTorso.Transparency = _G.SkeletonTransparency
+    skel_leftUpperArm.Transparency = _G.SkeletonTransparency
+    skel_leftLowerArm.Transparency = _G.SkeletonTransparency
+    skel_leftHand.Transparency = _G.SkeletonTransparency
+    skel_rightUpperArm.Transparency = _G.SkeletonTransparency
+    skel_rightLowerArm.Transparency = _G.SkeletonTransparency
+    skel_rightHand.Transparency = _G.SkeletonTransparency
+    skel_leftUpperLeg.Transparency = _G.SkeletonTransparency
+    skel_leftLowerLeg.Transparency = _G.SkeletonTransparency
+    skel_leftFoot.Transparency = _G.SkeletonTransparency
+    skel_rightUpperLeg.Transparency = _G.SkeletonTransparency
+    skel_rightLowerLeg.Transparency = _G.SkeletonTransparency
+    skel_rightFoot.Transparency = _G.SkeletonTransparency
+
+    skel_head.Thickness = _G.SkeletonThickness
+    skel_upperTorso.Thickness = _G.SkeletonThickness
+    skel_lowerTorso.Thickness = _G.SkeletonThickness
+    skel_leftUpperArm.Thickness = _G.SkeletonThickness
+    skel_leftLowerArm.Thickness = _G.SkeletonThickness
+    skel_leftHand.Thickness = _G.SkeletonThickness
+    skel_rightUpperArm.Thickness = _G.SkeletonThickness
+    skel_rightLowerArm.Thickness = _G.SkeletonThickness
+    skel_rightHand.Thickness = _G.SkeletonThickness
+    skel_leftUpperLeg.Thickness = _G.SkeletonThickness
+    skel_leftLowerLeg.Thickness = _G.SkeletonThickness
+    skel_leftFoot.Thickness = _G.SkeletonThickness
+    skel_rightUpperLeg.Thickness = _G.SkeletonThickness
+    skel_rightLowerLeg.Thickness = _G.SkeletonThickness
+    skel_rightFoot.Thickness = _G.SkeletonThickness
+
+    local function update15()
+        local connection
+        connection = runservice.RenderStepped:Connect(function()
+
+            if game.workspace:FindFirstChild(character.Name) and character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character:FindFirstChild("Humanoid").Health > 0 and character.HumanoidRootPart then
+                local character_rootpart_3d = character.HumanoidRootPart.Position
+                local character_rootpart_2d, rootpart_onscreen = camera:WorldToViewportPoint(character_rootpart_3d)
+
+                if rootpart_onscreen and character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+                    wait(0.001)
+                    local head_2d = camera:WorldToViewportPoint(character.Head.Position)
+                    local upperTorso_2d = camera:WorldToViewportPoint(character.UpperTorso.Position)
+                    local lowerTorso_2d = camera:WorldToViewportPoint(character.LowerTorso.Position)
+                    local rightUpperArm_2d = camera:WorldToViewportPoint(character.RightUpperArm.Position)
+                    local rightLowerArm_2d = camera:WorldToViewportPoint(character.RightLowerArm.Position)
+                    local rightHand_2d = camera:WorldToViewportPoint(character.RightHand.Position)
+                    local leftUpperArm_2d = camera:WorldToViewportPoint(character.LeftUpperArm.Position)
+                    local leftLowerArm_2d = camera:WorldToViewportPoint(character.LeftLowerArm.Position)
+                    local leftHand_2d = camera:WorldToViewportPoint(character.LeftHand.Position)
+                    local rightUpperLeg_2d = camera:WorldToViewportPoint(character.RightUpperLeg.Position)
+                    local rightLowerLeg_2d = camera:WorldToViewportPoint(character.RightLowerLeg.Position)
+                    local rightFoot_2d = camera:WorldToViewportPoint(character.RightFoot.Position)
+                    local leftUpperLeg_2d = camera:WorldToViewportPoint(character.LeftUpperLeg.Position)
+                    local leftLowerLeg_2d = camera:WorldToViewportPoint(character.LeftLowerLeg.Position)
+                    local leftFoot_2d = camera:WorldToViewportPoint(character.LeftFoot.Position)
+
+                    skel_head.From = Vector2.new(head_2d.X, head_2d.Y)
+                    skel_head.To = Vector2.new(upperTorso_2d.X, upperTorso_2d.Y)
+
+                    skel_upperTorso.From = Vector2.new(upperTorso_2d.X, upperTorso_2d.Y)
+                    skel_upperTorso.To = Vector2.new(lowerTorso_2d.X, lowerTorso_2d.Y)
+
+                    skel_leftUpperArm.From = Vector2.new(upperTorso_2d.X, upperTorso_2d.Y)
+                    skel_leftUpperArm.To = Vector2.new(leftUpperArm_2d.X, leftUpperArm_2d.Y)
+
+                    skel_leftLowerArm.From = Vector2.new(leftUpperArm_2d.X, leftUpperArm_2d.Y)
+                    skel_leftLowerArm.To = Vector2.new(leftLowerArm_2d.X, leftLowerArm_2d.Y)
+
+                    skel_leftHand.From = Vector2.new(leftLowerArm_2d.X, leftLowerArm_2d.Y)
+                    skel_leftHand.To = Vector2.new(leftHand_2d.X, leftHand_2d.Y)
+
+                    skel_rightUpperArm.From = Vector2.new(upperTorso_2d.X, upperTorso_2d.Y)
+                    skel_rightUpperArm.To = Vector2.new(rightUpperArm_2d.X, rightUpperArm_2d.Y)
+
+                    skel_rightLowerArm.From = Vector2.new(rightUpperArm_2d.X, rightUpperArm_2d.Y)
+                    skel_rightLowerArm.To = Vector2.new(rightLowerArm_2d.X, rightLowerArm_2d.Y)
+
+                    skel_rightHand.From = Vector2.new(rightLowerArm_2d.X, rightLowerArm_2d.Y)
+                    skel_rightHand.To = Vector2.new(rightHand_2d.X, rightHand_2d.Y)
+
+                    skel_leftUpperLeg.From = Vector2.new(lowerTorso_2d.X, lowerTorso_2d.Y)
+                    skel_leftUpperLeg.To = Vector2.new(leftUpperLeg_2d.X, leftUpperLeg_2d.Y)
+
+                    skel_leftLowerLeg.From = Vector2.new(leftUpperLeg_2d.X, leftUpperLeg_2d.Y)
+                    skel_leftLowerLeg.To = Vector2.new(leftLowerLeg_2d.X, leftLowerLeg_2d.Y)
+
+                    skel_leftFoot.From = Vector2.new(leftLowerLeg_2d.X, leftLowerLeg_2d.Y)
+                    skel_leftFoot.To = Vector2.new(leftFoot_2d.X, leftFoot_2d.Y)
+
+                    skel_rightUpperLeg.From = Vector2.new(lowerTorso_2d.X, lowerTorso_2d.Y)
+                    skel_rightUpperLeg.To = Vector2.new(rightUpperLeg_2d.X, rightUpperLeg_2d.Y)
+
+                    skel_rightLowerLeg.From = Vector2.new(rightUpperLeg_2d.X, rightUpperLeg_2d.Y)
+                    skel_rightLowerLeg.To = Vector2.new(rightLowerLeg_2d.X, rightLowerLeg_2d.Y)
+
+                    skel_rightFoot.From = Vector2.new(rightLowerLeg_2d.X, rightLowerLeg_2d.Y)
+                    skel_rightFoot.To = Vector2.new(rightFoot_2d.X, rightFoot_2d.Y)
+
+                    if _G.teamcheck then
+                        if _G.teamcheckmode == "colors" then
+                            if player.TeamColor == LocalPlayer.TeamColor then
+                                skel_head.Color = _G.teamcolor
+                                skel_upperTorso.Color = _G.teamcolor
+                                skel_lowerTorso.Color = _G.teamcolor
+                                skel_leftUpperArm.Color = _G.teamcolor
+                                skel_leftLowerArm.Color = _G.teamcolor
+                                skel_leftHand.Color = _G.teamcolor
+                                skel_rightUpperArm.Color = _G.teamcolor
+                                skel_rightLowerArm.Color = _G.teamcolor
+                                skel_rightHand.Color = _G.teamcolor
+                                skel_leftUpperLeg.Color = _G.teamcolor
+                                skel_leftLowerLeg.Color = _G.teamcolor
+                                skel_leftFoot.Color = _G.teamcolor
+                                skel_rightUpperLeg.Color = _G.teamcolor
+                                skel_rightLowerLeg.Color = _G.teamcolor
+                                skel_rightFoot.Color = _G.teamcolor
+                            else
+                                skel_head.Color = _G.enemycolor
+                                skel_upperTorso.Color = _G.enemycolor
+                                skel_lowerTorso.Color = _G.enemycolor
+                                skel_leftUpperArm.Color = _G.enemycolor
+                                skel_leftLowerArm.Color = _G.enemycolor
+                                skel_leftHand.Color = _G.enemycolor
+                                skel_rightUpperArm.Color = _G.enemycolor
+                                skel_rightLowerArm.Color = _G.enemycolor
+                                skel_rightHand.Color = _G.enemycolor
+                                skel_leftUpperLeg.Color = _G.enemycolor
+                                skel_leftLowerLeg.Color = _G.enemycolor
+                                skel_leftFoot.Color = _G.enemycolor
+                                skel_rightUpperLeg.Color = _G.enemycolor
+                                skel_rightLowerLeg.Color = _G.enemycolor
+                                skel_rightFoot.Color = _G.enemycolor
+                            end
+                        elseif _G.teamcheckmode == "invisible" then
+                            if player.TeamColor == LocalPlayer.TeamColor then
+                                skel_head.Visible = false
+                                skel_upperTorso.Visible = false
+                                skel_lowerTorso.Visible = false
+                                skel_leftUpperArm.Visible = false
+                                skel_leftLowerArm.Visible = false
+                                skel_leftHand.Visible = false
+                                skel_rightUpperArm.Visible = false
+                                skel_rightLowerArm.Visible = false
+                                skel_rightHand.Visible = false
+                                skel_leftUpperLeg.Visible = false
+                                skel_leftLowerLeg.Visible = false
+                                skel_leftFoot.Visible = false
+                                skel_rightUpperLeg.Visible = false
+                                skel_rightLowerLeg.Visible = false
+                                skel_rightFoot.Visible = false
+                            else
+                                skel_head.Visible = true
+                                skel_upperTorso.Visible = true
+                                skel_lowerTorso.Visible = true
+                                skel_leftUpperArm.Visible = true
+                                skel_leftLowerArm.Visible = true
+                                skel_leftHand.Visible = true
+                                skel_rightUpperArm.Visible = true
+                                skel_rightLowerArm.Visible = true
+                                skel_rightHand.Visible = true
+                                skel_leftUpperLeg.Visible = true
+                                skel_leftLowerLeg.Visible = true
+                                skel_leftFoot.Visible = true
+                                skel_rightUpperLeg.Visible = true
+                                skel_rightLowerLeg.Visible = true
+                                skel_rightFoot.Visible = true
+                            end
+                        end
+                    end
+                else
+                    skel_head.Visible = false
+                    skel_upperTorso.Visible = false
+                    skel_lowerTorso.Visible = false
+                    skel_leftUpperArm.Visible = false
+                    skel_leftLowerArm.Visible = false
+                    skel_leftHand.Visible = false
+                    skel_rightUpperArm.Visible = false
+                    skel_rightLowerArm.Visible = false
+                    skel_rightHand.Visible = false
+                    skel_leftUpperLeg.Visible = false
+                    skel_leftLowerLeg.Visible = false
+                    skel_leftFoot.Visible = false
+                    skel_rightUpperLeg.Visible = false
+                    skel_rightLowerLeg.Visible = false
+                    skel_rightFoot.Visible = false
+                end
+            else
+                if player == nil then
+                    connection:Disconnect()
+                    connection = nil
+                end
+
+                skel_head.Visible = false
+                skel_upperTorso.Visible = false
+                skel_lowerTorso.Visible = false
+                skel_leftUpperArm.Visible = false
+                skel_leftLowerArm.Visible = false
+                skel_leftHand.Visible = false
+                skel_rightUpperArm.Visible = false
+                skel_rightLowerArm.Visible = false
+                skel_rightHand.Visible = false
+                skel_leftUpperLeg.Visible = false
+                skel_leftLowerLeg.Visible = false
+                skel_leftFoot.Visible = false
+                skel_rightUpperLeg.Visible = false
+                skel_rightLowerLeg.Visible = false
+                skel_rightFoot.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(update15)()
+    return skel_head, skel_upperTorso, skel_lowerTorso, skel_leftUpperArm, skel_leftLowerArm, skel_leftHand, skel_rightUpperArm, skel_rightLowerArm, skel_rightHand, skel_leftUpperLeg, skel_leftLowerLeg, skel_leftFoot, skel_rightUpperLeg,skel_rightLowerLeg, skel_rightFoot
+end
+
+local function hideSkeleton(character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+
+    wait(0.025)
+
+    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+        local r6Parts = {
+            skel_torso,
+            skel_left_lower_arm,
+            skel_right_lower_arm,
+            skel_left_lower_leg,
+            skel_right_lower_leg
+        }
+
+        for _, part in ipairs(r6Parts) do
+            if part then
+                wait(0.025)
+                part.Visible = false
+            end
+        end
+    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
+        local r15Parts = {
+            skel_upperTorso,
+            skel_lowerTorso,
+            skel_leftUpperArm,
+            skel_leftLowerArm,
+            skel_leftHand,
+            skel_rightUpperArm,
+            skel_rightLowerArm,
+            skel_rightHand,
+            skel_leftUpperLeg,
+            skel_leftLowerLeg,
+            skel_leftFoot,
+            skel_rightUpperLeg,
+            skel_rightLowerLeg,
+            skel_rightFoot
+        }
+
+        for _, part in ipairs(r15Parts) do
+            if part then
+                wait(0.025)
+                part.Visible = false
             end
         end
     end
 end
 
-RunService.RenderStepped:Connect(UpdateESP)
+local function draw(player, character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
 
-for _, Player in pairs(Players:GetPlayers()) do
-    if Player ~= LocalPlayer then
-        CreateArrow(Player)
+    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+        draw6(player, character)
+    elseif humanoid.RigType == Enum.HumanoidRigType.R15 then
+        draw15(player, character)
+    end
+
+    humanoid.Died:Connect(function()
+        print("Character died: " .. character.Name)
+        wait(0.025)
+        hideSkeleton(character)
+    end)
+end
+
+local function clearLines(character)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid then
+        print("Humanoid not found in character: " .. character.Name)
+        return
+    end
+    wait(0.025)
+    hideSkeleton(character)
+end
+
+local function onCharacterAdded(player, character)
+    print("Character added: " .. character.Name)
+    wait(0.025)
+    coroutine.wrap(draw)(player, character)
+end
+
+local function onCharacterRemoving(player)
+    if player.Character then
+        print("Character removing: " .. player.Character.Name)
+        wait(0.025)
+        clearLines(player.Character)
     end
 end
 
-Players.PlayerAdded:Connect(function(Player)
-    if Player ~= LocalPlayer then
-        CreateArrow(Player)
+local function onPlayerAdded(player)
+    print("Player added: " .. player.Name)
+    if player.Character then
+        wait(0.025)
+        onCharacterAdded(player, player.Character)
     end
+    player.CharacterAdded:Connect(function(character)
+        wait(0.025)
+        onCharacterAdded(player, character)
+    end)
+    player.CharacterRemoving:Connect(function()
+        wait(0.025)
+        onCharacterRemoving(player)
+    end)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    wait(0.025)
+    onPlayerAdded(player)
+end
+
+game.Players.PlayerAdded:Connect(onPlayerAdded)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+_G.HighlightEnabled = false
+_G.HighlightColor = Color3.fromRGB(255, 255, 0)
+_G.HighlightTransparency = 1
+
+_G.OutlineEnabled = false
+_G.OutlineColor = Color3.fromRGB(255, 0, 0)
+_G.OutlineTransparency = 1
+
+local function applyHighlight(player)
+    if player == lplr then return end
+
+    local character = player.Character
+    if not character then return end
+
+    local highlight = character:FindFirstChildOfClass("Highlight")
+    if not highlight then
+        highlight = Instance.new("Highlight")
+        highlight.Parent = character
+    end
+
+    if _G.HighlightEnabled then
+        highlight.Enabled = true
+        highlight.FillTransparency = _G.HighlightTransparency
+        highlight.OutlineTransparency = _G.OutlineTransparency
+        highlight.FillColor = _G.HighlightColor
+        highlight.OutlineColor = _G.OutlineColor
+
+        if _G.teamcheck then
+            if _G.teamcheckmode == "colors" then
+                if player.TeamColor == lplr.TeamColor then
+                    highlight.FillColor = _G.teamcolor
+                    highlight.OutlineColor = _G.teamcolor
+                else
+                    highlight.FillColor = _G.enemycolor
+                    highlight.OutlineColor = _G.enemycolor
+                end
+            elseif _G.teamcheckmode == "invisible" then
+                if player.TeamColor == lplr.TeamColor then
+                    highlight.Enabled = false
+                else
+                    highlight.Enabled = true
+                end
+            end
+        end
+    else
+        highlight.Enabled = false
+    end
+end
+
+function _G.UpdateHighlight()
+    for _, player in ipairs(Players:GetPlayers()) do
+        applyHighlight(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.025)
+        applyHighlight(player)
+    end)
 end)
 
-Players.PlayerRemoving:Connect(function(Player)
-    RemoveArrow(Player)
+RunService.RenderStepped:Connect(function()
+    _G.UpdateHighlight()
 end)
+
+local Window = Rayfield:CreateWindow({
+    Name = "BNT ESP",
+    Icon = 0,
+    LoadingTitle = "By Bomzinho",
+    LoadingSubtitle = "Loading....",
+    Theme = "Amethyst",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "ESPP"
+    },
+
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+
+    KeySystem = false,
+    KeySettings = {
+        Title = "BNT ESP",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"4321", "1234"}
+    }
+})
+
+local Tab = Window:CreateTab("Aimbot", 4483362458)
+
+Tab:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab:CreateToggle({
+    Name = "Enable Aimbot",
+    CurrentValue = false,
+    Flag = "Enable Aimbot",
+    Callback = function(Value)
+        SilentAimEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Enable WallCheck",
+    CurrentValue = false,
+    Flag = "Enable WallCheck",
+    Callback = function(Value)
+        WallCheckEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Enable TeamCheck",
+    CurrentValue = false,
+    Flag = "Enable TeamCheck",
+    Callback = function(Value)
+        TeamCheckEnabled = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Show Fov",
+    CurrentValue = false,
+    Flag = "Show Fov",
+    Callback = function(Value)
+        FOVVisible = Value
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Fov Filled",
+    CurrentValue = false,
+    Flag = "Fov Filled",
+    Callback = function(Value)
+        FOVCircle.Filled = Value
+    end,
+})
+
+Tab:CreateColorPicker({
+    Name = "Fov Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "Fov Color",
+    Callback = function(Value)
+        FOVCircle.Color = Value
+    end
+})
+
+Tab:CreateSlider({
+    Name = "Fov Size",
+    Range = {0, 550},
+    Increment = .5,
+    Suffix = "",
+    CurrentValue = 75,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOVCircle.Radius = Value
+        FOV = Value
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Fov Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Transparency",
+    Callback = function(Value)
+        FOVCircle.Transparency = Value
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Fov Thickness",
+    Range = {0, 10},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "Fov Thickness",
+    Callback = function(Value)
+        FOVCircle.Thickness = Value
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "AimPart",
+    Options = {"Head", "HumanoidRootPart"},
+    CurrentOption = {"Head"},
+    MultipleOptions = false,
+    Flag = "AimPart",
+    Callback = function(Options)
+        _G.targetPart = Options[1]
+    end,
+})
+
+local Tab1 = Window:CreateTab("ESP", 4483362458)
+
+Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateToggle({
+    Name = "Show Box",
+    CurrentValue = false,
+    Flag = "Show Box",
+    Callback = function(Value)
+        _G.boxVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Box Filled",
+    CurrentValue = false,
+    Flag = "BoxFilled",
+    Callback = function(Value)
+        _G.boxFilledVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Health Bar",
+    CurrentValue = false,
+    Flag = "healthbarouf",
+    Callback = function(Value)
+        _G.HealthBarVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Health Bar Filled",
+    CurrentValue = false,
+    Flag = "healthbarouff",
+    Callback = function(Value)
+        _G.HealthBarFilled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Tracers",
+    CurrentValue = false,
+    Flag = "Tracer",
+    Callback = function(Value)
+        _G.TracerVisible = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Show Skeletons",
+    CurrentValue = false,
+    Flag = "Skeleton",
+    Callback = function(Value)
+        _G.EspSkeleton = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Enable Chams",
+    CurrentValue = false,
+    Flag = "Chams",
+    Callback = function(Value)
+        _G.HighlightEnabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Enable Chams Outline",
+    CurrentValue = false,
+    Flag = "ChamsOutline",
+    Callback = function(Value)
+        _G.OutlineEnabled = Value
+    end,
+})
+
+Tab1:CreateToggle({
+    Name = "Teamcheck",
+    CurrentValue = false,
+    Flag = "teamcheck",
+    Callback = function(Value)
+        _G.teamcheck = Value
+    end,
+})
+
+Tab1:CreateLabel("Color Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateColorPicker({
+    Name = "Team Color",
+    Color = Color3.fromRGB(0, 255, 0),
+    Flag = "teamcolor",
+    Callback = function(Value)
+        _G.teamcolor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Enemy Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "enemycolor",
+    Callback = function(Value)
+        _G.enemycolor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Box Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxColor",
+    Callback = function(Value)
+        _G.boxColor = Value
+        _G.color = Value
+        UpdateCornerBox(cornerBox)
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Box Filled Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "boxFilledColor",
+    Callback = function(Value)
+        _G.boxFilledColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Tracers Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "TracerColor",
+    Callback = function(Value)
+        _G.TracerColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Skeletons Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Skeleton Color",
+    Callback = function(Value)
+        _G.SkeletonColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Chams Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Chams Color",
+    Callback = function(Value)
+        _G.HighlightColor = Value
+    end
+})
+
+Tab1:CreateColorPicker({
+    Name = "Chams Outline Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "Chams Outline Color",
+    Callback = function(Value)
+        _G.OutlineColor = Value
+    end
+})
+
+Tab1:CreateLabel("Transparency Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxTransparency",
+    Callback = function(Value)
+        _G.boxTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Box Filled Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxFilledTransparency",
+    Callback = function(Value)
+        _G.boxFilledTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarTransparency",
+    Callback = function(Value)
+        _G.HealthBarTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracers Transparency",
+    Range = {0, 1},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerTransparency",
+    Callback = function(Value)
+        _G.TracerTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeletons Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "SkeletonTransparency",
+    Callback = function(Value)
+        _G.SkeletonTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "ChamsTransparency",
+    Callback = function(Value)
+        _G.HighlightTransparency = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Chams Outline Transparency",
+    Range = {0, 1},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "ChamsOutlineTransparency",
+    Callback = function(Value)
+        _G.OutlineTransparency = Value
+    end,
+})
+
+Tab1:CreateLabel("Thickness Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateSlider({
+    Name = "Box Thickness",
+    Range = {0, 3},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "boxThickness",
+    Callback = function(Value)
+        _G.boxThickness = Value
+        _G.thickness = Value
+        UpdateCornerBox(cornerBox)
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Health Bar Thickness",
+    Range = {0, 3},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "HealthBarThickness",
+    Callback = function(Value)
+        _G.HealthBarThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Tracers Thickness",
+    Range = {0, 3},
+    Increment = .05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "TracerThickness",
+    Callback = function(Value)
+        _G.TracerThickness = Value
+    end,
+})
+
+Tab1:CreateSlider({
+    Name = "Skeletons Thickness",
+    Range = {0, 3},
+    Increment = 0.05,
+    Suffix = "",
+    CurrentValue = 1,
+    Flag = "SkeletonThickness",
+    Callback = function(Value)
+        _G.SkeletonThickness = Value
+    end,
+})
+
+Tab1:CreateLabel("Other Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
+
+Tab1:CreateDropdown({
+    Name = "Teamcheck Mode",
+    Options = {"colors", "invisible"},
+    CurrentOption = {"colors"},
+    MultipleOptions = false,
+    Flag = "TeamcheckMode",
+    Callback = function(Options)
+        _G.temcheckmode = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Health Bar Position",
+    Options = {"Left", "Right", "Top", "Bottom"},
+    CurrentOption = {"Left"},
+    MultipleOptions = false,
+    Flag = "HealthBarPosition",
+    Callback = function(Options)
+        _G.HealthBarPosition = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Tracers From",
+    Options = {"Bottom", "Middle", "Top"},
+    CurrentOption = {"Bottom"},
+    MultipleOptions = false,
+    Flag = "TracerFrom",
+    Callback = function(Options)
+        _G.TracerFrom = Options[1]
+    end,
+})
+
+Tab1:CreateDropdown({
+    Name = "Box Type",
+    Options = {"Corner Box", "Normal Box"},
+    CurrentOption = {"Normal Box"},
+    MultipleOptions = false,
+    Flag = "BoxType",
+    Callback = function(Options)
+        _G.BoxType = Options[1]
+    end,
+})
+
+Rayfield:LoadConfiguration()
