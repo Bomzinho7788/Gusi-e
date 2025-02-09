@@ -129,11 +129,12 @@ end
 
 local function UpdateCornerBox(box)
     for _, line in pairs(box) do
-        line.Thickness = _G.thickness
+        line.Thickness = 1
         line.Color = Color3.new(0, 0, 0)
         line.Visible = false
     end
 end
+
 
 game:GetService("RunService").RenderStepped:Connect(function()
     UpdateCornerBox(cornerBox)
