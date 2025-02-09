@@ -269,6 +269,7 @@ ESPPREVIEWLABEL.BorderColor3 = Color3.new(0, 0, 0)
 ESPPREVIEWLABEL.BorderSizePixel = 0
 ESPPREVIEWLABEL.Position = UDim2.new(0.187000006, -5, -0.0790000036, 0)
 ESPPREVIEWLABEL.Size = UDim2.new(0, 100, 0, 20)
+ESPPREVIEWLABEL.Draggable = true
 
 UICorner_3.Parent = ESPPREVIEWLABEL
 
@@ -279,6 +280,7 @@ Fix1.BorderColor3 = Color3.new(0, 0, 0)
 Fix1.BorderSizePixel = 0
 Fix1.Position = UDim2.new(0, 0, 0.349999994, 0)
 Fix1.Size = UDim2.new(0, 100, 0, 24)
+Fix1.Draggable = true
 
 TextLabel.Parent = Fix1
 TextLabel.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -291,6 +293,7 @@ TextLabel.Font = Enum.Font.Unknown
 TextLabel.Text = "ESP Preview"
 TextLabel.TextColor3 = Color3.new(1, 1, 1)
 TextLabel.TextSize = 14
+TextLabel.Draggable = true
 
 line1.Name = "line1"
 line1.Parent = Fix1
