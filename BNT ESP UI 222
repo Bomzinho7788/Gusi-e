@@ -1619,19 +1619,23 @@ Tab1:CreateToggle({
     end,
 })
 
+local function boxui()
+    if _G.BoxType == "Normal Box" and _G.boxVisible then
+        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = false
+        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = Value
+    elseif _G.BoxType == "Corner Box" _G.boxVisible then
+        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = Value
+        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = false
+    end
+end
+
 Tab1:CreateToggle({
     Name = "Show Box",
     CurrentValue = false,
     Flag = "Show Box",
     Callback = function(Value)
         _G.boxVisible = Value
-        if _G.BoxType == "Normal Box" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = Value
-        elseif _G.BoxType == "Corner Box" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = Value
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = false
-        end
+        boxui()
     end,
 })
 
