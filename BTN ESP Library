@@ -38,7 +38,7 @@ local Line4_3 = Instance.new("Frame")
 local camera = game:GetService("Workspace").CurrentCamera
 local viewportSize = camera.ViewportSize
 
-espp.Parent = game.Players.LocalPlayer.PlayerGui
+espp.Parent = game:GetService("CoreGui")
 espp.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 ESPPREVIEW.Name = "ESPPREVIEW"
