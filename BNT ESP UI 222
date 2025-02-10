@@ -1619,16 +1619,6 @@ Tab1:CreateToggle({
     end,
 })
 
-local function boxui()
-    if _G.BoxType == "Normal Box" and _G.boxVisible then
-        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = false
-        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = Value
-    elseif _G.BoxType == "Corner Box" _G.boxVisible then
-        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.CornerBox.Visible = Value
-        game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxNormal.Visible = false
-    end
-end
-
 Tab1:CreateToggle({
     Name = "Show Box",
     CurrentValue = false,
@@ -1645,11 +1635,6 @@ Tab1:CreateToggle({
     Flag = "BoxFilled",
     Callback = function(Value)
         _G.boxFilledVisible = Value
-        if _G.BoxType == "Normal Box" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxFill.Visible = Value
-        elseif _G.BoxType == "Corner Box" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.BoxFill.Visible = false
-        end
     end,
 })
 
@@ -1659,13 +1644,6 @@ Tab1:CreateToggle({
     Flag = "healthbarouf",
     Callback = function(Value)
         _G.HealthBarVisible = Value
-        if _G.HealthBarFilled == false then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.HealthBarWithNofill.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.HealthBar.Visible = Value
-        elseif _G.HealthBarFilled == true then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.HealthBarWithNofill.Visible = Value
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.HealthBar.Visible = false
-        end
     end,
 })
 
@@ -1684,19 +1662,6 @@ Tab1:CreateToggle({
     Flag = "Tracer",
     Callback = function(Value)
         _G.TracerVisible = Value
-        if _G.TracerFrom == "Top" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineMiddle.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineTop.Visible = Value
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineBottom.Visible = false
-        elseif _G.TracerFrom == "Bottom" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineMiddle.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineTop.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineBottom.Visible = Value
-        elseif _G.TracerFrom == "Middle" then
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineMiddle.Visible = Value
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineTop.Visible = false
-            game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.ESPLineBottom.Visible = false
-        end
     end,
 })
 
