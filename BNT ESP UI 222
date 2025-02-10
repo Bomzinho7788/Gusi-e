@@ -1619,14 +1619,7 @@ Tab1:CreateToggle({
     end,
 })
 
-Tab1:CreateToggle({
-    Name = "Show Box",
-    CurrentValue = false,
-    Flag = "ShowkBoxh",
-    Callback = function(Value)
-        _G.boxVisible = Value
-    end,
-})
+
 
 Tab1:CreateToggle({
     Name = "Box Filled",
