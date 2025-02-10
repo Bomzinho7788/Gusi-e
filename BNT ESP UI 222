@@ -1625,7 +1625,6 @@ Tab1:CreateToggle({
     Flag = "Show Box",
     Callback = function(Value)
         _G.boxVisible = Value
-        boxui()
     end,
 })
 
