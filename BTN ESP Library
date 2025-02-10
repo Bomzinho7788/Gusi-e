@@ -1,5 +1,3 @@
-
-
 local espp = Instance.new("ScreenGui")
 local ESPPREVIEW = Instance.new("Frame")
 local UICorner_2 = Instance.new("UICorner")
