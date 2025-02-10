@@ -1703,15 +1703,11 @@ ESPPREVIEW.Size = UDim2.new(0, 150, 0, 252)
 ESPPREVIEW.Visible = false
 UICorner_2.Parent = ESPPREVIEW
 
-ImageLabel.Parent = ESPPREVIEW
-ImageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
-ImageLabel.BackgroundTransparency = 1
-ImageLabel.BorderColor3 = Color3.new(0, 0, 0)
-ImageLabel.BorderSizePixel = 0
-ImageLabel.Position = UDim2.new(0.000799967442, 0, 0.120000079, 0)
-ImageLabel.Size = UDim2.new(0, 149, 0, 220)
-ImageLabel.Image = "rbxassetid://88147177486929"
-ImageLabel.ScaleType = Enum.ScaleType.Crop
+
+
+
+
+
 
 BoxNormal.Name = "Box Normal"
 BoxNormal.Parent = ESPPREVIEW
