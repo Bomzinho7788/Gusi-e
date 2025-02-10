@@ -38,17 +38,52 @@ local Line4_3 = Instance.new("Frame")
 local camera = game:GetService("Workspace").CurrentCamera
 local viewportSize = camera.ViewportSize
 
-ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 ESPPREVIEW.Name = "ESPPREVIEW"
 ESPPREVIEW.Parent = ScreenGui
-ESPPREVIEW.AnchorPoint = Vector2.new(0, 0)
+ESPPREVIEW.AnchorPoint = Vector2.new(0.5, 0.5)
 ESPPREVIEW.BackgroundColor3 = Color3.new(0.470588, 0, 0)
 ESPPREVIEW.BorderColor3 = Color3.new(0, 0, 0)
 ESPPREVIEW.BorderSizePixel = 0
-ESPPREVIEW.Position = UDim2.fromOffset(viewportSize.X / 2 - ESPPREVIEW.Size.X.Offset / 2, viewportSize.Y / 2 - ESPPREVIEW.Size.Y.Offset / 2)
+ESPPREVIEW.Position = UDim2.fromOffset((viewportSize.X/2) - (ESPPREVIEW.Size.X.Offset / 2), (viewportSize.Y/2) - (ESPPREVIEW.Size.Y.Offset / 2))
 ESPPREVIEW.Size = UDim2.new(0, 150, 0, 252)
+
+local UserInputService = game:GetService("UserInputService")
+local camera = game:GetService("Workspace").CurrentCamera
+local dragging, dragInput, startPos, startMousePos
+
+local function update(input)
+	local delta = input.Position - startMousePos
+	ESPPREVIEW.Position = UDim2.fromOffset(startPos.X.Offset + delta.X, startPos.Y.Offset + delta.Y)
+end
+
+ESPPREVIEW.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		startPos = ESPPREVIEW.Position
+		startMousePos = input.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+ESPPREVIEW.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
 
 UICorner_2.Parent = ESPPREVIEW
 
@@ -256,7 +291,6 @@ ESPPREVIEWLABEL.BorderColor3 = Color3.new(0, 0, 0)
 ESPPREVIEWLABEL.BorderSizePixel = 0
 ESPPREVIEWLABEL.Position = UDim2.new(0.187000006, -5, -0.0790000036, 0)
 ESPPREVIEWLABEL.Size = UDim2.new(0, 100, 0, 20)
-ESPPREVIEWLABEL.Draggable = true
 
 UICorner_3.Parent = ESPPREVIEWLABEL
 
@@ -267,7 +301,6 @@ Fix1.BorderColor3 = Color3.new(0, 0, 0)
 Fix1.BorderSizePixel = 0
 Fix1.Position = UDim2.new(0, 0, 0.349999994, 0)
 Fix1.Size = UDim2.new(0, 100, 0, 24)
-Fix1.Draggable = true
 
 TextLabel.Parent = Fix1
 TextLabel.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -280,6 +313,7 @@ TextLabel.Font = Enum.Font.Unknown
 TextLabel.Text = "ESP Preview"
 TextLabel.TextColor3 = Color3.new(1, 1, 1)
 TextLabel.TextSize = 14
+TextLabel.TextScaled = true
 TextLabel.Draggable = true
 
 line1.Name = "line1"
