@@ -1700,44 +1700,7 @@ ESPPREVIEW.BorderColor3 = Color3.new(0, 0, 0)
 ESPPREVIEW.BorderSizePixel = 0
 ESPPREVIEW.Position = UDim2.fromOffset((viewportSize.X/2) - (ESPPREVIEW.Size.X.Offset / 2), (viewportSize.Y/2) - (ESPPREVIEW.Size.Y.Offset / 2))
 ESPPREVIEW.Size = UDim2.new(0, 150, 0, 252)
-ESPPREVIEW.Visible = false
-
-local UserInputService = game:GetService("UserInputService")
-local camera = game:GetService("Workspace").CurrentCamera
-local dragging, dragInput, startPos, startMousePos
-
-local function update(input)
-	local delta = input.Position - startMousePos
-	ESPPREVIEW.Position = UDim2.fromOffset(startPos.X.Offset + delta.X, startPos.Y.Offset + delta.Y)
-end
-
-ESPPREVIEW.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		startPos = ESPPREVIEW.Position
-		startMousePos = input.Position
-
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
-end)
-
-ESPPREVIEW.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-		dragInput = input
-	end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		update(input)
-	end
-end)
-
-UICorner_2.Parent = ESPPREVIEW
+ESPPREVIEW.Visible = falseUICorner_2.Parent = ESPPREVIEW
 
 ImageLabel.Parent = ESPPREVIEW
 ImageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
