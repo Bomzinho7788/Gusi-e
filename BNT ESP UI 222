@@ -1613,7 +1613,7 @@ Tab1:CreateLabel("Geral Settings", 4483362458, Color3.fromRGB(0, 0, 0), false)
 Tab1:CreateToggle({
     Name = "ESP Preview",
     CurrentValue = false,
-    Flag = "Show Box",
+    Flag = "ShowkBox",
     Callback = function(Value)
         game.Players.LocalPlayer.PlayerGui.espp.ESPPREVIEW.Visible = Value
     end,
@@ -1622,7 +1622,7 @@ Tab1:CreateToggle({
 Tab1:CreateToggle({
     Name = "Show Box",
     CurrentValue = false,
-    Flag = "Show Box",
+    Flag = "ShowkBoxh",
     Callback = function(Value)
         _G.boxVisible = Value
     end,
