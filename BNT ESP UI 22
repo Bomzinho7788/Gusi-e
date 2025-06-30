@@ -1,136 +1,1044 @@
-local url = "https://raw.githubusercontent.com/Bomzinho778/Gusi-e/refs/heads/main/BomLib"
-local library = loadstring(game:HttpGet(url))()
+local DrawingLib = {}
+DrawingLib.__index = DrawingLib
 
-local myWindow = library.CreateWindow({Name = "Test"})
-local tabPanel = myWindow:FindFirstChildOfClass("ScrollingFrame")
+local TypeMap = {
+	Square = "Frame",
+	Line = "Frame",
+	Circle = "Frame"
+}
 
-local tab1 = library.CreateTab(myWindow, tabPanel, {
-	Name = "Tab 1",
-	Icon = "rbxassetid://76530199889334"
-})
+local GuiParent = Instance.new("ScreenGui")
+GuiParent.Name = "GuiDrawing"
+GuiParent.ResetOnSpawn = false
+GuiParent.IgnoreGuiInset = true
+GuiParent.DisplayOrder = 999999
+GuiParent.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
-library.CreateToggle(tab1, {
-	Name = "Toggle",
-	Default = false,
-	Callback = function(Value)
-		print("Toggle Value:", Value)
+local function V2(v)
+	return typeof(v) == "Vector2" and UDim2.new(0, v.X, 0, v.Y) or UDim2.new(0, 0, 0, 0)
+end
+
+function DrawingLib.new(Type)
+	local Class = TypeMap[Type]
+	if not Class then
+		warn("Tipo inválido: " .. tostring(Type))
+		return nil
 	end
-})
 
-library.CreateButton(tab1, {
-	Name = "Botão 1",
-	Callback = function()
-		print("Botão 1 foi clicado!")
+	local Object = Instance.new(Class)
+	Object.Name = "Draw_" .. Type
+	Object.AnchorPoint = Vector2.new(0.5, 0.5)
+	Object.BorderSizePixel = 0
+	Object.BackgroundTransparency = 1
+
+	if Type == "Square" then
+		local stroke = Instance.new("UIStroke")
+		stroke.Name = "UIStroke_Main"
+		stroke.Color = Color3.new(1, 1, 1)
+		stroke.Thickness = 1
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		stroke.LineJoinMode = Enum.LineJoinMode.Round
+		stroke.Parent = Object
+
+		local corner = Instance.new("UICorner")
+		corner.Name = "UICorner_Main"
+		corner.CornerRadius = UDim.new(0, 0)
+		corner.Parent = Object
+
+	elseif Type == "Line" then
+		Object.BackgroundColor3 = Color3.new(1, 1, 1)
+		Object.Size = UDim2.new(0, 100, 0, 1)
+		Object.Rotation = 0
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Name = "UIStroke_Main"
+		stroke.Color = Color3.new(1, 1, 1)
+		stroke.Thickness = 1
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		stroke.LineJoinMode = Enum.LineJoinMode.Round
+		stroke.Parent = Object
+
+		local corner = Instance.new("UICorner")
+		corner.Name = "UICorner_Main"
+		corner.CornerRadius = UDim.new(1, 0)
+		corner.Parent = Object
+
+	elseif Type == "Circle" then
+		Object.BackgroundColor3 = Color3.new(1, 1, 1)
+		Object.BackgroundTransparency = 1
+		Object.Size = UDim2.new(0, 50, 0, 50)
+
+		local corner = Instance.new("UICorner")
+		corner.Name = "UICorner_Main"
+		corner.CornerRadius = UDim.new(1, 0)
+		corner.Parent = Object
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Name = "UIStroke_Main"
+		stroke.Color = Color3.new(1, 1, 1)
+		stroke.Thickness = 1
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		stroke.LineJoinMode = Enum.LineJoinMode.Round
+		stroke.Parent = Object
 	end
-})
 
-library.CreateLabel(tab1, {
-	Text = "Label 1",
-})
+	Object.Visible = true
+	Object.Parent = GuiParent
 
-library.CreateWarnLabel(tab1, {
-	Text = "Warning Label 1",
-})
+	local Wrapper = setmetatable({
+		_instance = Object,
+		_type = Type,
+		_from = Vector2.zero,
+		_to = Vector2.new(100, 0),
+		_position = Vector2.zero,
+		_size = Vector2.new(100, Type == "Square" and 100 or (Type == "Circle" and 50 or 1)),
+		_color = Color3.new(1, 1, 1),
+		_transparency = 0,
+		_visible = true,
+		_thickness = 1,
+		_filled = false,
+		_fillColor = Color3.new(1, 1, 1),
+		_fillTransparency = 0.5,
+		_stroke = Object:FindFirstChild("UIStroke_Main"),
+		_corner = Object:FindFirstChild("UICorner_Main"),
+		_cornerRadius = 0
+	}, DrawingLib)
 
-library.CreateInfoLabel(tab1, {
-	Text = "Info Label 1",
-})
-
-library.CreateSlider(tab1, {
-	Name = "Volume",
-	Default = 70,
-	Min = 0,
-	Max = 100,
-	Callback = function(value)
-		print("Volume:", value)
+	if Type == "Line" then
+		Wrapper.From = Wrapper._from
+		Wrapper.To = Wrapper._to
+	else
+		Wrapper.Position = Wrapper._position
+		Wrapper.Size = Wrapper._size
 	end
-})
 
+	Wrapper.Color = Wrapper._color
+	Wrapper.Thickness = Wrapper._thickness
+	Wrapper.Filled = Wrapper._filled
+	Wrapper.FillColor = Wrapper._fillColor
+	Wrapper.FillTransparency = Wrapper._fillTransparency
+	Wrapper.Transparency = Wrapper._transparency
+	Wrapper.Visible = Wrapper._visible
+	Wrapper.CornerRadius = Wrapper._cornerRadius
 
-library.CreateTextBox(tab1, {
-	Name = "Test",
-	Callback = function(text, enterPressed)
-		if enterPressed then
-			print("Texto digitado1:", text)
-		end
-	end
-})
+	return Wrapper
+end
 
-library.CreateDropdown(tab1, {
-	Name = "Dropdown",
-	MultipleOptions = true,
-	Default = {"Option 1", "Option 2"},
-	Options = {"Option 1", "Option 2", "Option 3"},
-	CallBack = function(Options)
-		print("Selected = ", Options)
-	end
-})
-
-local tab2 = library.CreateTab(myWindow, tabPanel, {
-	Name = "Tab 2",
-	Icon = "rbxassetid://92817821432465"
-})
-
-library.CreateToggle(tab2, {
-	Name = "Toggle 1 tab 2",
-	Default = false,
-	Callback = function(Value)
-		print("Tab 2 Toggle Value:", Value)
-	end
-})
-
-library.CreateButton(tab2, {
-	Name = "Botão 2",
-	Callback = function()
-		print("Botão 2 foi clicado!")
-	end
-})
-
-library.CreateLabel(tab2, {
-	Text = "Label 2",
-})
-
-library.CreateWarnLabel(tab2, {
-	Text = "Warning Label 2",
-})
-
-library.CreateInfoLabel(tab2, {
-	Text = "Info Label 2",
-})
-
-library.CreateTextBox(tab2, {
-	Name = "Test2",
-	Callback = function(text, enterPressed)
-		if enterPressed then
-			print("Texto digitado1:", text)
-		end
-	end
-})
-
-library.CreateDropdown(tab2, {
-	Name = "Dropdown",
-	MultipleOptions = false,
-	Default = {"Option 1"},
-	Options = {"Option 1", "Option 2", "Option 3"},
-	CallBack = function(Options)
-		print("Selected = ", Options)
-	end
-})
-
-library.CreateSlider(tab2, {
-	Name = "Volume",
-	Default = 5024,
-	Min = 553,
-	Max = 10520,
-	Callback = function(value)
-		print("Volume:", value)
-	end
-})
-
--- Mostra a primeira aba por padrão
-for _, tab in ipairs(myWindow:GetChildren()) do
-	if tab:IsA("ScrollingFrame") and tab.Parent == myWindow then
-		tab.Visible = false
+function DrawingLib:__index(key)
+	if DrawingLib[key] then
+		return DrawingLib[key]
+	elseif rawget(self, "_" .. key) ~= nil then
+		return rawget(self, "_" .. key)
 	end
 end
-tab1.Visible = true
+
+function DrawingLib:__newindex(key, value)
+	local inst = self._instance
+	if key == "Position" and (self._type == "Square" or self._type == "Circle") then
+		self._position = typeof(value) == "Vector2" and value or Vector2.zero
+		inst.Position = V2(self._position)
+
+	elseif key == "From" and self._type == "Line" then
+		self._from = typeof(value) == "Vector2" and value or Vector2.zero
+		self:UpdateLine()
+
+	elseif key == "To" and self._type == "Line" then
+		self._to = typeof(value) == "Vector2" and value or Vector2.new(100, 0)
+		self:UpdateLine()
+
+	elseif key == "Size" and (self._type == "Square" or self._type == "Circle") then
+		self._size = typeof(value) == "Vector2" and value or Vector2.new(100, self._type == "Square" and 100 or 50)
+		inst.Size = V2(self._size)
+
+	elseif key == "Color" then
+		self._color = typeof(value) == "Color3" and value or Color3.new(1, 1, 1)
+		if self._stroke then
+			self._stroke.Color = self._color
+		end
+		if self._type == "Line" then
+			inst.BackgroundColor3 = self._color
+		end
+
+	elseif key == "Transparency" then
+		self._transparency = math.clamp(tonumber(value) or 0, 0, 1)
+		if self._stroke then
+			self._stroke.Transparency = self._transparency
+		end
+		if self._type == "Line" then
+			inst.BackgroundTransparency = self._transparency
+		end
+
+	elseif key == "Visible" then
+		self._visible = value and true or false
+		inst.Visible = self._visible
+
+	elseif key == "Thickness" then
+		self._thickness = math.max(tonumber(value) or 1, 1)
+		if self._stroke then
+			self._stroke.Thickness = self._thickness
+		end
+		if self._type == "Line" then
+			inst.Size = UDim2.new(0, self._thickness, 0, self._thickness)
+			self:UpdateLine()
+		end
+
+	elseif key == "Filled" then
+		self._filled = value and true or false
+		if self._type == "Square" or self._type == "Circle" then
+			inst.BackgroundTransparency = self._filled and self._fillTransparency or 1
+			inst.BackgroundColor3 = self._fillColor
+		end
+
+	elseif key == "FillColor" then
+		self._fillColor = typeof(value) == "Color3" and value or Color3.new(1, 1, 1)
+		if (self._type == "Square" or self._type == "Circle") and self._filled then
+			inst.BackgroundColor3 = self._fillColor
+		end
+
+	elseif key == "FillTransparency" then
+		self._fillTransparency = math.clamp(tonumber(value) or 0.5, 0, 1)
+		if (self._type == "Square" or self._type == "Circle") and self._filled then
+			inst.BackgroundTransparency = self._fillTransparency
+		end
+
+	elseif key == "CornerRadius" then
+		self._cornerRadius = math.max(tonumber(value) or 0, 0)
+		if self._corner then
+			if self._type == "Circle" then
+				self._corner.CornerRadius = UDim.new(1, 0)
+			else
+				self._corner.CornerRadius = UDim.new(0, self._cornerRadius)
+			end
+		end
+	else
+		rawset(self, key, value)
+	end
+end
+
+function DrawingLib:UpdateLine()
+	if self._type ~= "Line" then return end
+
+	local from = self._from
+	local to = self._to
+	local inst = self._instance
+
+	local delta = to - from
+	local distance = delta.Magnitude
+	local center = (from + to) / 2
+
+	inst.Position = V2(center)
+	inst.Size = UDim2.new(0, distance, 0, self._thickness)
+	inst.Rotation = math.deg(math.atan2(delta.Y, delta.X))
+end
+
+function DrawingLib:Destroy()
+	if self._instance then
+		self._instance:Destroy()
+	end
+end
+
+local ESP = {
+	Enabled = true,
+	TeamCheck = true,
+	TeamColors = {
+		Friendly = Color3.fromRGB(0, 255, 140),
+		Enemy = Color3.fromRGB(255, 80, 80),
+		Neutral = Color3.fromRGB(255, 255, 100)
+	},
+
+	Box = {
+		Enabled = true,
+		Color = Color3.fromRGB(255, 80, 80),
+		Thickness = 1,
+		Transparency = 0,
+		Filled = true,
+		FillColor = Color3.fromRGB(255, 60, 60),
+		FillTransparency = 0.75,
+		CornerRadius = 2,
+
+		OuterOutline = {
+			Enabled = true,
+			Color = Color3.fromRGB(10, 10, 10),
+			Thickness = 1,
+			Transparency = 0
+		},
+
+		InnerOutline = {
+			Enabled = true,
+			Color = Color3.fromRGB(0, 0, 0),
+			Thickness = 1,
+			Transparency = 0
+		}
+	},
+
+	HeadCircle = {
+		Enabled = true,
+		Color = Color3.fromRGB(255, 80, 80),
+		Thickness = 1,
+		Transparency = 0,
+		Filled = true,
+		FillColor = Color3.fromRGB(255, 80, 80),
+		FillTransparency = 0.5,
+
+		OuterOutline = {
+			Enabled = true,
+			Color = Color3.fromRGB(0, 0, 0),
+			Thickness = 1,
+			Transparency = 0
+		},
+
+		InnerOutline = {
+			Enabled = true,
+			Color = Color3.fromRGB(10, 10, 10),
+			Thickness = 1,
+			Transparency = 0
+		}
+	},
+
+	Skeleton = {
+		Enabled = true,
+		Color = Color3.fromRGB(255, 80, 80),
+		Thickness = 1,
+		Transparency = 0,
+
+		Outline = {
+			Enabled = true,
+			Color = Color3.fromRGB(0, 0, 0),
+			Thickness = 1,
+			Transparency = 0
+		}
+	},
+
+	Tracer = {
+		Enabled = true,
+		Color = Color3.fromRGB(255, 80, 80),
+		Thickness = 1,
+		Transparency = 0,
+
+		Outline = {
+			Enabled = true,
+			Color = Color3.fromRGB(0, 0, 0),
+			Thickness = 1,
+			Transparency = 0
+		},
+
+		From = "Bottom",
+	},
+
+	LocalPlayer = {
+		Enabled = false,
+		Color = Color3.fromRGB(0, 255, 255),
+
+		Box = {
+			Enabled = true,
+			Thickness = 1,
+			Transparency = 0,
+			Filled = true,
+			FillColor = Color3.fromRGB(0, 170, 170),
+			FillTransparency = 0.7,
+			CornerRadius = 2,
+
+			OuterOutline = {
+				Enabled = true,
+				Color = Color3.fromRGB(10, 10, 10),
+				Thickness = 1,
+				Transparency = 0
+			},
+
+			InnerOutline = {
+				Enabled = true,
+				Color = Color3.fromRGB(0, 0, 0),
+				Thickness = 1,
+				Transparency = 0
+			}
+		},
+
+		HeadCircle = {
+			Enabled = true,
+			Thickness = 1,
+			Transparency = 0,
+			Filled = true,
+			FillColor = Color3.fromRGB(0, 255, 255),
+			FillTransparency = 0.5,
+
+			OuterOutline = {
+				Enabled = true,
+				Color = Color3.fromRGB(0, 0, 0),
+				Thickness = 2,
+				Transparency = 0
+			},
+
+			InnerOutline = {
+				Enabled = true,
+				Color = Color3.fromRGB(10, 10, 10),
+				Thickness = 1,
+				Transparency = 0
+			}
+		},
+
+		Skeleton = {
+			Enabled = true,
+			Thickness = 1,
+			Transparency = 0,
+
+			Outline = {
+				Enabled = true,
+				Color = Color3.fromRGB(0, 0, 0),
+				Thickness = 1,
+				Transparency = 0
+			}
+		},
+		
+		Tracer = {
+			Enabled = true,
+			Color = Color3.fromRGB(0, 255, 255),
+			Thickness = 1,
+			Transparency = 0,
+
+			Outline = {
+				Enabled = true,
+				Color = Color3.fromRGB(0, 0, 0),
+				Thickness = 1,
+				Transparency = 0
+			},
+
+			From = "Bottom"
+		}
+	},
+
+	Settings = {
+		SearchDescendants = true,
+		CheckInterval = 0.25,
+		ShowTeam = false
+	}
+}
+
+local cache = {}
+local lastCheckTime = 0
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local R6Connections = {
+	["Head"] = {"Torso"},
+	["Torso"] = {"Left Arm", "Right Arm", "Left Leg", "Right Leg"},
+	["Left Arm"] = {"LeftHand"},
+	["Right Arm"] = {"RightHand"},
+	["Left Leg"] = {"LeftFoot"},
+	["Right Leg"] = {"RightFoot"}
+}
+
+local R15Connections = {
+	["Head"] = {"UpperTorso"},
+	["UpperTorso"] = {"LowerTorso", "LeftUpperArm", "RightUpperArm"},
+	["LowerTorso"] = {"LeftUpperLeg", "RightUpperLeg"},
+	["LeftUpperArm"] = {"LeftLowerArm"},
+	["LeftLowerArm"] = {"LeftHand"},
+	["RightUpperArm"] = {"RightLowerArm"},
+	["RightLowerArm"] = {"RightHand"},
+	["LeftUpperLeg"] = {"LeftLowerLeg"},
+	["LeftLowerLeg"] = {"LeftFoot"},
+	["RightUpperLeg"] = {"RightLowerLeg"},
+	["RightLowerLeg"] = {"RightFoot"}
+}
+
+local function shouldHaveESP(instance)
+	return instance:FindFirstChild("HumanoidRootPart") and instance:FindFirstChildOfClass("Humanoid")
+end
+
+local function findESPObjects()
+	local objects = {}
+
+	if ESP.LocalPlayer.Enabled and LocalPlayer.Character then
+		table.insert(objects, LocalPlayer.Character)
+	end
+
+	local function searchIn(container)
+		for _, child in ipairs(container:GetChildren()) do
+			if shouldHaveESP(child) then
+				if not Players:GetPlayerFromCharacter(child) or Players:GetPlayerFromCharacter(child) ~= LocalPlayer then
+					table.insert(objects, child)
+				end
+			elseif ESP.Settings.SearchDescendants and (child:IsA("Folder") or child:IsA("Model")) then
+				searchIn(child)
+			end
+		end
+	end
+
+	searchIn(workspace)
+	return objects
+end
+
+local function getTeamColor(player)
+	if not ESP.TeamCheck then return ESP.Box.Color end
+
+	if player == LocalPlayer then
+		return ESP.LocalPlayer.Color
+	end
+
+	if player.Team == LocalPlayer.Team then
+		return ESP.Settings.ShowTeam and ESP.TeamColors.Friendly or nil
+	else
+		return ESP.TeamColors.Enemy
+	end
+end
+
+local function createESP(object)
+	if cache[object] then return cache[object] end
+
+	local player = Players:GetPlayerFromCharacter(object)
+	local isLocalPlayer = player == LocalPlayer
+	local teamColor = player and getTeamColor(player) or ESP.Box.Color
+
+	if ESP.TeamCheck and player and player.Team == LocalPlayer.Team and not ESP.Settings.ShowTeam and not isLocalPlayer then
+		return nil
+	end
+
+	local boxColor = isLocalPlayer and ESP.LocalPlayer.Color or teamColor or ESP.Box.Color
+	local headCircleColor = isLocalPlayer and ESP.LocalPlayer.Color or teamColor or ESP.HeadCircle.Color
+	local skeletonColor = isLocalPlayer and ESP.LocalPlayer.Color or teamColor or ESP.Skeleton.Color
+	local tracerColor = isLocalPlayer and ESP.LocalPlayer.Color or teamColor or ESP.Tracer.Color
+
+	local esp = {
+		box = DrawingLib.new("Square"),
+		outerOutline = DrawingLib.new("Square"),
+		innerOutline = DrawingLib.new("Square"),
+		headCircle = DrawingLib.new("Circle"),
+		headCircleOuterOutline = DrawingLib.new("Circle"),
+		headCircleInnerOutline = DrawingLib.new("Circle"),
+		tracer = DrawingLib.new("Line"),
+		object = object,
+		isLocalPlayer = isLocalPlayer,
+		player = player
+	}
+
+	local boxConfig = isLocalPlayer and ESP.LocalPlayer.Box or ESP.Box
+	esp.box.Color = boxColor
+	esp.box.Thickness = boxConfig.Thickness
+	esp.box.Transparency = boxConfig.Transparency
+	esp.box.Filled = boxConfig.Filled
+	esp.box.FillColor = isLocalPlayer and boxConfig.FillColor or boxColor
+	esp.box.FillTransparency = boxConfig.FillTransparency
+	esp.box.CornerRadius = boxConfig.CornerRadius
+
+	esp.outerOutline.Color = boxConfig.OuterOutline.Color
+	esp.outerOutline.Thickness = boxConfig.OuterOutline.Thickness
+	esp.outerOutline.Transparency = boxConfig.OuterOutline.Transparency
+	esp.outerOutline.Filled = false
+	esp.outerOutline.CornerRadius = boxConfig.CornerRadius + 1
+
+	esp.innerOutline.Color = boxConfig.InnerOutline.Color
+	esp.innerOutline.Thickness = boxConfig.InnerOutline.Thickness
+	esp.innerOutline.Transparency = boxConfig.InnerOutline.Transparency
+	esp.innerOutline.Filled = false
+	esp.innerOutline.CornerRadius = boxConfig.CornerRadius - 1
+
+	local headCircleConfig = isLocalPlayer and ESP.LocalPlayer.HeadCircle or ESP.HeadCircle
+	esp.headCircle.Color = headCircleColor
+	esp.headCircle.Thickness = headCircleConfig.Thickness
+	esp.headCircle.Transparency = headCircleConfig.Transparency
+	esp.headCircle.Filled = headCircleConfig.Filled
+	esp.headCircle.FillColor = isLocalPlayer and headCircleConfig.FillColor or headCircleColor
+	esp.headCircle.FillTransparency = headCircleConfig.FillTransparency
+	esp.headCircle._corner.CornerRadius = UDim.new(1, 0)
+
+	esp.headCircleOuterOutline.Color = headCircleConfig.OuterOutline.Color
+	esp.headCircleOuterOutline.Thickness = headCircleConfig.OuterOutline.Thickness
+	esp.headCircleOuterOutline.Transparency = headCircleConfig.OuterOutline.Transparency
+	esp.headCircleOuterOutline.Filled = false
+	esp.headCircleOuterOutline._corner.CornerRadius = UDim.new(1, 0)
+
+	esp.headCircleInnerOutline.Color = headCircleConfig.InnerOutline.Color
+	esp.headCircleInnerOutline.Thickness = headCircleConfig.InnerOutline.Thickness
+	esp.headCircleInnerOutline.Transparency = headCircleConfig.InnerOutline.Transparency
+	esp.headCircleInnerOutline.Filled = false
+	esp.headCircleInnerOutline._corner.CornerRadius = UDim.new(1, 0)
+
+	local tracerConfig = isLocalPlayer and ESP.LocalPlayer.Tracer or ESP.Tracer
+	esp.tracer.Color = tracerColor
+	esp.tracer.Thickness = tracerConfig.Thickness
+	esp.tracer.Transparency = tracerConfig.Transparency
+
+	if tracerConfig.Outline.Enabled then
+		esp.tracer._stroke.Color = tracerConfig.Outline.Color
+		esp.tracer._stroke.Thickness = tracerConfig.Outline.Thickness + tracerConfig.Thickness
+		esp.tracer._stroke.Transparency = tracerConfig.Outline.Transparency
+	end
+
+	if (isLocalPlayer and ESP.LocalPlayer.Skeleton.Enabled) or (not isLocalPlayer and ESP.Skeleton.Enabled) then
+		esp.skeletonLines = {}
+
+		local skeletonConfig = isLocalPlayer and ESP.LocalPlayer.Skeleton or ESP.Skeleton
+		local function createLine()
+			local line = DrawingLib.new("Line")
+			line.Color = skeletonColor
+			line.Thickness = skeletonConfig.Thickness
+			line.Transparency = skeletonConfig.Transparency
+
+			if skeletonConfig.Outline.Enabled then
+				line._stroke.Color = skeletonConfig.Outline.Color
+				line._stroke.Thickness = skeletonConfig.Outline.Thickness + skeletonConfig.Thickness
+				line._stroke.Transparency = skeletonConfig.Outline.Transparency
+			end
+
+			return line
+		end
+
+		for i = 1, 20 do
+			table.insert(esp.skeletonLines, createLine())
+		end
+	end
+
+	cache[object] = esp
+	return esp
+end
+
+local function updateSkeleton(esp)
+	local skeletonConfig = esp.isLocalPlayer and ESP.LocalPlayer.Skeleton or ESP.Skeleton
+	if not skeletonConfig.Enabled or not esp.skeletonLines then return end
+
+	local character = esp.object
+	if not character or not character.Parent then return end
+
+	local isR15 = false
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		isR15 = humanoid.RigType == Enum.HumanoidRigType.R15
+	end
+
+	local connections = isR15 and R15Connections or R6Connections
+	local lineIndex = 1
+
+	local function drawLine(part1Name, part2Name)
+		local part1 = character:FindFirstChild(part1Name)
+		local part2 = character:FindFirstChild(part2Name)
+
+		if part1 and part2 and esp.skeletonLines[lineIndex] then
+			local pos1 = Camera:WorldToViewportPoint(part1.Position)
+			local pos2 = Camera:WorldToViewportPoint(part2.Position)
+
+			if pos1.Z > 0 and pos2.Z > 0 then
+				local line = esp.skeletonLines[lineIndex]
+				line.From = Vector2.new(pos1.X, pos1.Y)
+				line.To = Vector2.new(pos2.X, pos2.Y)
+				line.Visible = ESP.Enabled and (ESP.LocalPlayer.Enabled or not esp.isLocalPlayer)
+				lineIndex = lineIndex + 1
+			end
+		end
+	end
+
+	local minVec, maxVec = nil, nil
+	local headSize = Vector2.new(0, 0)
+	local headPosition = Vector2.new(0, 0)
+	local parts = {}
+
+	if isR15 then
+		parts = {
+			character:FindFirstChild("Head"),
+			character:FindFirstChild("UpperTorso"),
+			character:FindFirstChild("LowerTorso"),
+			character:FindFirstChild("LeftUpperArm"),
+			character:FindFirstChild("RightUpperArm"),
+			character:FindFirstChild("LeftUpperLeg"),
+			character:FindFirstChild("RightUpperLeg"),
+		}
+	else
+		parts = {
+			character:FindFirstChild("Head"),
+			character:FindFirstChild("Torso"),
+			character:FindFirstChild("Left Arm"),
+			character:FindFirstChild("Right Arm"),
+			character:FindFirstChild("Left Leg"),
+			character:FindFirstChild("Right Leg"),
+		}
+	end
+
+	for _, part in ipairs(parts) do
+		if part then
+			local cf = part.CFrame
+			local size = part.Size / 2
+			local corners = {
+				cf * Vector3.new( size.X,  size.Y,  size.Z),
+				cf * Vector3.new(-size.X,  size.Y,  size.Z),
+				cf * Vector3.new( size.X, -size.Y,  size.Z),
+				cf * Vector3.new(-size.X, -size.Y,  size.Z),
+				cf * Vector3.new( size.X,  size.Y, -size.Z),
+				cf * Vector3.new(-size.X,  size.Y, -size.Z),
+				cf * Vector3.new( size.X, -size.Y, -size.Z),
+				cf * Vector3.new(-size.X, -size.Y, -size.Z),
+			}
+
+			for _, worldPoint in ipairs(corners) do
+				local screenPoint = Camera:WorldToViewportPoint(worldPoint)
+				if screenPoint.Z > 0 then
+					local screenPos2D = Vector2.new(screenPoint.X, screenPoint.Y)
+					if not minVec then
+						minVec = screenPos2D
+						maxVec = screenPos2D
+					else
+						minVec = Vector2.new(math.min(minVec.X, screenPos2D.X), math.min(minVec.Y, screenPos2D.Y))
+						maxVec = Vector2.new(math.max(maxVec.X, screenPos2D.X), math.max(maxVec.Y, screenPos2D.Y))
+					end
+				end
+			end
+
+			if part.Name == "Head" then
+				local headScreenPos = Camera:WorldToViewportPoint(part.Position)
+				if headScreenPos.Z > 0 then
+					local headTop = Camera:WorldToViewportPoint(part.Position + Vector3.new(0, part.Size.Y/2, 0))
+					local headBottom = Camera:WorldToViewportPoint(part.Position - Vector3.new(0, part.Size.Y/2, 0))
+					if headTop.Z > 0 and headBottom.Z > 0 then
+						local headHeight = (headTop.Y - headBottom.Y)
+						local headWidth = headHeight
+						headSize = Vector2.new(headWidth, headHeight)
+						headPosition = Vector2.new(headScreenPos.X, headScreenPos.Y)
+					end
+				end
+			end
+		end
+	end
+
+	if not headSize or headSize.X == 0 or headSize.Y == 0 then
+		headSize = Vector2.new(10, 10)
+	end
+
+	for part1, connectedParts in pairs(connections) do
+		for _, part2 in ipairs(connectedParts) do
+			if character:FindFirstChild(part1) and not (part1 == "Head" and (part2 == (isR15 and "UpperTorso" or "Torso"))) then
+				drawLine(part1, part2)
+			end
+		end
+	end
+
+	if character:FindFirstChild("Head") and character:FindFirstChild(isR15 and "UpperTorso" or "Torso") then
+		local torsoPart = character:FindFirstChild(isR15 and "UpperTorso" or "Torso")
+		local torsoScreenPosData = Camera:WorldToViewportPoint(torsoPart.Position)
+
+		if torsoScreenPosData.Z > 0 then
+			local torsoScreenPos = Vector2.new(torsoScreenPosData.X, torsoScreenPosData.Y)
+
+			local headPart = character:FindFirstChild("Head")
+			local headBaseWorldPos = headPart.Position - Vector3.new(0, headPart.Size.Y / 2, 0)
+
+			local headBaseScreenPosData = Camera:WorldToViewportPoint(headBaseWorldPos)
+			if headBaseScreenPosData.Z > 0 then
+				local headBaseScreenPos = Vector2.new(headBaseScreenPosData.X, headBaseScreenPosData.Y)
+
+				if lineIndex <= #esp.skeletonLines then
+					local line = esp.skeletonLines[lineIndex]
+					line.From = torsoScreenPos
+					line.To = headBaseScreenPos
+					line.Visible = ESP.Enabled and (ESP.LocalPlayer.Enabled or not esp.isLocalPlayer)
+					lineIndex = lineIndex + 1
+				end
+			end
+		end
+	end
+
+	for i = lineIndex, #esp.skeletonLines do
+		esp.skeletonLines[i].Visible = false
+	end
+end
+
+local function updateTracer(esp)
+	local tracerConfig = esp.isLocalPlayer and ESP.LocalPlayer.Tracer or ESP.Tracer
+	if not tracerConfig.Enabled then
+		esp.tracer.Visible = false
+		return
+	end
+
+	local character = esp.object
+	if not character or not character.Parent then return end
+
+	local rootPart = character:FindFirstChild("HumanoidRootPart")
+	if not rootPart then return end
+
+	local rootPos = Camera:WorldToViewportPoint(rootPart.Position)
+	if rootPos.Z <= 0 then
+		esp.tracer.Visible = false
+		return
+	end
+
+	local viewportSize = Camera.ViewportSize
+	local fromPosition
+
+	if tracerConfig.From == "Top" then
+		fromPosition = Vector2.new(viewportSize.X / 2, 0)
+	elseif tracerConfig.From == "Center" then
+		fromPosition = Vector2.new(viewportSize.X / 2, viewportSize.Y / 2)
+	else -- Default "Bottom"
+		fromPosition = Vector2.new(viewportSize.X / 2, viewportSize.Y)
+	end
+
+	local toPosition = Vector2.new(rootPos.X, rootPos.Y)
+
+	esp.tracer.From = fromPosition
+	esp.tracer.To = toPosition
+	esp.tracer.Visible = ESP.Enabled and (ESP.LocalPlayer.Enabled or not esp.isLocalPlayer)
+end
+
+local function updateESP(esp)
+	local object = esp.object
+	if not object or not object.Parent or not object:FindFirstChild("HumanoidRootPart") then
+		return false
+	end
+
+	local rootPart = object:FindFirstChild("HumanoidRootPart")
+	if not rootPart then return false end
+
+	if esp.player and ESP.TeamCheck then
+		local teamColor = getTeamColor(esp.player)
+		if teamColor then
+			if not esp.isLocalPlayer then
+				esp.box.Color = teamColor
+				esp.box.FillColor = teamColor
+				esp.headCircle.Color = teamColor
+				esp.headCircle.FillColor = teamColor
+				esp.tracer.Color = teamColor
+				if esp.skeletonLines then
+					for _, line in ipairs(esp.skeletonLines) do
+						line.Color = teamColor
+					end
+				end
+			end
+		end
+	end
+
+	local camera = workspace.CurrentCamera
+	local parts = {}
+
+	for _, part in ipairs(object:GetChildren()) do
+		if part:IsA("BasePart") and part.Transparency < 1 then
+			table.insert(parts, part)
+		end
+	end
+
+	if #parts == 0 then
+		esp.box.Visible = false
+		esp.outerOutline.Visible = false
+		esp.innerOutline.Visible = false
+		esp.headCircle.Visible = false
+		esp.headCircleOuterOutline.Visible = false
+		esp.headCircleInnerOutline.Visible = false
+		esp.tracer.Visible = false
+		if esp.skeletonLines then
+			for _, line in ipairs(esp.skeletonLines) do
+				line.Visible = false
+			end
+		end
+		return false
+	end
+
+	local minVec, maxVec = nil, nil
+	local headPart = object:FindFirstChild("Head")
+	local headSize = Vector2.zero
+	local headPosition = Vector2.zero
+
+	for _, part in ipairs(parts) do
+		local cf = part.CFrame
+		local size = part.Size / 2
+		local corners = {
+			cf * Vector3.new( size.X,  size.Y,  size.Z),
+			cf * Vector3.new(-size.X,  size.Y,  size.Z),
+			cf * Vector3.new( size.X, -size.Y,  size.Z),
+			cf * Vector3.new(-size.X, -size.Y,  size.Z),
+			cf * Vector3.new( size.X,  size.Y, -size.Z),
+			cf * Vector3.new(-size.X,  size.Y, -size.Z),
+			cf * Vector3.new( size.X, -size.Y, -size.Z),
+			cf * Vector3.new(-size.X, -size.Y, -size.Z),
+		}
+
+		for _, worldPoint in ipairs(corners) do
+			local screenPoint = camera:WorldToViewportPoint(worldPoint)
+			if screenPoint.Z > 0 then
+				if not minVec then
+					minVec = Vector2.new(screenPoint.X, screenPoint.Y)
+					maxVec = Vector2.new(screenPoint.X, screenPoint.Y)
+				else
+					minVec = Vector2.new(math.min(minVec.X, screenPoint.X), math.min(minVec.Y, screenPoint.Y))
+					maxVec = Vector2.new(math.max(maxVec.X, screenPoint.X), math.max(maxVec.Y, screenPoint.Y))
+				end
+			end
+		end
+
+		if part.Name == "Head" then
+			local headScreenPos = camera:WorldToViewportPoint(part.Position)
+			if headScreenPos.Z > 0 then
+				local headTop = camera:WorldToViewportPoint(part.Position + Vector3.new(0, part.Size.Y/2, 0))
+				local headBottom = camera:WorldToViewportPoint(part.Position - Vector3.new(0, part.Size.Y/2, 0))
+				if headTop.Z > 0 and headBottom.Z > 0 then
+					local headHeight = (headTop.Y - headBottom.Y)
+					local headWidth = headHeight
+					headSize = Vector2.new(headWidth, headHeight)
+					headPosition = Vector2.new(headScreenPos.X, headScreenPos.Y)
+				end
+			end
+		end
+	end
+
+	if not minVec or not maxVec then
+		esp.box.Visible = false
+		esp.outerOutline.Visible = false
+		esp.innerOutline.Visible = false
+		esp.headCircle.Visible = false
+		esp.headCircleOuterOutline.Visible = false
+		esp.headCircleInnerOutline.Visible = false
+		esp.tracer.Visible = false
+		if esp.skeletonLines then
+			for _, line in ipairs(esp.skeletonLines) do
+				line.Visible = false
+			end
+		end
+		return false
+	end
+
+	local width = maxVec.X - minVec.X
+	local height = maxVec.Y - minVec.Y
+	local center = (minVec + maxVec) / 2
+
+	local shouldShow = ESP.Enabled and (ESP.LocalPlayer.Enabled or not esp.isLocalPlayer)
+
+	local boxConfig = esp.isLocalPlayer and ESP.LocalPlayer.Box or ESP.Box
+	esp.box.Size = Vector2.new(width, height)
+	esp.box.Position = center
+	esp.box.Visible = shouldShow and boxConfig.Enabled
+
+	if boxConfig.OuterOutline.Enabled then
+		esp.outerOutline.Size = Vector2.new(width + (boxConfig.OuterOutline.Thickness * 2), height + (boxConfig.OuterOutline.Thickness * 2))
+		esp.outerOutline.Position = center
+		esp.outerOutline.Visible = shouldShow and boxConfig.Enabled
+	else
+		esp.outerOutline.Visible = false
+	end
+
+	if boxConfig.InnerOutline.Enabled then
+		esp.innerOutline.Size = Vector2.new(width - (boxConfig.InnerOutline.Thickness * 2), height - (boxConfig.InnerOutline.Thickness * 2))
+		esp.innerOutline.Position = center
+		esp.innerOutline.Visible = shouldShow and boxConfig.Enabled
+	else
+		esp.innerOutline.Visible = false
+	end
+
+	local headCircleConfig = esp.isLocalPlayer and ESP.LocalPlayer.HeadCircle or ESP.HeadCircle
+	if headCircleConfig.Enabled and headSize ~= Vector2.zero and headPosition ~= Vector2.zero then
+		local diameter = math.max(headSize.X, headSize.Y)
+		headSize = Vector2.new(diameter, diameter)
+
+		esp.headCircle.Size = headSize
+		esp.headCircle.Position = headPosition
+		esp.headCircle.Visible = shouldShow and headCircleConfig.Enabled
+
+		if headCircleConfig.OuterOutline.Enabled then
+			esp.headCircleOuterOutline.Size = headSize + Vector2.new(headCircleConfig.OuterOutline.Thickness * 2, headCircleConfig.OuterOutline.Thickness * 2)
+			esp.headCircleOuterOutline.Position = headPosition
+			esp.headCircleOuterOutline.Visible = shouldShow and headCircleConfig.Enabled
+		else
+			esp.headCircleOuterOutline.Visible = false
+		end
+
+		if headCircleConfig.InnerOutline.Enabled then
+			esp.headCircleInnerOutline.Size = headSize - Vector2.new(headCircleConfig.InnerOutline.Thickness * 2, headCircleConfig.InnerOutline.Thickness * 2)
+			esp.headCircleInnerOutline.Position = headPosition
+			esp.headCircleInnerOutline.Visible = shouldShow and headCircleConfig.Enabled
+		else
+			esp.headCircleInnerOutline.Visible = false
+		end
+	else
+		esp.headCircle.Visible = false
+		esp.headCircleOuterOutline.Visible = false
+		esp.headCircleInnerOutline.Visible = false
+	end
+
+	updateTracer(esp)
+
+	updateSkeleton(esp)
+
+	return true
+end
+
+local function cleanCache()
+	for object, esp in pairs(cache) do
+		if not object or not object.Parent or not object:FindFirstChild("HumanoidRootPart") then
+			esp.box:Destroy()
+			esp.outerOutline:Destroy()
+			esp.innerOutline:Destroy()
+			esp.headCircle:Destroy()
+			esp.headCircleOuterOutline:Destroy()
+			esp.headCircleInnerOutline:Destroy()
+			esp.tracer:Destroy()
+			if esp.skeletonLines then
+				for _, line in ipairs(esp.skeletonLines) do
+					line:Destroy()
+				end
+			end
+			cache[object] = nil
+		end
+	end
+end
+
+local function checkNewObjects()
+	local currentTime = os.clock()
+	if currentTime - lastCheckTime < ESP.Settings.CheckInterval then
+		return
+	end
+	lastCheckTime = currentTime
+
+	local objects = findESPObjects()
+	for _, object in ipairs(objects) do
+		if not cache[object] then
+			createESP(object)
+		end
+	end
+end
+
+local function espLoop()
+	cleanCache()
+	checkNewObjects()
+
+	if not ESP.Enabled then
+		for _, esp in pairs(cache) do
+			esp.box.Visible = false
+			esp.outerOutline.Visible = false
+			esp.innerOutline.Visible = false
+			esp.headCircle.Visible = false
+			esp.headCircleOuterOutline.Visible = false
+			esp.headCircleInnerOutline.Visible = false
+			esp.tracer.Visible = false
+			if esp.skeletonLines then
+				for _, line in ipairs(esp.skeletonLines) do
+					line.Visible = false
+				end
+			end
+		end
+		return
+	end
+
+	for _, esp in pairs(cache) do
+		updateESP(esp)
+	end
+end
+
+RunService:BindToRenderStep("ESPUpdate", Enum.RenderPriority.Last.Value, espLoop)
+
+local function cleanup()
+	RunService:UnbindFromRenderStep("ESPUpdate")
+	for _, esp in pairs(cache) do
+		esp.box:Destroy()
+		esp.outerOutline:Destroy()
+		esp.innerOutline:Destroy()
+		esp.headCircle:Destroy()
+		esp.headCircleOuterOutline:Destroy()
+		esp.headCircleInnerOutline:Destroy()
+		esp.tracer:Destroy()
+		if esp.skeletonLines then
+			for _, line in ipairs(esp.skeletonLines) do
+				line:Destroy()
+			end
+		end
+	end
+	table.clear(cache)
+end
+
+return ESP
